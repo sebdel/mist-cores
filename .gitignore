@@ -6,3 +6,7 @@ greybox_tmp/
 *.summary
 *.done
 *.bak
+PLLJ_PLLSPE_INFO.txt
+*.jdi
+*.pin
+*.sof
