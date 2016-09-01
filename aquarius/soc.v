@@ -49,12 +49,12 @@ wire cpu_clock;
 // the configuration string is returned to the io controller to allow
 // it to control the menu on the OSD 
 parameter CONF_STR = {
-        "AQUARIUS;;",
+        "AQUARIUS;BIN;",
         "O1,Scanlines,On,Off;",
         "T2,Reset"
 };
 
-parameter CONF_STR_LEN = 10+20+8;
+parameter CONF_STR_LEN = 13+20+8;
 
 // the status register is controlled by the on screen display (OSD)
 wire [7:0] status;
@@ -65,10 +65,10 @@ wire ps2_kbd_clk, ps2_kbd_data;
 user_io #(.STRLEN(CONF_STR_LEN)) user_io ( 
 		.conf_str   ( CONF_STR   ),
 
-		.SPI_CLK    ( SPI_SCK    ),
-      .SPI_SS_IO  ( CONF_DATA0 ),
-      .SPI_MISO   ( SPI_DO     ),
-      .SPI_MOSI   ( SPI_DI     ),
+		.SPI_SCK    ( SPI_SCK    ),
+      .CONF_DATA0 ( CONF_DATA0 ),
+      .SPI_DO     ( SPI_DO     ),
+      .SPI_DI     ( SPI_DI     ),
 
 		.status     ( status     ),
 		
@@ -129,15 +129,17 @@ vga vga (
 reg [7:0] cpu_reset_cnt = 8'h00;
 wire cpu_reset = (cpu_reset_cnt != 255);
 always @(posedge cpu_clock) begin
-	if ( dio_download )
-		rom_loaded <= 1'b1;
-	if(!pll_locked || status[0] || status[2] || dio_download)
+	if(!pll_locked || status[0] || status[2] || dio_download) begin
 		cpu_reset_cnt <= 8'd0;
-	else 
+	end else 
 		if(cpu_reset_cnt != 255)
 			cpu_reset_cnt <= cpu_reset_cnt + 8'd1;
 end
-			
+
+always @(negedge dio_download) begin
+	rom_loaded <= 1'b1;
+end			
+
 // CPU control signals
 wire [15:0] cpu_addr;
 wire [7:0] cpu_din;

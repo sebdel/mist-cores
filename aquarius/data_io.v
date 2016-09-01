@@ -42,6 +42,10 @@ module data_io (
 // spi client
 // *********************************************************************************
 
+// filter spi clock. the 8 bit gate delay is ~2.5ns in total
+wire [7:0] spi_sck_D = { spi_sck_D[6:0], sck } /* synthesis keep */;
+wire spi_sck = (spi_sck && spi_sck_D != 8'h00) || (!spi_sck && spi_sck_D == 8'hff);
+
 // this core supports only the display related OSD commands
 // of the minimig
 reg [6:0]      sbuf;
@@ -49,6 +53,9 @@ reg [7:0]      cmd;
 reg [4:0]      cnt;
 reg rclk;
 
+reg [24:0] laddr;
+reg [7:0] ldata;
+	
 localparam UIO_FILE_TX      = 8'h53;
 localparam UIO_FILE_TX_DAT  = 8'h54;
 localparam UIO_FILE_INDEX   = 8'h55;
@@ -57,7 +64,7 @@ assign downloading = downloading_reg;
 reg downloading_reg = 1'b0;
 
 // data_io has its own SPI interface to the io controller
-always@(posedge sck, posedge ss) begin
+always@(posedge spi_sck, posedge ss) begin
 	if(ss == 1'b1)
 		cnt <= 5'd0;
 	else begin
@@ -70,7 +77,7 @@ always@(posedge sck, posedge ss) begin
 
 		// increase target address after write
 		if(rclk)
-			addr <= addr + 1;
+			laddr <= laddr + 1;
 	 
 		// count 0-7 8-15 8-15 ... 
 		if(cnt < 15) 	cnt <= cnt + 4'd1;
@@ -84,7 +91,7 @@ always@(posedge sck, posedge ss) begin
 		if((cmd == UIO_FILE_TX) && (cnt == 15)) begin
 			// prepare 
 			if(sdi) begin
-				addr <= 25'd0;
+				laddr <= 25'd0;
 				downloading_reg <= 1'b1; 
 			end else
 				downloading_reg <= 1'b0; 
@@ -92,7 +99,7 @@ always@(posedge sck, posedge ss) begin
 		
 		// command 0x54: UIO_FILE_TX
 		if((cmd == UIO_FILE_TX_DAT) && (cnt == 15)) begin
-			data <= {sbuf, sdi};
+			ldata <= {sbuf, sdi};
 			rclk <= 1'b1;
 		end
 		
@@ -104,13 +111,16 @@ end
 
 reg rclkD, rclkD2;
 always@(posedge clk) begin
-	// bring rclk from spi clock domain into c64 clock domain
+	// bring all signals from spi clock domain into local clock domain
 	rclkD <= rclk;
 	rclkD2 <= rclkD;
 	wr <= 1'b0;
 	
-	if(rclkD && !rclkD2)
+	if(rclkD && !rclkD2) begin
+		addr <= laddr;
+		data <= ldata;
 		wr <= 1'b1;
+	end
 end
 
 endmodule

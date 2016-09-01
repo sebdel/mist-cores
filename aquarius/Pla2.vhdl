@@ -14,13 +14,6 @@ port
     CLK            : in    std_logic;
     RST            : in    std_logic;
 
--- VGA configuration parameters
-
-    VGA_RES        : out   std_logic;
-    VGA_CMOD       : out   std_logic_vector(1 downto 0);
-    VGA_DIPSIZE_H  : out   std_logic_vector(9 downto 0);
-    VGA_DIPSIZE_V  : out   std_logic_vector(9 downto 0);
-
 -- VGA communication interface
 
     VGA_CLK        : out    std_logic;
@@ -44,28 +37,10 @@ end PLA2;
 
 architecture RTL of PLA2 is
 
--- VGA configuration constants
-
-Constant VgaRes800x600: std_logic := '0';                               -- 800 x 600 (SVGA)
-Constant VgaRes640x480: std_logic := '1';                               -- 640 x 480 (VGA)
-
-Constant VgaCmodBW : std_logic_vector(1 downto 0) := "00";              -- Black & White
-Constant VgaCmodC16: std_logic_vector(1 downto 0) := "01";              -- 16 Colors
-Constant VgaCmodC64: std_logic_vector(1 downto 0) := "10";              -- 64 Colors
-
-Constant VgaDipSize640: std_logic_vector(9 downto 0) := "1010000000";   -- 640
-Constant VgaDipSize480: std_logic_vector(9 downto 0) := "0111100000";   -- 480
-
 signal x_pos : std_logic_vector(2 downto 0);
 signal y_pos : std_logic_vector(2 downto 0);
 
 begin
-    -- Set VGA configuration parameters
-
-    VGA_RES       <= VgaRes640x480;           -- 640 x 480 (VGA)
-    VGA_CMOD      <= VgaCmodC64;              -- 64 Colors
-    VGA_DIPSIZE_H <= VgaDipSize640;           -- Number of pixels per line (640)
-    VGA_DIPSIZE_V <= VgaDipSize480;           -- Number of lines (480)
 
     VD_OUT <= "00000000";
     VD_WE <= '0';
