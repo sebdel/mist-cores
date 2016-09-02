@@ -33,9 +33,9 @@ port
 
 -- External memory interface
 
-    OE_EXT         : out    std_logic;
-    WE_EXT         : out    std_logic;
-    CS_EXT         : out    std_logic;
+    OE_EXTN        : out    std_logic;
+    WE_EXTN        : out    std_logic;
+    CS_EXTN        : out    std_logic;
     DATA_EXT_IN    : in  std_logic_vector(7 downto 0);
     DATA_EXT_OUT   : out  std_logic_vector(7 downto 0);
 
@@ -71,8 +71,9 @@ begin
      video_selected      <= true when  ADDR(15 downto 11) = "00110"                   else false;
      ram_selected        <= true when  ADDR(15 downto 11) = "00111"                   else false;
      rompack_selected    <= true when (ADDR(15 downto 14) = "11") and (ROM_EN = '1')  else false;
-     ext_selected        <= true when (ADDR(15) /= ADDR(14)) or ram_selected or
-                                     ((ADDR(15 downto 14) = "11") and (ROM_EN = '0')) else false;
+	  ext_selected        <= true when  ADDR(15 downto 14) = "01" 							  else false;
+--     ext_selected        <= true when (ADDR(15) /= ADDR(14)) or ram_selected or
+--                                     ((ADDR(15 downto 14) = "11") and (ROM_EN = '0')) else false;
      kbd_swlock_selected <= true when  ADDR(7 downto 0)   = X"FF"                     else false;
      led_selected        <= true when  ADDR(7 downto 0)   = X"FE"                     else false;
      sync_selected       <= true when  ADDR(7 downto 0)   = X"FD"                     else false;
@@ -104,9 +105,9 @@ begin
                      DATAO           when ram_selected     else
                      DATAO xor swlock;
 
-     WE_EXT <= (not MEMWR) or HOLD_CTRL0;
-     OE_EXT <= (not MEMRD) or HOLD_CTRL0;
-     CS_EXT <= '0' when (ext_selected = true) else '1';
+     WE_EXTN <= (not MEMWR) or HOLD_CTRL0;
+     OE_EXTN <= (not MEMRD) or HOLD_CTRL0;
+     CS_EXTN <= '0' when (ext_selected = true) else '1';
 
 
     HOLD_CONTROL0: process( CLK )

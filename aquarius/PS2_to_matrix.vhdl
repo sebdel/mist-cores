@@ -9,7 +9,6 @@ entity PS2_to_matrix is port
     sfrdatao : out std_logic_vector(7 downto 0);
     addr     : in  std_logic_vector(15 downto 8);
     kbd_leds : in  std_logic_vector(2 downto 0);
-    sensible : in  std_logic;
 
     psdatai  : in  std_logic_vector(7 downto 0);
     psdatao  : out std_logic_vector(7 downto 0);
@@ -163,7 +162,6 @@ begin
   variable state : states;
 
   variable key_matrix : std_logic_vector(47 downto 0);
-  variable sensible_key_matrix : std_logic_vector(47 downto 0);
 
   variable extension : boolean;
   variable break : std_logic;
@@ -293,90 +291,56 @@ begin
       end case;
     end if;
 
-    if (sensible = '1') then
-       sensible_key_matrix := key_matrix;
-
-       if (key_matrix(4) = '0') then                         -- Ibm        Aqu
-              sensible_key_matrix( 0) := key_matrix(44);     -- Shift-' -> Shift-2   """
-       --     sensible_key_matrix(44) := key_matrix(24);     -- Shift-8 -> Shift-'   "*"
-              sensible_key_matrix(24) := key_matrix(30);     -- Shift-9 -> Shift-8   "("
-              sensible_key_matrix(30) := key_matrix(38);     -- Shift-0 -> Shift-9   ")"
-              sensible_key_matrix(38) := key_matrix(37);     -- Shift-/ -> Shift-0   "?"
-              sensible_key_matrix(37) := key_matrix(18);     -- Shift-6 -> Shift-/   "^"
-              sensible_key_matrix(18) := key_matrix(26);     -- Shift-7 -> Shift-6   "&"
-        --    sensible_key_matrix(26) := key_matrix(44);     -- '       -> Shift-7   "'"  HS
-        --    sensible_key_matrix(44) := key_matrix(46);     -- Shift-; -> '         ";"  HS
-              sensible_key_matrix(46) := key_matrix( 0);     -- Shift-2 -> Shift-;   "@"  HS
-
-              sensible_key_matrix( 4) := not key_matrix(46);
-              sensible_key_matrix(44) := key_matrix(46) and key_matrix(24);
-       else
-              sensible_key_matrix( 4) := key_matrix(44);
-              sensible_key_matrix(26) := key_matrix(44);
-       end if;
-
-       sfrdatao(5 downto 0) <=
-              ( (sensible_key_matrix( 5 downto  0) ) and
-                (sensible_key_matrix(11 downto  6) ) and
-                (sensible_key_matrix(17 downto 12) ) and
-                (sensible_key_matrix(23 downto 18) ) and
-                (sensible_key_matrix(29 downto 24) ) and
-                (sensible_key_matrix(35 downto 30) ) and
-                (sensible_key_matrix(41 downto 36) ) and
-                (sensible_key_matrix(47 downto 42) ) );
-    else
-
-		 if (addr(8) = '0') then
-		  col1 := "000000";
-		 else
-		  col1 := "111111";
-		 end if;
-		 if (addr(9) = '0') then
-		  col2 := "000000";
-		 else
-		  col2 := "111111";
-		 end if;
-		 if (addr(10) = '0') then
-		  col3 := "000000";
-		 else
-		  col3 := "111111";
-		 end if;
-		 if (addr(11) = '0') then
-		  col4 := "000000";
-		 else
-		  col4 := "111111";
-		 end if;
-		 if (addr(12) = '0') then
-		  col5 := "000000";
-		 else
-		  col5 := "111111";
-		 end if;
-		 if (addr(13) = '0') then
-		  col6 := "000000";
-		 else
-		  col6 := "111111";
-		 end if;
-		 if (addr(14) = '0') then
-		  col7 := "000000";
-		 else
-		  col7 := "111111";
-		 end if;
-		 if (addr(15) = '0') then
-		  col8 := "000000";
-		 else
-		  col8 := "111111";
-		 end if;
-		 
-       sfrdatao(5 downto 0) <=
-              ( (key_matrix( 5 downto  0) or col8 ) and
-                (key_matrix(11 downto  6) or col7 ) and
-                (key_matrix(17 downto 12) or col6 ) and
-                (key_matrix(23 downto 18) or col5 ) and
-                (key_matrix(29 downto 24) or col4 ) and
-                (key_matrix(35 downto 30) or col3 ) and
-                (key_matrix(41 downto 36) or col2 ) and
-                (key_matrix(47 downto 42) or col1 ) );
-    end if;
+	 if (addr(8) = '0') then
+	  col1 := "000000";
+	 else
+	  col1 := "111111";
+	 end if;
+	 if (addr(9) = '0') then
+	  col2 := "000000";
+	 else
+	  col2 := "111111";
+	 end if;
+	 if (addr(10) = '0') then
+	  col3 := "000000";
+	 else
+	  col3 := "111111";
+	 end if;
+	 if (addr(11) = '0') then
+	  col4 := "000000";
+	 else
+	  col4 := "111111";
+	 end if;
+	 if (addr(12) = '0') then
+	  col5 := "000000";
+	 else
+	  col5 := "111111";
+	 end if;
+	 if (addr(13) = '0') then
+	  col6 := "000000";
+	 else
+	  col6 := "111111";
+	 end if;
+	 if (addr(14) = '0') then
+	  col7 := "000000";
+	 else
+	  col7 := "111111";
+	 end if;
+	 if (addr(15) = '0') then
+	  col8 := "000000";
+	 else
+	  col8 := "111111";
+	 end if;
+	 
+	 sfrdatao(5 downto 0) <=
+			  ( (key_matrix( 5 downto  0) or col8 ) and
+				 (key_matrix(11 downto  6) or col7 ) and
+				 (key_matrix(17 downto 12) or col6 ) and
+				 (key_matrix(23 downto 18) or col5 ) and
+				 (key_matrix(29 downto 24) or col4 ) and
+				 (key_matrix(35 downto 30) or col3 ) and
+				 (key_matrix(41 downto 36) or col2 ) and
+				 (key_matrix(47 downto 42) or col1 ) );
   end process;
 
   sfrdatao(7 downto 6) <= "11";

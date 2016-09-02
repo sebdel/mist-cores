@@ -174,7 +174,7 @@ wire ram_rden, ram_wren;
 
 // during ROM download, data_io writes to the ram. Otherwise it's the CPU.
 wire [7:0] sdram_din = dio_download ? dio_data : extram_data;
-wire [24:0] sdram_addr = dio_download ? { 2'b11, dio_addr[13:0] } : { 9'd0, cpu_addr[15:0] };
+wire [24:0] sdram_addr = dio_download ? { 11'b11, dio_addr[13:0] } : { 9'd0, cpu_addr[15:0] };
 wire sdram_wr = dio_download ? dio_write : !ram_wren;
 wire sdram_oe = dio_download ? 1'b1 : !ram_rden;
 
@@ -235,23 +235,22 @@ wire cass_in, cass_out;
 Pla1 Pla1 (
     .CLK   ( cpu_clock ),
     .RST   ( cpu_reset ),
-    .DATAO ( cpu_dout  ),
-	 
-    .DATAI    ( cpu_din  ),
-    .ADDR     ( cpu_addr ),
-    .MEMWR    ( !cpu_wr_n ), 
-    .MEMRD    ( !cpu_rd_n ), 
-    .IOWR     ( (!cpu_iorq_n && cpu_m1_n) && !cpu_wr_n ),
-    .IORD     ( (!cpu_iorq_n && cpu_m1_n) && !cpu_rd_n ),
+    .DATAO ( cpu_dout  ),	 
+    .DATAI ( cpu_din   ),
+    .ADDR  ( cpu_addr  ),
+    .MEMWR ( !cpu_wr_n ), 
+    .MEMRD ( !cpu_rd_n ), 
+    .IOWR  ( (!cpu_iorq_n && cpu_m1_n) && !cpu_wr_n ),
+    .IORD  ( (!cpu_iorq_n && cpu_m1_n) && !cpu_rd_n ),
 
     .VIDEO_WE     ( video_we          ),
-    .DATA_ROM     ( aquarius_rom_data ),
     .DATA_VIDEO   ( vram_dout         ),
+    .DATA_ROM     ( aquarius_rom_data ),
     .DATA_ROMPACK ( extram_q          ),
     .ROM_EN       ( rom_loaded        ),
 
-    .OE_EXT       ( ram_rden    ),
-    .WE_EXT       ( ram_wren    ),
+    .OE_EXTN      ( ram_rden    ),
+    .WE_EXTN      ( ram_wren    ),
     .DATA_EXT_IN  ( extram_q    ),
     .DATA_EXT_OUT ( extram_data ),
 
@@ -351,8 +350,6 @@ PS2_to_matrix PS2_to_matrix (
 	 // Pla1 interface
     .sfrdatao ( key_value      ),
     .addr     ( cpu_addr[15:8] ),
-    .kbd_leds ( 3'd0           ),
-    .sensible ( 1'b0           ),
 
 	 // PS2 keyboard interface
     .psdatai ( keyboard_datao ),
