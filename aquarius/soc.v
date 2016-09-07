@@ -262,7 +262,7 @@ Pla1 Pla1 (
 	 .PSG_IN		( psg_dout  ),
 	 .PSG_OUT	( psg_din   ),
 	 .PSG_SEL   ( psg_sel   ),
-	 //.LED_OUT   ( LED       ),
+	 .LED_OUT   ( LED       ),
     .CASS_OUT  ( cass_out  ),
     .CASS_IN   ( cass_in   ),
     .VSYNC     ( video_vs  )
