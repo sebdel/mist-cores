@@ -155,6 +155,9 @@ set_global_assignment -name FITTER_EFFORT "FAST FIT"
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to VGA_*
+set_global_assignment -name VERILOG_FILE sigma_delta_dac.v
+set_global_assignment -name VHDL_FILE vol_table_array.vhd
+set_global_assignment -name VHDL_FILE YM2149_volmix.vhd
 set_global_assignment -name VHDL_FILE CodecDAC.vhdl
 set_global_assignment -name VERILOG_FILE data_io.v
 set_global_assignment -name VERILOG_FILE sdram.v
@@ -177,4 +180,5 @@ set_global_assignment -name SIGNALTAP_FILE soc.stp
 set_global_assignment -name QIP_FILE aquarius_rom.qip
 set_global_assignment -name QIP_FILE character_rom.qip
 set_global_assignment -name QIP_FILE vram2k.qip
+set_global_assignment -name VERILOG_FILE pads.v
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

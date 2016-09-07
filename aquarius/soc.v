@@ -58,8 +58,9 @@ parameter CONF_STR_LEN = 13+20+8;
 
 // the status register is controlled by the on screen display (OSD)
 wire [7:0] status;
-// the MiST emulates a PS2 keyboard and mouse
+// the MiST emulates a PS2 keyboard and joysticks
 wire ps2_kbd_clk, ps2_kbd_data;
+wire [7:0] joystick0,joystick1;
 
 // include user_io module for arm controller communication
 user_io #(.STRLEN(CONF_STR_LEN)) user_io ( 
@@ -75,7 +76,10 @@ user_io #(.STRLEN(CONF_STR_LEN)) user_io (
 		// ps2 kbd interface
 		.ps2_clk        ( ps2_clock      ),
 		.ps2_kbd_clk    ( ps2_kbd_clk    ),
-		.ps2_kbd_data   ( ps2_kbd_data   )
+		.ps2_kbd_data   ( ps2_kbd_data   ),
+		
+		.joystick_0     (joystick0),
+		.joystick_1     (joystick1)
 );
 
 // include the on screen display
@@ -255,7 +259,10 @@ Pla1 Pla1 (
     .DATA_EXT_OUT ( extram_data ),
 
     .KEY_VALUE ( key_value ),
-	 .LED_OUT   ( LED       ),
+	 .PSG_IN		( psg_dout  ),
+	 .PSG_OUT	( psg_din   ),
+	 .PSG_SEL   ( psg_sel   ),
+	 //.LED_OUT   ( LED       ),
     .CASS_OUT  ( cass_out  ),
     .CASS_IN   ( cass_in   ),
     .VSYNC     ( video_vs  )
@@ -323,8 +330,6 @@ vram2k vram2k (
 
 // include sound codec
 wire speaker;
-assign AUDIO_L = speaker;
-assign AUDIO_R = speaker;
 
 CodecDriver_DAC CodecDriver_DAC (
 	.CLK ( cpu_clock   ),
@@ -335,9 +340,60 @@ CodecDriver_DAC CodecDriver_DAC (
    .CASS_OUT ( cass_out ),
 
    // Speaker
-
    .SPEAKER ( speaker ),
    .MUTE    ( 1'b0 )
+);
+
+wire [7:0] psg_dout, psg_din;
+wire psg_sel;
+wire [7:0] psg_audio_out;
+ 
+YM2149 ym2149 (
+	.I_DA    ( psg_din                 ),
+   .O_DA    ( psg_dout                ),
+
+   // control
+   .I_A9_L  ( 1'b0                    ),
+   .I_A8    ( 1'b1                    ),
+   .I_BDIR  ( psg_sel && !cpu_wr_n    ),
+   .I_BC2   ( 1'b1                    ),
+   .I_BC1   ( psg_sel && (cpu_addr[0] || cpu_wr_n) ),
+   .I_SEL_L ( 1'b1                    ),
+
+   .O_AUDIO ( psg_audio_out           ),
+
+	// I/O Ports
+   .I_IOA   ( pad0                    ),
+   .I_IOB   ( pad1                    ),
+
+   //
+   .ENA     ( 1'b1                    ), 
+   .RESET_L ( !cpu_reset              ),
+   .CLK     ( clk2m                   ),      // 2 MHz
+   .CLK8    ( cpu_clock               )       // 4 MHz CPU bus clock
+);
+
+wire [7:0] pad0, pad1;
+
+Pads pads (
+	.clk		 ( clk2m     ),
+	.reset 	 ( cpu_reset ),
+	.joy0_in  ( joystick1 ),	// invert because joystick0 is not the primary one in MiST
+	.joy1_in  ( joystick0 ),
+	.pad0_out ( pad0      ),	
+	.pad1_out ( pad1      )
+);
+
+// Mix PSG and speaker output to get some feedback from the tape.
+// That's not how the original worked though.
+wire [14:0] audio_data = { psg_audio_out, speaker, 6'h00 } - 15'h4000;
+
+sigma_delta_dac sigma_delta_dac (
+   .clk      ( ram_clock     ),
+	.left     ( AUDIO_L       ),
+	.right    ( AUDIO_R       ),
+	.ldatasum ( audio_data    ),
+	.rdatasum ( audio_data    )
 );
 
 // include keyboard decoder
@@ -381,6 +437,11 @@ reg [24:0] clk_div;
 always @(posedge clock_100mhz) begin	
 	clk_div <= clk_div + 25'b1;
 end	
+
+// divide 4Mhz clock down to 2MHz
+reg clk2m;	
+always @(posedge cpu_clock)
+	clk2m <= !clk2m;
 		  
 // PLL to generate 100MHz system clock, 4MHz cpu clock & 32MHz SDRAM clock
 pll pll (
@@ -388,8 +449,8 @@ pll pll (
 	 .locked ( pll_locked    ),         // PLL is running stable
 	 .c0     ( clock_100mhz  ),   		// system clock@100MHz
 	 .c1     ( cpu_clock     ),     		// CPU clock@4MHz
-	 .c2     ( ram_clock     ),        	// RAM clock@2 MHz
-	 .c3     ( SDRAM_CLK     )         	// slightly phase shifted 32 MHz
+	 .c2     ( ram_clock     ),        	// RAM clock@32MHz
+	 .c3     ( SDRAM_CLK     )         	// slightly phase shifted 32MHz
 );
 
 endmodule

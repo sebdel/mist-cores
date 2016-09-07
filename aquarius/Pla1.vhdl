@@ -42,6 +42,9 @@ port
 -- Peripheral interface
 
     KEY_VALUE      : in     std_logic_vector(7 downto 0);
+	 PSG_IN			 : in		 std_logic_vector(7 downto 0);	 
+	 PSG_OUT			 : out    std_logic_vector(7 downto 0);	 
+    PSG_SEL        : out    std_logic;
     LED_OUT        : out    std_logic;
     CASS_OUT       : out    std_logic;
     CASS_IN        : in     std_logic;
@@ -61,6 +64,7 @@ signal cass_selected       : boolean;
 signal ext_selected        : boolean;
 signal sync_selected       : boolean;
 signal led_selected        : boolean;
+signal psg_selected        : boolean;
 
 signal swlock : std_logic_vector(7 downto 0);
 
@@ -78,11 +82,13 @@ begin
      led_selected        <= true when  ADDR(7 downto 0)   = X"FE"                     else false;
      sync_selected       <= true when  ADDR(7 downto 0)   = X"FD"                     else false;
      cass_selected       <= true when  ADDR(7 downto 0)   = X"FC"                     else false;
-
+     psg_selected        <= true when  ADDR(7 downto 1)   = "1111011"                 else false; -- 0xF6 / 0xF7
+	  
      VIDEO_WE <= '1' when (MEMWR = '1') and (video_selected = true) else '0';
      RAM_WE   <= '1' when (MEMWR = '1') and (ram_selected   = true) else '0';
          
 	  DATAI <= KEY_VALUE                when (IORD = '1') and (kbd_swlock_selected = true) else
+				  PSG_IN						   when (IORD = '1') and (psg_selected 		 = true)	else
               "1111111" & CASS_IN      when (IORD = '1') and (cass_selected       = true) else
               "1111111" & VSYNC        when (IORD = '1') and (sync_selected       = true) else
 				  DATA_ROM                 when (IORD = '0') and (rom_selected        = true) else
@@ -94,7 +100,8 @@ begin
 				  
 	  -- Peripherals write
      CASS_OUT <= DATAO(0)                 when (IOWR = '1') and (cass_selected = true);
-	  LED_OUT  <= '0'               			when (RST   = '1') else
+     PSG_OUT  <= DATAO                    when (IOWR = '1') and (psg_selected = true);
+	  LED_OUT  <= '0'               			when (RST  = '1') else
 					  DATAO(0)                 when (IOWR = '1') and (led_selected = true);
 			  
      swlock   <= "00000000"               when (RST   = '1') else
@@ -105,10 +112,11 @@ begin
                      DATAO           when ram_selected     else
                      DATAO xor swlock;
 
+	  PSG_SEL <= '1' when (IOWR = '1' or IORD = '1') and (psg_selected = true) else '0';
+	  
      WE_EXTN <= (not MEMWR) or HOLD_CTRL0;
      OE_EXTN <= (not MEMRD) or HOLD_CTRL0;
      CS_EXTN <= '0' when (ext_selected = true) else '1';
-
 
     HOLD_CONTROL0: process( CLK )
     begin
