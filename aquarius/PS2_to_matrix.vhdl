@@ -171,14 +171,6 @@ begin
   variable wait_ps_busy_low : boolean;
   variable wait_psint_low : boolean;
   variable wait_cycles : integer range 0 to 255;
-  variable col1 : std_logic_vector(5 downto 0);
-  variable col2 : std_logic_vector(5 downto 0);
-  variable col3 : std_logic_vector(5 downto 0);
-  variable col4 : std_logic_vector(5 downto 0);
-  variable col5 : std_logic_vector(5 downto 0);
-  variable col6 : std_logic_vector(5 downto 0);
-  variable col7 : std_logic_vector(5 downto 0);
-  variable col8 : std_logic_vector(5 downto 0);
   
   subtype bv6 is bit_vector(5 to 0);
 
@@ -291,56 +283,15 @@ begin
       end case;
     end if;
 
-	 if (addr(8) = '0') then
-	  col1 := "000000";
-	 else
-	  col1 := "111111";
-	 end if;
-	 if (addr(9) = '0') then
-	  col2 := "000000";
-	 else
-	  col2 := "111111";
-	 end if;
-	 if (addr(10) = '0') then
-	  col3 := "000000";
-	 else
-	  col3 := "111111";
-	 end if;
-	 if (addr(11) = '0') then
-	  col4 := "000000";
-	 else
-	  col4 := "111111";
-	 end if;
-	 if (addr(12) = '0') then
-	  col5 := "000000";
-	 else
-	  col5 := "111111";
-	 end if;
-	 if (addr(13) = '0') then
-	  col6 := "000000";
-	 else
-	  col6 := "111111";
-	 end if;
-	 if (addr(14) = '0') then
-	  col7 := "000000";
-	 else
-	  col7 := "111111";
-	 end if;
-	 if (addr(15) = '0') then
-	  col8 := "000000";
-	 else
-	  col8 := "111111";
-	 end if;
-	 
 	 sfrdatao(5 downto 0) <=
-			  ( (key_matrix( 5 downto  0) or col8 ) and
-				 (key_matrix(11 downto  6) or col7 ) and
-				 (key_matrix(17 downto 12) or col6 ) and
-				 (key_matrix(23 downto 18) or col5 ) and
-				 (key_matrix(29 downto 24) or col4 ) and
-				 (key_matrix(35 downto 30) or col3 ) and
-				 (key_matrix(41 downto 36) or col2 ) and
-				 (key_matrix(47 downto 42) or col1 ) );
+			  ( (key_matrix( 5 downto  0) or (std_logic_vector(5 downto 0)'range => addr(15)) ) and
+				 (key_matrix(11 downto  6) or (std_logic_vector(5 downto 0)'range => addr(14)) ) and
+				 (key_matrix(17 downto 12) or (std_logic_vector(5 downto 0)'range => addr(13)) ) and
+				 (key_matrix(23 downto 18) or (std_logic_vector(5 downto 0)'range => addr(12)) ) and
+				 (key_matrix(29 downto 24) or (std_logic_vector(5 downto 0)'range => addr(11)) ) and
+				 (key_matrix(35 downto 30) or (std_logic_vector(5 downto 0)'range => addr(10)) ) and
+				 (key_matrix(41 downto 36) or (std_logic_vector(5 downto 0)'range => addr(9))  ) and
+				 (key_matrix(47 downto 42) or (std_logic_vector(5 downto 0)'range => addr(8))  ) );
   end process;
 
   sfrdatao(7 downto 6) <= "11";
