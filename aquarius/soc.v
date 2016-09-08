@@ -384,9 +384,8 @@ Pads pads (
 	.pad1_out ( pad1      )
 );
 
-// Mix PSG and speaker output to get some feedback from the tape.
-// That's not how the original worked though.
-wire [14:0] audio_data = { psg_audio_out, speaker, 6'h00 } - 15'h4000;
+// Mix PSG and speaker output. That's not how the original worked though. (we lack the line SOUND from the cartridge)
+wire [14:0] audio_data = { psg_audio_out[7] | speaker, psg_audio_out[6:0], 7'h00 } - 15'h4000;
 
 sigma_delta_dac sigma_delta_dac (
    .clk      ( ram_clock     ),
