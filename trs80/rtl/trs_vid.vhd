@@ -24,7 +24,8 @@ entity trs_vid is
 		Addr	: in std_logic_vector(9 downto 0);
 		DI		: in std_logic_vector(7 downto 0);
 		DO		: out std_logic_vector(7 downto 0);
-		Sync	: out std_logic;
+		HSync	: out std_logic;
+		VSync	: out std_logic;
 		Video	: out std_logic);
 end trs_vid;
 
@@ -57,8 +58,6 @@ architecture rtl of trs_vid is
 	signal Chr_Data	: std_logic_vector(7 downto 0);
 	signal Blank	: std_logic;
 	signal Shift	: std_logic_vector(5 downto 0);
-	signal HSync	: std_logic;
-	signal VSync	: std_logic;
 
 begin
 
@@ -104,7 +103,7 @@ begin
 	z17_18 : vram
 		port map(
 			clock => Clk,
-			wren => Wr_n,
+			wren => ((not Wr_n) and (not CS_n)),
 			address => RAM_Addr,
 			data => DI,
 			q => Chr);
@@ -115,7 +114,7 @@ begin
 	Chr_Addr <= Chr(6 downto 0) & std_logic_Vector(ChrR_Cnt);
 	z25 : trs_char
 		port map(
-			A =>  Chr_Addr,
+			A => Chr_Addr,
 			D => Chr_Data);
 
 	-- Video shift register
@@ -163,7 +162,6 @@ begin
 		if Rst_n = '0' then
 			HSync <= '0';
 			VSync <= '0';
-			Sync <= '0';
 		elsif Clk'event and Clk = '1' then
 			if Tick = '1' then
 				-- Hor_Cnt is 1774080/1747200Hz
@@ -184,7 +182,6 @@ begin
 						VSync <= '0';
 					end if;
 				end if;
-				Sync <= HSync xor VSync;
 			end if;
 		end if;
 	end process;

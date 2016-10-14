@@ -92,7 +92,7 @@ begin
 	RAMCS_n <= RAMCS_n_i;
 	ROMCS_n <= ROMCS_n_i;
 	VidCS_n <= VidCS_n_i;
-
+	
 	DI_CPU <= DO_RAM when RAMCS_n_i = '0'
 -- pragma translate_off
 			and not is_x(DO_RAM) else
