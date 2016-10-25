@@ -37,8 +37,8 @@ always @(posedge clock) begin
 		reset_n_i <= 1'b1;
 end
 
-// Beware, everything is active low here; make sure CPU can't write to ROM
-assign glue_write_n = cpu_mreq_n || cpu_wr_n || !rom_cs_n;
+// Beware, everything is active low here
+assign glue_write_n = cpu_mreq_n || cpu_wr_n;
 
 // $0000-$0FFF : ROM (4KB)
 assign rom_cs_n = !(cpu_addr[15:12] == 4'b0000);
@@ -46,8 +46,9 @@ assign rom_cs_n = !(cpu_addr[15:12] == 4'b0000);
 // $3C00-$3FFF : VRAM (1KB)
 assign vram_cs_n = !(cpu_addr[15:10] == 6'b001111);
 
-// $4000-$47FF : RAM (2KB)
-assign ram_cs_n = !(cpu_addr[15:11] == 5'b01000);
+// $4000-$4FFF : RAM (4KB)
+// RAMCS_n_i <= '0' when A(15 downto 14) = "01" and unsigned(A(13 downto RAMWidth)) = 0 else '1';
+assign ram_cs_n = !(cpu_addr[15:12] == 4'b0100);
 
 // $3800-3BFF : Keyboard
 assign keyboard_cs_n = !(cpu_addr[15:10] == 6'b001110);

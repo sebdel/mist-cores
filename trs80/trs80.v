@@ -40,7 +40,6 @@ module trs80 (
 
 // clocks
 wire clock_100mhz;
-wire cpu_clock;
 
 // the configuration string is returned to the io controller to allow
 // it to control the menu on the OSD 
@@ -207,7 +206,7 @@ wire [7:0] sdram_dout;
 // during ROM download, data_io writes to the ram. Otherwise it's the CPU.
 wire [7:0] sdram_din = dio_download ? dio_data : cpu_dout;
 wire [24:0] sdram_addr = dio_download ? { 13'd0, dio_addr[11:0] } : { 9'd0, cpu_addr[15:0] };
-wire sdram_wr = dio_download ? dio_write : (!glue_write_n && !ram_cs_n);
+wire sdram_wr = dio_download ? dio_write : (!glue_write_n && !ram_cs_n && rom_cs_n);
 
 assign SDRAM_CKE = 1'b1;
 
@@ -339,34 +338,34 @@ keyboard keyboard (
 	.int   ( keyboard_int   )
 );
 
-// counter to generate various clocks from the 100MHz
+// counter to generate various clocks from the 25MHz
 reg [24:0] clk_div;
-always @(posedge clock_100mhz) begin	
+always @(posedge clock_25mhz)
 	clk_div <= clk_div + 25'b1;
-end	
 
 // vga clock @25MHz
-wire vga_clock = clk_div[1];
+wire vga_clock = clock_25mhz;
 // pixel clock @12.5MHz
-wire pixel_clock = clk_div[2];
+wire pixel_clock = clk_div[0];
 // ps2 @12KHz
-wire ps2_clock = clk_div[12];
+wire ps2_clock = clk_div[10];
 // 3Hz for debug prurpose
-wire slow_clock = clk_div[24];
+wire slow_clock = clk_div[22];
 
-// divide 4Mhz clock down to 2MHz
-reg clk2m;	
-always @(posedge cpu_clock)
-	clk2m <= !clk2m;
+// divide 32Mhz clock down to 4MHz
+reg [24:0] clk32m_div;	
+always @(posedge ram_clock)
+	clk32m_div <= clk32m_div + 25'b1;
+
+wire cpu_clock = clk32m_div[2];	// 4MHz	
 		  
 // PLL to generate 100MHz system clock, 4MHz cpu clock & 32MHz SDRAM clock
 pll pll (
 	 .inclk0 ( CLOCK_27[0]   ),
 	 .locked ( pll_locked    ),         // PLL is running stable
-	 .c0     ( clock_100mhz  ),   		// system clock@100MHz
-	 .c1     ( cpu_clock     ),     		// CPU clock@4MHz
-	 .c2     ( ram_clock     ),        	// RAM clock@32MHz
-	 .c3     ( SDRAM_CLK     )         	// slightly phase shifted 32MHz
+	 .c0     ( clock_25mhz  ),   			// system clock@25MHz
+	 .c1     ( ram_clock     ),			// RAM clock@32MHz
+	 .c2     ( SDRAM_CLK     )         	// slightly phase shifted 32MHz
 );
 
 endmodule
