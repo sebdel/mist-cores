@@ -201,15 +201,16 @@ T80s T80s (
 
 // include SDRAM (64k, because why not ?)
 wire ram_clock;
-wire [7:0] sdram_dout;
+//wire [7:0] sdram_dout;
 
 // during ROM download, data_io writes to the ram. Otherwise it's the CPU.
-wire [7:0] sdram_din = dio_download ? dio_data : cpu_dout;
-wire [24:0] sdram_addr = dio_download ? { 13'd0, dio_addr[11:0] } : { 9'd0, cpu_addr[15:0] };
-wire sdram_wr = dio_download ? dio_write : (!glue_write_n && !ram_cs_n && rom_cs_n);
-
-assign SDRAM_CKE = 1'b1;
-
+//wire [7:0] sdram_din = dio_download ? dio_data : cpu_dout;
+//wire [24:0] sdram_addr = dio_download ? { 13'd0, dio_addr[11:0] } : { 9'd0, cpu_addr[15:0] };
+//wire sdram_wr = dio_download ? dio_write : (!glue_write_n && !ram_cs_n && rom_cs_n);
+//
+//assign SDRAM_CKE = 1'b1;
+assign SDRAM_nCS = 1'b1;	// deactivate SDRAM
+/*
 sdram sdram (
 	// interface to the MT48LC16M16 chip
    .sd_data        ( SDRAM_DQ                  ),
@@ -232,6 +233,26 @@ sdram sdram (
    .we             ( sdram_wr 					  ),
    .oe         	 ( 1'b1		  					  ),	// doesn't matter, this will be sorted out in the GLUE
    .dout           ( sdram_dout             	  )
+);
+*/
+
+wire [7:0] ram_dout;
+
+ram4k ram4k(
+	.address	( cpu_addr[11:0]	),
+	.clock	( ram_clock			),
+	.data		( cpu_dout			),
+	.wren		( !glue_write_n && !ram_cs_n ),
+	.rden		( glue_write_n && !ram_cs_n  ),
+	.q			( ram_dout			)
+);
+
+wire [7:0] rom_dout;
+
+rom4k rom4k(
+	.address	( cpu_addr[11:0]	),
+	.clock	( ram_clock			),
+	.q			( rom_dout 			)
 );
 
 // include ROM download helper
@@ -268,8 +289,8 @@ glue glue (
 	.cpu_wr_n	( cpu_wr_n		),
 	.cpu_addr	( cpu_addr		),
 	
-	.ram_dout	( sdram_dout	),
-	.rom_dout	( sdram_dout	),
+	.ram_dout	( ram_dout		),
+	.rom_dout	( rom_dout		),
 	.vram_dout	( vram_dout		),
 	.keyboard_dout	( keyboard_dout	),
 
