@@ -285,7 +285,7 @@ glue glue (
 	.keyboard_cs_n	( keyboard_cs_n	)
 );
 
-// include vram (2k), use only 1KB
+// include 1KB vram
 wire [7:0] vram_dout;
 wire [9:0] vram_b_addr;
 wire [7:0] vram_b_dout;

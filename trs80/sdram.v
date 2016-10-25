@@ -23,14 +23,14 @@
 module sdram (
 
 	// interface to the MT48LC16M16 chip
-	inout [15:0]  		sd_data,    // 16 bit bidirectional data bus
-	output [12:0]		sd_addr,    // 13 bit multiplexed address bus
-	output [1:0] 		sd_dqm,     // two byte masks
-	output [1:0] 		sd_ba,      // two banks
-	output 				sd_cs,      // a single chip select
-	output 				sd_we,      // write enable
-	output 				sd_ras,     // row address select
-	output 				sd_cas,     // columns address select
+	inout [15:0]  			sd_data,    // 16 bit bidirectional data bus
+	output reg [12:0]		sd_addr,    // 13 bit multiplexed address bus
+	output reg [1:0] 		sd_dqm,     // two byte masks
+	output reg [1:0] 		sd_ba,      // two banks
+	output 					sd_cs,      // a single chip select
+	output 					sd_we,      // write enable
+	output 					sd_ras,     // row address select
+	output 					sd_cas,     // columns address select
 
 	// cpu/chipset interface
 	input 		 		init,			// init signal after FPGA config to initialize RAM
@@ -68,9 +68,9 @@ always @(posedge clk) begin
 	// 32Mhz counter synchronous to 4 Mhz clock
    // force counter to pass state 5->6 exactly after the rising edge of clkref
 	// since clkref is two clocks early
-   if(((q == 6) && ( clkref == 0)) ||
-		((q == 7) && ( clkref == 1)) ||
-      ((q != 6) && (q != 7)))
+   if(((q == 7) && ( clkref == 0)) ||
+		((q == 0) && ( clkref == 1)) ||
+      ((q != 7) && (q != 0)))
 			q <= q + 3'd1;
 end
 
@@ -118,30 +118,32 @@ always @(posedge clk) begin
 	sd_cmd <= CMD_INHIBIT;
 
 	if(reset != 0) begin
+		sd_ba <= 2'b00;
+		sd_dqm <= 2'b00;
+			
+		if(reset == 13) sd_addr <= 13'b0010000000000;
+		else   			 sd_addr <= MODE;
+
 		if(q == STATE_IDLE) begin
 			if(reset == 13)  sd_cmd <= CMD_PRECHARGE;
 			if(reset ==  2)  sd_cmd <= CMD_LOAD_MODE;
 		end
 	end else begin
+		if(q <= STATE_CMD_START) begin	
+			sd_addr <= addr[20:8];
+			sd_ba <= addr[22:21];
+			sd_dqm <= 2'b00;
+		end else
+			sd_addr <= { 4'b0010, addr[23], addr[7:0]};
+	
 		if(q == STATE_IDLE) begin
 			if(we || oe) sd_cmd <= CMD_ACTIVE;
 			else         sd_cmd <= CMD_AUTO_REFRESH;
 		end else if(q == STATE_CMD_CONT) begin
 			if(we)		 sd_cmd <= CMD_WRITE;
 			else if(oe)  sd_cmd <= CMD_READ;
-		end
+		end 
 	end
 end
-	
-wire [12:0] reset_addr = (reset == 13)?13'b0010000000000:MODE;
-	
-wire [12:0] run_addr = 
-	(q == STATE_CMD_START)?addr[20:8]:{ 4'b0010, addr[23], addr[7:0]};
-
-assign sd_addr = (reset != 0)?reset_addr:run_addr;
-
-assign sd_ba = addr[22:21];
-
-assign sd_dqm = 2'b00;
 
 endmodule
