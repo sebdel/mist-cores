@@ -4,7 +4,7 @@
 // MODULE: altsyncram 
 
 // ============================================================
-// File Name: vram2k.v
+// File Name: vram.v
 // Megafunction Name(s):
 // 			altsyncram
 //
@@ -31,7 +31,7 @@
 //Altera or its authorized distributors.  Please refer to the 
 //applicable agreement for further details.
 
-module vram2k (
+module vram (
 	address_a,
 	address_b,
 	clock_a,
@@ -173,10 +173,10 @@ endmodule
 // Retrieval info: CONNECT: @wren_b 0 0 0 0 wren_b 0 0 0 0
 // Retrieval info: CONNECT: q_a 0 0 8 0 @q_a 0 0 8 0
 // Retrieval info: CONNECT: q_b 0 0 8 0 @q_b 0 0 8 0
-// Retrieval info: GEN_FILE: TYPE_NORMAL vram2k.v TRUE
-// Retrieval info: GEN_FILE: TYPE_NORMAL vram2k.inc FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL vram2k.cmp FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL vram2k.bsf FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL vram2k_inst.v FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL vram2k_bb.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL vram.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL vram.inc FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL vram.cmp FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL vram.bsf FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL vram_inst.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL vram_bb.v TRUE
 // Retrieval info: LIB_FILE: altera_mf

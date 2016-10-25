@@ -149,7 +149,7 @@ set_global_assignment -name VHDL_FILE ps2_intf.vhd
 set_global_assignment -name VERILOG_FILE keyboard.v
 set_global_assignment -name VHDL_FILE trs_char_vg_se.vhd
 set_global_assignment -name VERILOG_FILE user_io.v
-set_global_assignment -name QIP_FILE vram2k.qip
+set_global_assignment -name QIP_FILE vram.qip
 set_global_assignment -name VERILOG_FILE sdram.v
 set_global_assignment -name VERILOG_FILE pll.v
 set_global_assignment -name QIP_FILE pll.qip

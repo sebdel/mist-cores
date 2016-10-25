@@ -9,17 +9,7 @@ module trs80 (
    output 	 		AUDIO_R,
 	
 	// SDRAM interface
-	inout [15:0]  	SDRAM_DQ, 		// SDRAM Data bus 16 Bits
-	output [12:0] 	SDRAM_A, 		// SDRAM Address bus 13 Bits
-	output        	SDRAM_DQML, 	// SDRAM Low-byte Data Mask
-	output        	SDRAM_DQMH, 	// SDRAM High-byte Data Mask
-	output        	SDRAM_nWE, 		// SDRAM Write Enable
-	output       	SDRAM_nCAS, 	// SDRAM Column Address Strobe
-	output        	SDRAM_nRAS, 	// SDRAM Row Address Strobe
 	output        	SDRAM_nCS, 		// SDRAM Chip Select
-	output [1:0]  	SDRAM_BA, 		// SDRAM Bank Address
-	output 			SDRAM_CLK, 		// SDRAM Clock
-	output        	SDRAM_CKE, 		// SDRAM Clock Enable
 	
    // SPI interface to arm io controller
    output		 SPI_DO,
@@ -38,9 +28,6 @@ module trs80 (
    output [5:0] VGA_B
 );
 
-// clocks
-wire clock_100mhz;
-
 // the configuration string is returned to the io controller to allow
 // it to control the menu on the OSD 
 parameter CONF_STR = {
@@ -50,6 +37,8 @@ parameter CONF_STR = {
 };
 
 parameter CONF_STR_LEN = 7+20+8;
+
+assign SDRAM_nCS = 1'b1;	// deactivate SDRAM
 
 // the status register is controlled by the on screen display (OSD)
 wire [7:0] status;
@@ -199,43 +188,8 @@ T80s T80s (
 	.DO       ( cpu_dout      )
 );
 
-// include SDRAM (64k, because why not ?)
+// 4K RAM
 wire ram_clock;
-//wire [7:0] sdram_dout;
-
-// during ROM download, data_io writes to the ram. Otherwise it's the CPU.
-//wire [7:0] sdram_din = dio_download ? dio_data : cpu_dout;
-//wire [24:0] sdram_addr = dio_download ? { 13'd0, dio_addr[11:0] } : { 9'd0, cpu_addr[15:0] };
-//wire sdram_wr = dio_download ? dio_write : (!glue_write_n && !ram_cs_n && rom_cs_n);
-//
-//assign SDRAM_CKE = 1'b1;
-assign SDRAM_nCS = 1'b1;	// deactivate SDRAM
-/*
-sdram sdram (
-	// interface to the MT48LC16M16 chip
-   .sd_data        ( SDRAM_DQ                  ),
-   .sd_addr        ( SDRAM_A                   ),
-   .sd_dqm         ( {SDRAM_DQMH, SDRAM_DQML}  ),
-   .sd_cs          ( SDRAM_nCS                 ),
-   .sd_ba          ( SDRAM_BA                  ),
-   .sd_we          ( SDRAM_nWE                 ),
-   .sd_ras         ( SDRAM_nRAS                ),
-   .sd_cas         ( SDRAM_nCAS                ),
-
-   // system interface
-   .clk            ( ram_clock                 ),
-   .clkref         ( cpu_clock                 ),
-   .init           ( !pll_locked               ),
-
-   // cpu/chipset interface
-   .din            ( sdram_din                 ),
-   .addr           ( sdram_addr					  ),
-   .we             ( sdram_wr 					  ),
-   .oe         	 ( 1'b1		  					  ),	// doesn't matter, this will be sorted out in the GLUE
-   .dout           ( sdram_dout             	  )
-);
-*/
-
 wire [7:0] ram_dout;
 
 ram4k ram4k(
@@ -247,6 +201,7 @@ ram4k ram4k(
 	.q			( ram_dout			)
 );
 
+// 4K ROM (level1)
 wire [7:0] rom_dout;
 
 rom4k rom4k(
@@ -255,7 +210,7 @@ rom4k rom4k(
 	.q			( rom_dout 			)
 );
 
-// include ROM download helper
+// ROM download helper (unused)
 wire dio_download;
 wire [24:0] dio_addr;
 wire [7:0] dio_data;
@@ -306,12 +261,12 @@ glue glue (
 	.keyboard_cs_n	( keyboard_cs_n	)
 );
 
-// include 1KB vram
+// 1K VRAM
 wire [7:0] vram_dout;
 wire [9:0] vram_b_addr;
 wire [7:0] vram_b_dout;
 
-vram2k vram2k (
+vram vram (
 	.clock_a   ( cpu_clock ),
 	.address_a ( cpu_addr[9:0] ),
 	.wren_a    ( !glue_write_n && !vram_cs_n  ),
@@ -325,7 +280,6 @@ vram2k vram2k (
 );
 
 // Keyboard
-
 wire [7:0] keyboard_dout;
 
 PS2_to_matrix PS2_to_matrix (
