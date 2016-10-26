@@ -1,3 +1,30 @@
+// keyboard.v
+//
+// TRS-80 Model I
+// PS2 interface passthrough
+// Note: that doesn't do much, we could get rid of this
+//
+// io controller writable ram for the MiST board
+// http://code.google.com/p/mist-board/
+//
+// ZX Spectrum adapted version
+//
+// Copyright (c) 2015 Till Harbaum <till@harbaum.org>
+//
+// This source file is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This source file is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
 module keyboard ( 
 	input clk,
 	input reset,

@@ -1,6 +1,6 @@
-//
 // user_io.v
 //
+// TRS-80 Model I
 // user_io for the MiST board
 // http://code.google.com/p/mist-board/
 //
