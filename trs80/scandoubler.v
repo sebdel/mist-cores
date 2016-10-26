@@ -1,6 +1,8 @@
-//
 // scandoubler.v
 // 
+// TRS-80 Model I
+// Scandoubler
+//
 // Copyright (c) 2015 Till Harbaum <till@harbaum.org> 
 // 
 // This source file is free software: you can redistribute it and/or modify 

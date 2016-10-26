@@ -1,5 +1,7 @@
-//
 // data_io.v
+//
+// TRS-80 Model I
+// MiST Data I/O interface
 //
 // io controller writable ram for the MiST board
 // http://code.google.com/p/mist-board/
