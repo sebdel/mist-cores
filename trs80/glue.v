@@ -82,16 +82,17 @@ end
 // Beware, everything is active low here
 assign glue_write_n = cpu_mreq_n || cpu_wr_n;
 
-// $0000-$0FFF : ROM (4KB)
-assign rom_cs_n = !(cpu_addr[15:12] == 4'b0000);
+// $0000-$2FFF : ROM (12KB)
+assign rom_cs_n = !((cpu_addr[15:14] == 2'b00) && !(cpu_addr[13] & cpu_addr[12] == 1'b1));
+
 
 // $3C00-$3FFF : VRAM (1KB)
 assign vram_cs_n = !(cpu_addr[15:10] == 6'b001111);
 
-// $4000-$4FFF : RAM (4KB)
-// RAMCS_n_i <= '0' when A(15 downto 14) = "01" and unsigned(A(13 downto RAMWidth)) = 0 else '1';
-assign ram_cs_n = !(cpu_addr[15:12] == 4'b0100);
+// $4000-$4FFF : RAM (16KB)
+assign ram_cs_n = !(cpu_addr[15:14] == 2'b01);
 
+// 37E0-37FF 	Memory Mapped I/O
 // $3800-3BFF : Keyboard
 assign keyboard_cs_n = !(cpu_addr[15:10] == 6'b001110);
 

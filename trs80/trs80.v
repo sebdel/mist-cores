@@ -205,12 +205,12 @@ T80s T80s (
 	.DO       ( cpu_dout      )
 );
 
-// 4K RAM
+// 16K RAM
 wire ram_clock;
 wire [7:0] ram_dout;
 
 ram4k ram4k(
-	.address	( cpu_addr[11:0]	),
+	.address	( cpu_addr[13:0]	),
 	.clock	( ram_clock			),
 	.data		( cpu_dout			),
 	.wren		( !glue_write_n && !ram_cs_n ),
@@ -218,11 +218,11 @@ ram4k ram4k(
 	.q			( ram_dout			)
 );
 
-// 4K ROM (level1)
+// 12.2K ROM (level2)
 wire [7:0] rom_dout;
 
 rom4k rom4k(
-	.address	( cpu_addr[11:0]	),
+	.address	( cpu_addr[13:0]	),
 	.clock	( ram_clock			),
 	.q			( rom_dout 			)
 );
@@ -303,7 +303,8 @@ PS2_to_matrix PS2_to_matrix (
     .clk   ( cpu_clock ),
     .reset ( !glue_reset_n ),
 
-	 // TRS80 interface
+	 // TRS80 interfaceseb
+	 
     .sfrdatao ( keyboard_dout ),
     .addr     ( cpu_addr[7:0] ),
 

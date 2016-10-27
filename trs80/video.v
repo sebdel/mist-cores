@@ -97,7 +97,7 @@ always @(posedge clock) begin
 	end else begin
 		if (ChrC_Cnt == 1)
 			if (!Hor_Cnt[6] && !Ver_Cnt[4])
-				if (character[7])
+				if (character[7])	// pseudo graphics mode
 					if (ChrR_Cnt < 4) begin
 						Shift[5:3] <= {3{character[0]}};
 						Shift[2:0] <= {3{character[1]}};
