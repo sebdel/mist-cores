@@ -21,6 +21,8 @@
 module trs80 (
    input [1:0]	CLOCK_27,
    
+	output 			LED,
+	
 	// Audio output
    output 			AUDIO_L,
    output 	 		AUDIO_R,
@@ -48,12 +50,12 @@ module trs80 (
 // the configuration string is returned to the io controller to allow
 // it to control the menu on the OSD 
 parameter CONF_STR = {
-        "TRS80;;",
+        "TRS80;CAS;",
         "O1,Scanlines,On,Off;",
         "T2,Reset"
 };
 
-parameter CONF_STR_LEN = 7+20+8;
+parameter CONF_STR_LEN = 10+20+8;
 
 assign SDRAM_nCS = 1'b1;	// deactivate SDRAM
 
@@ -167,16 +169,12 @@ video video (
 reg [7:0] cpu_reset_cnt = 8'h00;
 wire cpu_reset = (cpu_reset_cnt != 255);
 always @(posedge cpu_clock) begin
-	if(!pll_locked || arm_reset || osd_reset || dio_download) begin
+	if(!pll_locked || arm_reset || osd_reset) begin
 		cpu_reset_cnt <= 8'd0;
 	end else 
 		if(cpu_reset_cnt != 255)
 			cpu_reset_cnt <= cpu_reset_cnt + 8'd1;
 end
-
-always @(negedge dio_download) begin
-	rom_loaded <= 1'b1;
-end			
 
 // CPU control signals
 wire [15:0] cpu_addr;
@@ -205,11 +203,14 @@ T80s T80s (
 	.DO       ( cpu_dout      )
 );
 
+wire io_wr = (!cpu_iorq_n && cpu_m1_n) && !cpu_wr_n;
+wire io_rd = (!cpu_iorq_n && cpu_m1_n) && !cpu_rd_n;
+
 // 16K RAM
 wire ram_clock;
 wire [7:0] ram_dout;
 
-ram4k ram4k(
+ram16k ram16k(
 	.address	( cpu_addr[13:0]	),
 	.clock	( ram_clock			),
 	.data		( cpu_dout			),
@@ -221,36 +222,14 @@ ram4k ram4k(
 // 12.2K ROM (level2)
 wire [7:0] rom_dout;
 
-rom4k rom4k(
+rom12k rom12k(
 	.address	( cpu_addr[13:0]	),
 	.clock	( ram_clock			),
 	.q			( rom_dout 			)
 );
 
-// ROM download helper (unused)
-wire dio_download;
-wire [24:0] dio_addr;
-wire [7:0] dio_data;
-wire dio_write;
-reg rom_loaded = 0;
-
-data_io data_io (
-	// io controller spi interface
-   .sck	( SPI_SCK ),
-   .ss	( SPI_SS2 ),
-   .sdi	( SPI_DI  ),
-
-	.downloading ( dio_download ),  // signal indicating an active rom download
-	         
-   // external ram interface
-   .clk   ( cpu_clock ),
-   .wr    ( dio_write ),
-   .addr  ( dio_addr  ),
-   .data  ( dio_data  )
-);
-
 // GLUE
-wire ram_cs_n, vram_cs_n, rom_cs_n;
+wire ram_cs_n, vram_cs_n, rom_cs_n, cassette_cs_n;
 
 glue glue (
 	.clock		( cpu_clock		),
@@ -275,7 +254,8 @@ glue glue (
 	.ram_cs_n		( ram_cs_n			),
 	.rom_cs_n		( rom_cs_n			),
 	.vram_cs_n		( vram_cs_n			),
-	.keyboard_cs_n	( keyboard_cs_n	)
+	.keyboard_cs_n	( keyboard_cs_n	),
+	.cassette_cs_n ( cassette_cs_n	)
 );
 
 // 1K VRAM
@@ -331,6 +311,32 @@ keyboard keyboard (
 	.int   ( keyboard_int   )
 );
 
+//tape tape (
+//// spi interface to io controller
+//   .sdi        ( SPI_DI       ),
+//   .sck        ( SPI_SCK      ),
+//   .ss         ( SPI_SS2      ),
+//
+//	.clk        ( tape_clock   ),
+//	.play       ( tape_play    ),
+//   .tape_out   ( tape_data    )
+//);
+
+wire tape_data = (io_wr && !cassette_cs_n) ? cpu_dout[0] : 1'b0;
+wire tape_record = (io_wr && !cassette_cs_n) ? cpu_dout[2] : 1'b0;
+
+// Tape feedback, LED + Audio
+assign LED = !tape_data;
+// use a pwm to reduce audio output volume
+reg [7:0] aclk;
+always @(posedge clock_25mhz) 
+	aclk <= aclk + 8'd1;
+
+// limit volume to 1/8 => pwm < 64
+wire tape_audio = tape_data && (aclk < 64);
+assign AUDIO_L = tape_audio;
+assign AUDIO_R = tape_audio;
+
 // counter to generate various clocks from the 25MHz
 reg [24:0] clk_div;
 always @(posedge clock_25mhz)
@@ -345,14 +351,17 @@ wire ps2_clock = clk_div[10];
 // 3Hz for debug prurpose
 wire slow_clock = clk_div[22];
 
-// divide 32Mhz clock down to 4MHz
+// divide 32Mhz clock
 reg [24:0] clk32m_div;	
 always @(posedge ram_clock)
 	clk32m_div <= clk32m_div + 25'b1;
 
-wire cpu_clock = clk32m_div[2];	// 4MHz	
-		  
-// PLL to generate 100MHz system clock, 4MHz cpu clock & 32MHz SDRAM clock
+// CPU @2MHz
+wire cpu_clock = clk32m_div[3];	// 2MHz	
+// Tape @500KHz
+wire tape_clock = clk32m_div[5];	// 500KHz	
+ 		  
+// PLL to generate 25MHz clock & 32MHz SDRAM clocks
 pll pll (
 	 .inclk0 ( CLOCK_27[0]   ),
 	 .locked ( pll_locked    ),         // PLL is running stable

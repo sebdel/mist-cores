@@ -32,6 +32,7 @@ module data_io (
 
 	output        downloading,   // signal indicating an active download
    output reg [4:0]  index,     // menu index used to upload the file
+	output [15:0] size,          // number of bytes in input buffer	
 	 
 	// external ram interface
 	input 			   clk,
@@ -39,6 +40,9 @@ module data_io (
 	output reg [24:0] addr,
 	output reg [7:0]  data
 );
+
+parameter START_ADDR = 25'h4200;
+assign size = laddr[15:0];
 
 // *********************************************************************************
 // spi client
@@ -93,7 +97,7 @@ always@(posedge spi_sck, posedge ss) begin
 		if((cmd == UIO_FILE_TX) && (cnt == 15)) begin
 			// prepare 
 			if(sdi) begin
-				laddr <= 25'd0;
+				laddr <= START_ADDR;
 				downloading_reg <= 1'b1; 
 			end else
 				downloading_reg <= 1'b0; 
@@ -110,6 +114,22 @@ always@(posedge spi_sck, posedge ss) begin
 			index <= {sbuf[3:0], sdi};
 	end
 end
+
+// include the embedded dual port ram
+//data_io_ram data_io_ram (
+//	// wire up cpu port
+//	.address_a   	( a					),
+//	.clock_a			( clk					),
+//	.data_a			( din					),
+//	.wren_a			( we					),
+//	.q_a				( dout				),
+//	
+//	// io controller port
+//	.address_b		( addr[13:0]		),
+//	.clock_b			( rclk				),
+//	.data_b			( {sbuf, sdi}		),
+//	.wren_b			( (cmd == UIO_FILE_TX_DAT) && !ss	)
+//);
 
 reg rclkD, rclkD2;
 always@(posedge clk) begin

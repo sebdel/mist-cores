@@ -64,7 +64,8 @@ module glue(
 	output rom_cs_n,
 	output vram_cs_n,
 	output led_cs_n,
-	output keyboard_cs_n
+	output keyboard_cs_n,
+	output cassette_cs_n
 
 );
 
@@ -95,6 +96,9 @@ assign ram_cs_n = !(cpu_addr[15:14] == 2'b01);
 // 37E0-37FF 	Memory Mapped I/O
 // $3800-3BFF : Keyboard
 assign keyboard_cs_n = !(cpu_addr[15:10] == 6'b001110);
+
+// $FF port : cassette
+assign cassette_cs_n = !(cpu_addr[7:0] == 8'hff);
 
 assign glue_dout = !ram_cs_n ? ram_dout :
 						 !rom_cs_n ? rom_dout :
