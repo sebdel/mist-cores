@@ -203,11 +203,11 @@ data_io data_io (
 	.size				( file_size          ),
 
 	// ram interface
-	.clk				( clk						),
-	.we				( 1'b0					),
-	.a					( byte_count[13:0] 	),
-	.din				( 8'h00					),
-	.dout				( ram_data_out			)
+//	.clk				( clk						),
+//	.we				( 1'b0					),
+//	.a					( byte_count[13:0] 	),
+//	.din				( 8'h00					),
+//	.dout				( ram_data_out			)
 );
 
 endmodule

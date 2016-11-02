@@ -311,31 +311,34 @@ keyboard keyboard (
 	.int   ( keyboard_int   )
 );
 
-//tape tape (
-//// spi interface to io controller
-//   .sdi        ( SPI_DI       ),
-//   .sck        ( SPI_SCK      ),
-//   .ss         ( SPI_SS2      ),
-//
-//	.clk        ( tape_clock   ),
-//	.play       ( tape_play    ),
-//   .tape_out   ( tape_data    )
-//);
+wire [7:0] tape_dout;
 
-wire tape_data = (io_wr && !cassette_cs_n) ? cpu_dout[0] : 1'b0;
+tape tape (
+   .sdi        ( SPI_DI       ),
+   .sck        ( SPI_SCK      ),
+   .ss         ( SPI_SS2      ),
+
+	.clk        ( tape_clock   ),
+	.play       ( tape_play    ),
+   .tape_out   ( tape_dout    )
+);
+
+wire [1:0] tape_data = (io_wr && !cassette_cs_n) ? cpu_dout[1:0] : 2'b00;
 wire tape_record = (io_wr && !cassette_cs_n) ? cpu_dout[2] : 1'b0;
 
 // Tape feedback, LED + Audio
-assign LED = !tape_data;
-// use a pwm to reduce audio output volume
-reg [7:0] aclk;
-always @(posedge clock_25mhz) 
-	aclk <= aclk + 8'd1;
+assign LED = !tape_data[0];
 
-// limit volume to 1/8 => pwm < 64
-wire tape_audio = tape_data && (aclk < 64);
-assign AUDIO_L = tape_audio;
-assign AUDIO_R = tape_audio;
+// Audio feedback
+wire [14:0] audio_data = { tape_data[1:0], 13'h00 };
+
+sigma_delta_dac sigma_delta_dac (
+   .clk      ( ram_clock     ),
+	.left     ( AUDIO_L       ),
+	.right    ( AUDIO_R       ),
+	.ldatasum ( audio_data    ),
+	.rdatasum ( audio_data    )
+);
 
 // counter to generate various clocks from the 25MHz
 reg [24:0] clk_div;
