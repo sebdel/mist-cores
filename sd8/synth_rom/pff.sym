@@ -1,0 +1,45 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 1.
+Hexadecimal [16-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  2710 L
+    .__.ABS.                                                    =  0000 G
+    .__.CPU.                                                    =  0000 L
+    .__.H$L.                                                    =  0000 L
+  1 _FatFs                                                         0000 R
+    __divulong                                                     **** GX
+    __mullong                                                      **** GX
+  0 _check_fs                                                      0953 R
+  0 _clust2sect                                                    02AA R
+  0 _create_name                                                   0779 R
+  0 _dir_find                                                      0697 R
+  0 _dir_next                                                      050A R
+  0 _dir_rewind                                                    03F8 R
+    _disk_initialize                                               **** GX
+    _disk_readp                                                    **** GX
+  0 _follow_path                                                   084A R
+  0 _get_clust                                                     0363 R
+  0 _get_fat                                                       008A R
+  0 _mem_cmp                                                       0025 R
+  0 _mem_set                                                       0000 R
+  0 _pf_lseek                                                      173E GR
+  0 _pf_mount                                                      0A57 GR
+  0 _pf_open                                                       1254 GR
+  0 _pf_read                                                       140E GR
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
+Hexadecimal [16-Bits]
+
+Area Table
+
+   0 _CODE                                      size 1BB7   flags    0
+   1 _DATA                                      size    2   flags    0
+   2 _INITIALIZED                               size    0   flags    0
+   3 _DABS                                      size    0   flags    8
+   4 _HOME                                      size    0   flags    0
+   5 _GSINIT                                    size    0   flags    0
+   6 _GSFINAL                                   size    0   flags    0
+   7 _INITIALIZER                               size    0   flags    0
+   8 _CABS                                      size    0   flags    8
+

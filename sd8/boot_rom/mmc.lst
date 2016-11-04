@@ -1,0 +1,929 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ANSI-C Compiler
+                              3 ; Version 3.4.0 #8981 (Jul 12 2014) (Linux)
+                              4 ; This file was generated Mon Jan 18 22:50:17 2016
+                              5 ;--------------------------------------------------------
+                              6 	.module mmc
+                              7 	.optsdcc -mz80
+                              8 	
+                              9 ;--------------------------------------------------------
+                             10 ; Public variables in this module
+                             11 ;--------------------------------------------------------
+                             12 	.globl _forward
+                             13 	.globl _dly_us
+                             14 	.globl _disk_initialize
+                             15 	.globl _disk_readp
+                             16 ;--------------------------------------------------------
+                             17 ; special function registers
+                             18 ;--------------------------------------------------------
+                     0000    19 _DataPort	=	0x0000
+                     0001    20 _ControlPort	=	0x0001
+                             21 ;--------------------------------------------------------
+                             22 ; ram data
+                             23 ;--------------------------------------------------------
+                             24 	.area _DATA
+   0000                      25 _buffer:
+   0000                      26 	.ds 512
+   0200                      27 _CardType:
+   0200                      28 	.ds 1
+                             29 ;--------------------------------------------------------
+                             30 ; ram data
+                             31 ;--------------------------------------------------------
+                             32 	.area _INITIALIZED
+   0000                      33 _buffer_sector:
+   0000                      34 	.ds 4
+                             35 ;--------------------------------------------------------
+                             36 ; absolute external ram data
+                             37 ;--------------------------------------------------------
+                             38 	.area _DABS (ABS)
+                             39 ;--------------------------------------------------------
+                             40 ; global & static initialisations
+                             41 ;--------------------------------------------------------
+                             42 	.area _HOME
+                             43 	.area _GSINIT
+                             44 	.area _GSFINAL
+                             45 	.area _GSINIT
+                             46 ;--------------------------------------------------------
+                             47 ; Home
+                             48 ;--------------------------------------------------------
+                             49 	.area _HOME
+                             50 	.area _HOME
+                             51 ;--------------------------------------------------------
+                             52 ; code
+                             53 ;--------------------------------------------------------
+                             54 	.area _CODE
+                             55 ;mmc.c:29: void dly_us(unsigned char n) {
+                             56 ;	---------------------------------
+                             57 ; Function dly_us
+                             58 ; ---------------------------------
+   0000                      59 _dly_us_start::
+   0000                      60 _dly_us:
+                             61 ;mmc.c:30: while(n--);
+   0000 21 02 00      [10]   62 	ld	hl, #2+0
+   0003 39            [11]   63 	add	hl, sp
+   0004 56            [ 7]   64 	ld	d, (hl)
+   0005                      65 00101$:
+   0005 5A            [ 4]   66 	ld	e,d
+   0006 15            [ 4]   67 	dec	d
+   0007 7B            [ 4]   68 	ld	a,e
+   0008 B7            [ 4]   69 	or	a, a
+   0009 20 FA         [12]   70 	jr	NZ,00101$
+   000B C9            [10]   71 	ret
+   000C                      72 _dly_us_end::
+                             73 ;mmc.c:33: void forward(BYTE n) {
+                             74 ;	---------------------------------
+                             75 ; Function forward
+                             76 ; ---------------------------------
+   000C                      77 _forward_start::
+   000C                      78 _forward:
+                             79 ;mmc.c:34: }
+   000C C9            [10]   80 	ret
+   000D                      81 _forward_end::
+                             82 ;mmc.c:85: BYTE rcvr_mmc (void)
+                             83 ;	---------------------------------
+                             84 ; Function rcvr_mmc
+                             85 ; ---------------------------------
+   000D                      86 _rcvr_mmc:
+                             87 ;mmc.c:87: DataPort = 0xff;
+   000D 3E FF         [ 7]   88 	ld	a,#0xFF
+   000F D3 00         [11]   89 	out	(_DataPort),a
+                             90 ;mmc.c:94: __endasm;
+   0011 00            [ 4]   91 	nop
+   0012 00            [ 4]   92 	nop
+                             93 ;mmc.c:96: return DataPort;
+   0013 DB 00         [11]   94 	in	a,(_DataPort)
+   0015 6F            [ 4]   95 	ld	l,a
+   0016 C9            [10]   96 	ret
+                             97 ;mmc.c:104: void skip_mmc (
+                             98 ;	---------------------------------
+                             99 ; Function skip_mmc
+                            100 ; ---------------------------------
+   0017                     101 _skip_mmc:
+                            102 ;mmc.c:108: do {
+   0017 C1            [10]  103 	pop	bc
+   0018 D1            [10]  104 	pop	de
+   0019 D5            [11]  105 	push	de
+   001A C5            [11]  106 	push	bc
+   001B                     107 00101$:
+                            108 ;mmc.c:109: DataPort = 0xff;
+   001B 3E FF         [ 7]  109 	ld	a,#0xFF
+   001D D3 00         [11]  110 	out	(_DataPort),a
+                            111 ;mmc.c:110: } while (--n);
+   001F 1B            [ 6]  112 	dec	de
+   0020 7A            [ 4]  113 	ld	a,d
+   0021 B3            [ 4]  114 	or	a,e
+   0022 20 F7         [12]  115 	jr	NZ,00101$
+   0024 C9            [10]  116 	ret
+                            117 ;mmc.c:120: void release_spi (void)
+                            118 ;	---------------------------------
+                            119 ; Function release_spi
+                            120 ; ---------------------------------
+   0025                     121 _release_spi:
+                            122 ;mmc.c:122: CS_H();
+   0025 3E 01         [ 7]  123 	ld	a,#0x01
+   0027 D3 01         [11]  124 	out	(_ControlPort),a
+                            125 ;mmc.c:123: rcvr_mmc();
+   0029 C3r0Dr00      [10]  126 	jp	_rcvr_mmc
+                            127 ;mmc.c:132: BYTE send_cmd (
+                            128 ;	---------------------------------
+                            129 ; Function send_cmd
+                            130 ; ---------------------------------
+   002C                     131 _send_cmd:
+   002C DD E5         [15]  132 	push	ix
+   002E DD 21 00 00   [14]  133 	ld	ix,#0
+   0032 DD 39         [15]  134 	add	ix,sp
+                            135 ;mmc.c:140: if (cmd & 0x80) {	/* ACMD<n> is the command sequense of CMD55-CMD<n> */
+   0034 DD CB 04 7E   [20]  136 	bit	7, 4 (ix)
+   0038 28 1C         [12]  137 	jr	Z,00104$
+                            138 ;mmc.c:141: cmd &= 0x7F;
+   003A DD CB 04 BE   [23]  139 	res	7, 4 (ix)
+                            140 ;mmc.c:142: res = send_cmd(CMD55, 0);
+   003E 21 00 00      [10]  141 	ld	hl,#0x0000
+   0041 E5            [11]  142 	push	hl
+   0042 21 00 00      [10]  143 	ld	hl,#0x0000
+   0045 E5            [11]  144 	push	hl
+   0046 3E 77         [ 7]  145 	ld	a,#0x77
+   0048 F5            [11]  146 	push	af
+   0049 33            [ 6]  147 	inc	sp
+   004A CDr2Cr00      [17]  148 	call	_send_cmd
+   004D F1            [10]  149 	pop	af
+   004E F1            [10]  150 	pop	af
+   004F 33            [ 6]  151 	inc	sp
+                            152 ;mmc.c:143: if (res > 1) return res;
+   0050 3E 01         [ 7]  153 	ld	a,#0x01
+   0052 95            [ 4]  154 	sub	a, l
+   0053 DArECr00      [10]  155 	jp	C,00113$
+   0056                     156 00104$:
+                            157 ;mmc.c:147: CS_H(); rcvr_mmc();
+   0056 3E 01         [ 7]  158 	ld	a,#0x01
+   0058 D3 01         [11]  159 	out	(_ControlPort),a
+   005A CDr0Dr00      [17]  160 	call	_rcvr_mmc
+                            161 ;mmc.c:148: CS_L(); rcvr_mmc();
+   005D 3E 00         [ 7]  162 	ld	a,#0x00
+   005F D3 01         [11]  163 	out	(_ControlPort),a
+   0061 CDr0Dr00      [17]  164 	call	_rcvr_mmc
+                            165 ;mmc.c:151: XMIT_MMC(cmd);					/* Start + Command index */
+   0064 DD 7E 04      [19]  166 	ld	a,4 (ix)
+   0067 D3 00         [11]  167 	out	(_DataPort),a
+                            168 ;mmc.c:152: XMIT_MMC((BYTE)(arg >> 24));	/* Argument[31..24] */
+   0069 F5            [11]  169 	push	af
+   006A DD 6E 05      [19]  170 	ld	l,5 (ix)
+   006D DD 66 06      [19]  171 	ld	h,6 (ix)
+   0070 DD 5E 07      [19]  172 	ld	e,7 (ix)
+   0073 DD 56 08      [19]  173 	ld	d,8 (ix)
+   0076 F1            [10]  174 	pop	af
+   0077 06 18         [ 7]  175 	ld	b,#0x18
+   0079                     176 00141$:
+   0079 CB 3A         [ 8]  177 	srl	d
+   007B CB 1B         [ 8]  178 	rr	e
+   007D CB 1C         [ 8]  179 	rr	h
+   007F CB 1D         [ 8]  180 	rr	l
+   0081 10 F6         [13]  181 	djnz	00141$
+   0083 7D            [ 4]  182 	ld	a,l
+   0084 D3 00         [11]  183 	out	(_DataPort),a
+                            184 ;mmc.c:153: XMIT_MMC((BYTE)(arg >> 16));	/* Argument[23..16] */
+   0086 F5            [11]  185 	push	af
+   0087 DD 6E 05      [19]  186 	ld	l,5 (ix)
+   008A DD 66 06      [19]  187 	ld	h,6 (ix)
+   008D DD 5E 07      [19]  188 	ld	e,7 (ix)
+   0090 DD 56 08      [19]  189 	ld	d,8 (ix)
+   0093 F1            [10]  190 	pop	af
+   0094 06 10         [ 7]  191 	ld	b,#0x10
+   0096                     192 00143$:
+   0096 CB 3A         [ 8]  193 	srl	d
+   0098 CB 1B         [ 8]  194 	rr	e
+   009A CB 1C         [ 8]  195 	rr	h
+   009C CB 1D         [ 8]  196 	rr	l
+   009E 10 F6         [13]  197 	djnz	00143$
+   00A0 7D            [ 4]  198 	ld	a,l
+   00A1 D3 00         [11]  199 	out	(_DataPort),a
+                            200 ;mmc.c:154: XMIT_MMC((BYTE)(arg >> 8));		/* Argument[15..8] */
+   00A3 F5            [11]  201 	push	af
+   00A4 DD 66 05      [19]  202 	ld	h,5 (ix)
+   00A7 DD 6E 06      [19]  203 	ld	l,6 (ix)
+   00AA DD 5E 07      [19]  204 	ld	e,7 (ix)
+   00AD DD 56 08      [19]  205 	ld	d,8 (ix)
+   00B0 F1            [10]  206 	pop	af
+   00B1 06 08         [ 7]  207 	ld	b,#0x08
+   00B3                     208 00145$:
+   00B3 CB 3A         [ 8]  209 	srl	d
+   00B5 CB 1B         [ 8]  210 	rr	e
+   00B7 CB 1D         [ 8]  211 	rr	l
+   00B9 CB 1C         [ 8]  212 	rr	h
+   00BB 10 F6         [13]  213 	djnz	00145$
+   00BD 7C            [ 4]  214 	ld	a,h
+   00BE D3 00         [11]  215 	out	(_DataPort),a
+                            216 ;mmc.c:155: XMIT_MMC((BYTE)arg);			/* Argument[7..0] */
+   00C0 DD 7E 05      [19]  217 	ld	a,5 (ix)
+   00C3 D3 00         [11]  218 	out	(_DataPort),a
+                            219 ;mmc.c:156: n = 0x01;						/* Dummy CRC + Stop */
+   00C5 26 01         [ 7]  220 	ld	h,#0x01
+                            221 ;mmc.c:157: if (cmd == CMD0) n = 0x95;		/* Valid CRC for CMD0(0) */
+   00C7 DD 7E 04      [19]  222 	ld	a,4 (ix)
+   00CA D6 40         [ 7]  223 	sub	a, #0x40
+   00CC 20 02         [12]  224 	jr	NZ,00106$
+   00CE 26 95         [ 7]  225 	ld	h,#0x95
+   00D0                     226 00106$:
+                            227 ;mmc.c:158: if (cmd == CMD8) n = 0x87;		/* Valid CRC for CMD8(0x1AA) */
+   00D0 DD 7E 04      [19]  228 	ld	a,4 (ix)
+   00D3 D6 48         [ 7]  229 	sub	a, #0x48
+   00D5 20 02         [12]  230 	jr	NZ,00108$
+   00D7 26 87         [ 7]  231 	ld	h,#0x87
+   00D9                     232 00108$:
+                            233 ;mmc.c:159: XMIT_MMC(n);
+   00D9 7C            [ 4]  234 	ld	a,h
+   00DA D3 00         [11]  235 	out	(_DataPort),a
+                            236 ;mmc.c:163: do {
+   00DC 16 0A         [ 7]  237 	ld	d,#0x0A
+   00DE                     238 00110$:
+                            239 ;mmc.c:164: res = rcvr_mmc();
+   00DE D5            [11]  240 	push	de
+   00DF CDr0Dr00      [17]  241 	call	_rcvr_mmc
+   00E2 D1            [10]  242 	pop	de
+                            243 ;mmc.c:165: } while ((res & 0x80) && --n);
+   00E3 CB 7D         [ 8]  244 	bit	7, l
+   00E5 28 05         [12]  245 	jr	Z,00112$
+   00E7 15            [ 4]  246 	dec	d
+   00E8 7A            [ 4]  247 	ld	a,d
+   00E9 B7            [ 4]  248 	or	a, a
+   00EA 20 F2         [12]  249 	jr	NZ,00110$
+   00EC                     250 00112$:
+                            251 ;mmc.c:167: return res;			/* Return with the response value */
+   00EC                     252 00113$:
+   00EC DD E1         [14]  253 	pop	ix
+   00EE C9            [10]  254 	ret
+                            255 ;mmc.c:183: DSTATUS disk_initialize (void)
+                            256 ;	---------------------------------
+                            257 ; Function disk_initialize
+                            258 ; ---------------------------------
+   00EF                     259 _disk_initialize_start::
+   00EF                     260 _disk_initialize:
+   00EF DD E5         [15]  261 	push	ix
+   00F1 DD 21 00 00   [14]  262 	ld	ix,#0
+   00F5 DD 39         [15]  263 	add	ix,sp
+   00F7 21 F9 FF      [10]  264 	ld	hl,#-7
+   00FA 39            [11]  265 	add	hl,sp
+   00FB F9            [ 6]  266 	ld	sp,hl
+                            267 ;mmc.c:188: CS_H();
+   00FC 3E 01         [ 7]  268 	ld	a,#0x01
+   00FE D3 01         [11]  269 	out	(_ControlPort),a
+                            270 ;mmc.c:189: skip_mmc(10);			/* Dummy clocks */
+   0100 21 0A 00      [10]  271 	ld	hl,#0x000A
+   0103 E5            [11]  272 	push	hl
+   0104 CDr17r00      [17]  273 	call	_skip_mmc
+   0107 F1            [10]  274 	pop	af
+                            275 ;mmc.c:191: ty = 0;
+   0108 DD 36 FD 00   [19]  276 	ld	-3 (ix),#0x00
+                            277 ;mmc.c:192: if (send_cmd(CMD0, 0) == 1) {			/* Enter Idle state */
+   010C 21 00 00      [10]  278 	ld	hl,#0x0000
+   010F E5            [11]  279 	push	hl
+   0110 21 00 00      [10]  280 	ld	hl,#0x0000
+   0113 E5            [11]  281 	push	hl
+   0114 3E 40         [ 7]  282 	ld	a,#0x40
+   0116 F5            [11]  283 	push	af
+   0117 33            [ 6]  284 	inc	sp
+   0118 CDr2Cr00      [17]  285 	call	_send_cmd
+   011B F1            [10]  286 	pop	af
+   011C F1            [10]  287 	pop	af
+   011D 33            [ 6]  288 	inc	sp
+   011E 2D            [ 4]  289 	dec	l
+   011F C2r5Br02      [10]  290 	jp	NZ,00125$
+                            291 ;mmc.c:193: if (send_cmd(CMD8, 0x1AA) == 1) {	/* SDv2 */
+   0122 21 00 00      [10]  292 	ld	hl,#0x0000
+   0125 E5            [11]  293 	push	hl
+   0126 21 AA 01      [10]  294 	ld	hl,#0x01AA
+   0129 E5            [11]  295 	push	hl
+   012A 3E 48         [ 7]  296 	ld	a,#0x48
+   012C F5            [11]  297 	push	af
+   012D 33            [ 6]  298 	inc	sp
+   012E CDr2Cr00      [17]  299 	call	_send_cmd
+   0131 F1            [10]  300 	pop	af
+   0132 F1            [10]  301 	pop	af
+   0133 33            [ 6]  302 	inc	sp
+   0134 2D            [ 4]  303 	dec	l
+   0135 C2rECr01      [10]  304 	jp	NZ,00122$
+                            305 ;mmc.c:194: for (n = 0; n < 4; n++) buf[n] = rcvr_mmc();	/* Get trailing return value of R7 resp */
+   0138 21 00 00      [10]  306 	ld	hl,#0x0000
+   013B 39            [11]  307 	add	hl,sp
+   013C DD 75 FE      [19]  308 	ld	-2 (ix),l
+   013F DD 74 FF      [19]  309 	ld	-1 (ix),h
+   0142 1E 00         [ 7]  310 	ld	e,#0x00
+   0144                     311 00126$:
+   0144 DD 6E FE      [19]  312 	ld	l,-2 (ix)
+   0147 DD 66 FF      [19]  313 	ld	h,-1 (ix)
+   014A 16 00         [ 7]  314 	ld	d,#0x00
+   014C 19            [11]  315 	add	hl, de
+   014D E5            [11]  316 	push	hl
+   014E D5            [11]  317 	push	de
+   014F CDr0Dr00      [17]  318 	call	_rcvr_mmc
+   0152 7D            [ 4]  319 	ld	a,l
+   0153 D1            [10]  320 	pop	de
+   0154 E1            [10]  321 	pop	hl
+   0155 77            [ 7]  322 	ld	(hl),a
+   0156 1C            [ 4]  323 	inc	e
+   0157 7B            [ 4]  324 	ld	a,e
+   0158 D6 04         [ 7]  325 	sub	a, #0x04
+   015A 38 E8         [12]  326 	jr	C,00126$
+                            327 ;mmc.c:195: if (buf[2] == 0x01 && buf[3] == 0xAA) {			/* The card can work at vdd range of 2.7-3.6V */
+   015C DD 6E FE      [19]  328 	ld	l,-2 (ix)
+   015F DD 66 FF      [19]  329 	ld	h,-1 (ix)
+   0162 23            [ 6]  330 	inc	hl
+   0163 23            [ 6]  331 	inc	hl
+   0164 7E            [ 7]  332 	ld	a,(hl)
+   0165 3D            [ 4]  333 	dec	a
+   0166 C2r5Br02      [10]  334 	jp	NZ,00125$
+   0169 DD 6E FE      [19]  335 	ld	l,-2 (ix)
+   016C DD 66 FF      [19]  336 	ld	h,-1 (ix)
+   016F 23            [ 6]  337 	inc	hl
+   0170 23            [ 6]  338 	inc	hl
+   0171 23            [ 6]  339 	inc	hl
+   0172 7E            [ 7]  340 	ld	a,(hl)
+   0173 D6 AA         [ 7]  341 	sub	a, #0xAA
+   0175 C2r5Br02      [10]  342 	jp	NZ,00125$
+                            343 ;mmc.c:196: for (tmr = 1000; tmr; tmr--) {				/* Wait for leaving idle state (ACMD41 with HCS bit) */
+   0178 11 E8 03      [10]  344 	ld	de,#0x03E8
+   017B                     345 00128$:
+                            346 ;mmc.c:197: if (send_cmd(ACMD41, 1UL << 30) == 0) break;
+   017B D5            [11]  347 	push	de
+   017C 21 00 40      [10]  348 	ld	hl,#0x4000
+   017F E5            [11]  349 	push	hl
+   0180 21 00 00      [10]  350 	ld	hl,#0x0000
+   0183 E5            [11]  351 	push	hl
+   0184 3E E9         [ 7]  352 	ld	a,#0xE9
+   0186 F5            [11]  353 	push	af
+   0187 33            [ 6]  354 	inc	sp
+   0188 CDr2Cr00      [17]  355 	call	_send_cmd
+   018B F1            [10]  356 	pop	af
+   018C F1            [10]  357 	pop	af
+   018D 33            [ 6]  358 	inc	sp
+   018E 7D            [ 4]  359 	ld	a,l
+   018F D1            [10]  360 	pop	de
+   0190 B7            [ 4]  361 	or	a, a
+   0191 28 0F         [12]  362 	jr	Z,00104$
+                            363 ;mmc.c:198: DLY_US(1000);
+   0193 D5            [11]  364 	push	de
+   0194 3E E8         [ 7]  365 	ld	a,#0xE8
+   0196 F5            [11]  366 	push	af
+   0197 33            [ 6]  367 	inc	sp
+   0198 CDr00r00      [17]  368 	call	_dly_us
+   019B 33            [ 6]  369 	inc	sp
+   019C D1            [10]  370 	pop	de
+                            371 ;mmc.c:196: for (tmr = 1000; tmr; tmr--) {				/* Wait for leaving idle state (ACMD41 with HCS bit) */
+   019D 1B            [ 6]  372 	dec	de
+   019E 7A            [ 4]  373 	ld	a,d
+   019F B3            [ 4]  374 	or	a,e
+   01A0 20 D9         [12]  375 	jr	NZ,00128$
+   01A2                     376 00104$:
+                            377 ;mmc.c:200: if (tmr && send_cmd(CMD58, 0) == 0) {		/* Check CCS bit in the OCR */
+   01A2 7A            [ 4]  378 	ld	a,d
+   01A3 B3            [ 4]  379 	or	a,e
+   01A4 CAr5Br02      [10]  380 	jp	Z,00125$
+   01A7 21 00 00      [10]  381 	ld	hl,#0x0000
+   01AA E5            [11]  382 	push	hl
+   01AB 21 00 00      [10]  383 	ld	hl,#0x0000
+   01AE E5            [11]  384 	push	hl
+   01AF 3E 7A         [ 7]  385 	ld	a,#0x7A
+   01B1 F5            [11]  386 	push	af
+   01B2 33            [ 6]  387 	inc	sp
+   01B3 CDr2Cr00      [17]  388 	call	_send_cmd
+   01B6 F1            [10]  389 	pop	af
+   01B7 F1            [10]  390 	pop	af
+   01B8 33            [ 6]  391 	inc	sp
+   01B9 7D            [ 4]  392 	ld	a,l
+                            393 ;mmc.c:201: for (n = 0; n < 4; n++) buf[n] = rcvr_mmc();
+   01BA B7            [ 4]  394 	or	a,a
+   01BB C2r5Br02      [10]  395 	jp	NZ,00125$
+   01BE 5F            [ 4]  396 	ld	e,a
+   01BF                     397 00130$:
+   01BF DD 6E FE      [19]  398 	ld	l,-2 (ix)
+   01C2 DD 66 FF      [19]  399 	ld	h,-1 (ix)
+   01C5 16 00         [ 7]  400 	ld	d,#0x00
+   01C7 19            [11]  401 	add	hl, de
+   01C8 E5            [11]  402 	push	hl
+   01C9 D5            [11]  403 	push	de
+   01CA CDr0Dr00      [17]  404 	call	_rcvr_mmc
+   01CD 7D            [ 4]  405 	ld	a,l
+   01CE D1            [10]  406 	pop	de
+   01CF E1            [10]  407 	pop	hl
+   01D0 77            [ 7]  408 	ld	(hl),a
+   01D1 1C            [ 4]  409 	inc	e
+   01D2 7B            [ 4]  410 	ld	a,e
+   01D3 D6 04         [ 7]  411 	sub	a, #0x04
+   01D5 38 E8         [12]  412 	jr	C,00130$
+                            413 ;mmc.c:202: ty = (buf[0] & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2;	/* SDv2 (HC or SC) */
+   01D7 DD 6E FE      [19]  414 	ld	l,-2 (ix)
+   01DA DD 66 FF      [19]  415 	ld	h,-1 (ix)
+   01DD CB 76         [12]  416 	bit	6,(hl)
+   01DF 28 04         [12]  417 	jr	Z,00136$
+   01E1 3E 0C         [ 7]  418 	ld	a,#0x0C
+   01E3 18 02         [12]  419 	jr	00137$
+   01E5                     420 00136$:
+   01E5 3E 04         [ 7]  421 	ld	a,#0x04
+   01E7                     422 00137$:
+   01E7 DD 77 FD      [19]  423 	ld	-3 (ix),a
+   01EA 18 6F         [12]  424 	jr	00125$
+   01EC                     425 00122$:
+                            426 ;mmc.c:206: if (send_cmd(ACMD41, 0) <= 1) 	{
+   01EC 21 00 00      [10]  427 	ld	hl,#0x0000
+   01EF E5            [11]  428 	push	hl
+   01F0 21 00 00      [10]  429 	ld	hl,#0x0000
+   01F3 E5            [11]  430 	push	hl
+   01F4 3E E9         [ 7]  431 	ld	a,#0xE9
+   01F6 F5            [11]  432 	push	af
+   01F7 33            [ 6]  433 	inc	sp
+   01F8 CDr2Cr00      [17]  434 	call	_send_cmd
+   01FB F1            [10]  435 	pop	af
+   01FC F1            [10]  436 	pop	af
+   01FD 33            [ 6]  437 	inc	sp
+   01FE 3E 01         [ 7]  438 	ld	a,#0x01
+   0200 95            [ 4]  439 	sub	a, l
+   0201 38 08         [12]  440 	jr	C,00113$
+                            441 ;mmc.c:207: ty = CT_SD1; cmd = ACMD41;	/* SDv1 */
+   0203 DD 36 FD 02   [19]  442 	ld	-3 (ix),#0x02
+   0207 16 E9         [ 7]  443 	ld	d,#0xE9
+   0209 18 06         [12]  444 	jr	00155$
+   020B                     445 00113$:
+                            446 ;mmc.c:209: ty = CT_MMC; cmd = CMD1;	/* MMCv3 */
+   020B DD 36 FD 01   [19]  447 	ld	-3 (ix),#0x01
+   020F 16 41         [ 7]  448 	ld	d,#0x41
+                            449 ;mmc.c:211: for (tmr = 1000; tmr; tmr--) {			/* Wait for leaving idle state */
+   0211                     450 00155$:
+   0211 01 E8 03      [10]  451 	ld	bc,#0x03E8
+   0214                     452 00132$:
+                            453 ;mmc.c:212: if (send_cmd(cmd, 0) == 0) break;
+   0214 C5            [11]  454 	push	bc
+   0215 D5            [11]  455 	push	de
+   0216 21 00 00      [10]  456 	ld	hl,#0x0000
+   0219 E5            [11]  457 	push	hl
+   021A 21 00 00      [10]  458 	ld	hl,#0x0000
+   021D E5            [11]  459 	push	hl
+   021E D5            [11]  460 	push	de
+   021F 33            [ 6]  461 	inc	sp
+   0220 CDr2Cr00      [17]  462 	call	_send_cmd
+   0223 F1            [10]  463 	pop	af
+   0224 F1            [10]  464 	pop	af
+   0225 33            [ 6]  465 	inc	sp
+   0226 7D            [ 4]  466 	ld	a,l
+   0227 D1            [10]  467 	pop	de
+   0228 C1            [10]  468 	pop	bc
+   0229 B7            [ 4]  469 	or	a, a
+   022A 28 11         [12]  470 	jr	Z,00117$
+                            471 ;mmc.c:213: DLY_US(1000);
+   022C C5            [11]  472 	push	bc
+   022D D5            [11]  473 	push	de
+   022E 3E E8         [ 7]  474 	ld	a,#0xE8
+   0230 F5            [11]  475 	push	af
+   0231 33            [ 6]  476 	inc	sp
+   0232 CDr00r00      [17]  477 	call	_dly_us
+   0235 33            [ 6]  478 	inc	sp
+   0236 D1            [10]  479 	pop	de
+   0237 C1            [10]  480 	pop	bc
+                            481 ;mmc.c:211: for (tmr = 1000; tmr; tmr--) {			/* Wait for leaving idle state */
+   0238 0B            [ 6]  482 	dec	bc
+   0239 78            [ 4]  483 	ld	a,b
+   023A B1            [ 4]  484 	or	a,c
+   023B 20 D7         [12]  485 	jr	NZ,00132$
+   023D                     486 00117$:
+                            487 ;mmc.c:215: if (!tmr || send_cmd(CMD16, 512) != 0)			/* Set R/W block length to 512 */
+   023D 78            [ 4]  488 	ld	a,b
+   023E B1            [ 4]  489 	or	a,c
+   023F 28 16         [12]  490 	jr	Z,00118$
+   0241 21 00 00      [10]  491 	ld	hl,#0x0000
+   0244 E5            [11]  492 	push	hl
+   0245 21 00 02      [10]  493 	ld	hl,#0x0200
+   0248 E5            [11]  494 	push	hl
+   0249 3E 50         [ 7]  495 	ld	a,#0x50
+   024B F5            [11]  496 	push	af
+   024C 33            [ 6]  497 	inc	sp
+   024D CDr2Cr00      [17]  498 	call	_send_cmd
+   0250 F1            [10]  499 	pop	af
+   0251 F1            [10]  500 	pop	af
+   0252 33            [ 6]  501 	inc	sp
+   0253 7D            [ 4]  502 	ld	a,l
+   0254 B7            [ 4]  503 	or	a, a
+   0255 28 04         [12]  504 	jr	Z,00125$
+   0257                     505 00118$:
+                            506 ;mmc.c:216: ty = 0;
+   0257 DD 36 FD 00   [19]  507 	ld	-3 (ix),#0x00
+   025B                     508 00125$:
+                            509 ;mmc.c:219: CardType = ty;
+   025B DD 7E FD      [19]  510 	ld	a,-3 (ix)
+   025E 32r00r02      [13]  511 	ld	(#_CardType + 0),a
+                            512 ;mmc.c:220: release_spi();
+   0261 CDr25r00      [17]  513 	call	_release_spi
+                            514 ;mmc.c:222: return ty ? 0 : STA_NOINIT;
+   0264 DD 7E FD      [19]  515 	ld	a,-3 (ix)
+   0267 B7            [ 4]  516 	or	a, a
+   0268 28 04         [12]  517 	jr	Z,00138$
+   026A 2E 00         [ 7]  518 	ld	l,#0x00
+   026C 18 02         [12]  519 	jr	00139$
+   026E                     520 00138$:
+   026E 2E 01         [ 7]  521 	ld	l,#0x01
+   0270                     522 00139$:
+   0270 DD F9         [10]  523 	ld	sp, ix
+   0272 DD E1         [14]  524 	pop	ix
+   0274 C9            [10]  525 	ret
+   0275                     526 _disk_initialize_end::
+                            527 ;mmc.c:231: DRESULT disk_readp (
+                            528 ;	---------------------------------
+                            529 ; Function disk_readp
+                            530 ; ---------------------------------
+   0275                     531 _disk_readp_start::
+   0275                     532 _disk_readp:
+   0275 DD E5         [15]  533 	push	ix
+   0277 DD 21 00 00   [14]  534 	ld	ix,#0
+   027B DD 39         [15]  535 	add	ix,sp
+   027D 21 F3 FF      [10]  536 	ld	hl,#-13
+   0280 39            [11]  537 	add	hl,sp
+   0281 F9            [ 6]  538 	ld	sp,hl
+                            539 ;mmc.c:238: BYTE *buff_sec = buffer;
+                            540 ;mmc.c:243: if (!(CardType & CT_BLOCK)) sector *= 512;	/* Convert to byte address if needed */
+   0282 FD 21r00r02   [14]  541 	ld	iy,#_CardType
+   0286 FD CB 00 5E   [20]  542 	bit	3, 0 (iy)
+   028A 20 16         [12]  543 	jr	NZ,00102$
+   028C F5            [11]  544 	push	af
+   028D F1            [10]  545 	pop	af
+   028E 06 09         [ 7]  546 	ld	b,#0x09
+   0290                     547 00231$:
+   0290 DD CB 06 26   [23]  548 	sla	6 (ix)
+   0294 DD CB 07 16   [23]  549 	rl	7 (ix)
+   0298 DD CB 08 16   [23]  550 	rl	8 (ix)
+   029C DD CB 09 16   [23]  551 	rl	9 (ix)
+   02A0 10 EE         [13]  552 	djnz	00231$
+   02A2                     553 00102$:
+                            554 ;mmc.c:269: *buff++ = rcvr_mmc();
+   02A2 DD 7E 04      [19]  555 	ld	a,4 (ix)
+   02A5 DD 77 FC      [19]  556 	ld	-4 (ix),a
+   02A8 DD 7E 05      [19]  557 	ld	a,5 (ix)
+   02AB DD 77 FD      [19]  558 	ld	-3 (ix),a
+                            559 ;mmc.c:248: while(count--)
+   02AE DD 7E 0C      [19]  560 	ld	a,12 (ix)
+   02B1 DD 77 FE      [19]  561 	ld	-2 (ix),a
+   02B4 DD 7E 0D      [19]  562 	ld	a,13 (ix)
+   02B7 DD 77 FF      [19]  563 	ld	-1 (ix),a
+                            564 ;mmc.c:246: if(buffer_sector == sector) {
+   02BA 3Ar00r00      [13]  565 	ld	a,(#_buffer_sector + 0)
+   02BD DD 96 06      [19]  566 	sub	a, 6 (ix)
+   02C0 20 49         [12]  567 	jr	NZ,00107$
+   02C2 3Ar01r00      [13]  568 	ld	a,(#_buffer_sector + 1)
+   02C5 DD 96 07      [19]  569 	sub	a, 7 (ix)
+   02C8 20 41         [12]  570 	jr	NZ,00107$
+   02CA 3Ar02r00      [13]  571 	ld	a,(#_buffer_sector + 2)
+   02CD DD 96 08      [19]  572 	sub	a, 8 (ix)
+   02D0 20 39         [12]  573 	jr	NZ,00107$
+   02D2 3Ar03r00      [13]  574 	ld	a,(#_buffer_sector + 3)
+   02D5 DD 96 09      [19]  575 	sub	a, 9 (ix)
+   02D8 20 31         [12]  576 	jr	NZ,00107$
+                            577 ;mmc.c:247: buff_sec += offset;  // skip to requested bytes
+   02DA 3Er00         [ 7]  578 	ld	a,#<(_buffer)
+   02DC DD 86 0A      [19]  579 	add	a, 10 (ix)
+   02DF 4F            [ 4]  580 	ld	c,a
+   02E0 3Es00         [ 7]  581 	ld	a,#>(_buffer)
+   02E2 DD 8E 0B      [19]  582 	adc	a, 11 (ix)
+   02E5 47            [ 4]  583 	ld	b,a
+                            584 ;mmc.c:248: while(count--)
+   02E6 DD 5E FC      [19]  585 	ld	e,-4 (ix)
+   02E9 DD 56 FD      [19]  586 	ld	d,-3 (ix)
+   02EC E5            [11]  587 	push	hl
+   02ED DD 6E FE      [19]  588 	ld	l,-2 (ix)
+   02F0 DD 66 FF      [19]  589 	ld	h,-1 (ix)
+   02F3 E5            [11]  590 	push	hl
+   02F4 FD E1         [14]  591 	pop	iy
+   02F6 E1            [10]  592 	pop	hl
+   02F7                     593 00103$:
+   02F7 FD E5         [15]  594 	push	iy
+   02F9 E1            [10]  595 	pop	hl
+   02FA FD 2B         [10]  596 	dec	iy
+   02FC 7C            [ 4]  597 	ld	a,h
+   02FD B5            [ 4]  598 	or	a,l
+   02FE 28 06         [12]  599 	jr	Z,00105$
+                            600 ;mmc.c:249: *buff++ = *buff_sec++;
+   0300 0A            [ 7]  601 	ld	a,(bc)
+   0301 03            [ 6]  602 	inc	bc
+   0302 12            [ 7]  603 	ld	(de),a
+   0303 13            [ 6]  604 	inc	de
+   0304 18 F1         [12]  605 	jr	00103$
+   0306                     606 00105$:
+                            607 ;mmc.c:251: return RES_OK;
+   0306 2E 00         [ 7]  608 	ld	l,#0x00
+   0308 C3r04r05      [10]  609 	jp	00139$
+   030B                     610 00107$:
+                            611 ;mmc.c:254: res = RES_ERROR;
+   030B DD 36 F9 01   [19]  612 	ld	-7 (ix),#0x01
+                            613 ;mmc.c:255: if (send_cmd(CMD17, sector) == 0) {		/* READ_SINGLE_BLOCK */
+   030F DD 6E 08      [19]  614 	ld	l,8 (ix)
+   0312 DD 66 09      [19]  615 	ld	h,9 (ix)
+   0315 E5            [11]  616 	push	hl
+   0316 DD 6E 06      [19]  617 	ld	l,6 (ix)
+   0319 DD 66 07      [19]  618 	ld	h,7 (ix)
+   031C E5            [11]  619 	push	hl
+   031D 3E 51         [ 7]  620 	ld	a,#0x51
+   031F F5            [11]  621 	push	af
+   0320 33            [ 6]  622 	inc	sp
+   0321 CDr2Cr00      [17]  623 	call	_send_cmd
+   0324 F1            [10]  624 	pop	af
+   0325 F1            [10]  625 	pop	af
+   0326 33            [ 6]  626 	inc	sp
+   0327 7D            [ 4]  627 	ld	a,l
+   0328 B7            [ 4]  628 	or	a, a
+   0329 C2rFEr04      [10]  629 	jp	NZ,00135$
+                            630 ;mmc.c:258: do {							/* Wait for data packet in timeout of 100ms */
+   032C 11 E8 03      [10]  631 	ld	de,#0x03E8
+   032F                     632 00109$:
+                            633 ;mmc.c:259: DLY_US(100);
+   032F D5            [11]  634 	push	de
+   0330 3E 64         [ 7]  635 	ld	a,#0x64
+   0332 F5            [11]  636 	push	af
+   0333 33            [ 6]  637 	inc	sp
+   0334 CDr00r00      [17]  638 	call	_dly_us
+   0337 33            [ 6]  639 	inc	sp
+   0338 CDr0Dr00      [17]  640 	call	_rcvr_mmc
+   033B D1            [10]  641 	pop	de
+                            642 ;mmc.c:261: } while (d == 0xFF && --tmr);
+   033C 7D            [ 4]  643 	ld	a,l
+   033D 3C            [ 4]  644 	inc	a
+   033E 20 05         [12]  645 	jr	NZ,00111$
+   0340 1B            [ 6]  646 	dec	de
+   0341 7A            [ 4]  647 	ld	a,d
+   0342 B3            [ 4]  648 	or	a,e
+   0343 20 EA         [12]  649 	jr	NZ,00109$
+   0345                     650 00111$:
+                            651 ;mmc.c:263: if (d == 0xFE) {				/* A data packet arrived */
+   0345 7D            [ 4]  652 	ld	a,l
+   0346 D6 FE         [ 7]  653 	sub	a, #0xFE
+   0348 C2rFEr04      [10]  654 	jp	NZ,00135$
+                            655 ;mmc.c:266: if((!offset) && (count == 512)) {
+   034B DD 7E 0B      [19]  656 	ld	a,11 (ix)
+   034E DD B6 0A      [19]  657 	or	a,10 (ix)
+   0351 C2r1Er04      [10]  658 	jp	NZ,00129$
+   0354 DD 7E 0C      [19]  659 	ld	a,12 (ix)
+   0357 B7            [ 4]  660 	or	a, a
+   0358 C2r1Er04      [10]  661 	jp	NZ,00129$
+   035B DD 7E 0D      [19]  662 	ld	a,13 (ix)
+   035E D6 02         [ 7]  663 	sub	a, #0x02
+   0360 C2r1Er04      [10]  664 	jp	NZ,00129$
+                            665 ;mmc.c:268: for(c=0;c<64;c++) {
+   0363 DD 36 F3 40   [19]  666 	ld	-13 (ix),#0x40
+   0367                     667 00138$:
+                            668 ;mmc.c:269: *buff++ = rcvr_mmc();
+   0367 DD 6E 04      [19]  669 	ld	l,4 (ix)
+   036A DD 66 05      [19]  670 	ld	h,5 (ix)
+   036D E5            [11]  671 	push	hl
+   036E CDr0Dr00      [17]  672 	call	_rcvr_mmc
+   0371 7D            [ 4]  673 	ld	a,l
+   0372 E1            [10]  674 	pop	hl
+   0373 77            [ 7]  675 	ld	(hl),a
+   0374 23            [ 6]  676 	inc	hl
+   0375 DD 75 04      [19]  677 	ld	4 (ix),l
+   0378 DD 74 05      [19]  678 	ld	5 (ix),h
+                            679 ;mmc.c:270: *buff++ = rcvr_mmc();
+   037B DD 6E 04      [19]  680 	ld	l,4 (ix)
+   037E DD 66 05      [19]  681 	ld	h,5 (ix)
+   0381 E5            [11]  682 	push	hl
+   0382 CDr0Dr00      [17]  683 	call	_rcvr_mmc
+   0385 7D            [ 4]  684 	ld	a,l
+   0386 E1            [10]  685 	pop	hl
+   0387 77            [ 7]  686 	ld	(hl),a
+   0388 23            [ 6]  687 	inc	hl
+   0389 DD 75 04      [19]  688 	ld	4 (ix),l
+   038C DD 74 05      [19]  689 	ld	5 (ix),h
+                            690 ;mmc.c:271: *buff++ = rcvr_mmc();
+   038F DD 6E 04      [19]  691 	ld	l,4 (ix)
+   0392 DD 66 05      [19]  692 	ld	h,5 (ix)
+   0395 E5            [11]  693 	push	hl
+   0396 CDr0Dr00      [17]  694 	call	_rcvr_mmc
+   0399 7D            [ 4]  695 	ld	a,l
+   039A E1            [10]  696 	pop	hl
+   039B 77            [ 7]  697 	ld	(hl),a
+   039C 23            [ 6]  698 	inc	hl
+   039D DD 75 04      [19]  699 	ld	4 (ix),l
+   03A0 DD 74 05      [19]  700 	ld	5 (ix),h
+                            701 ;mmc.c:272: *buff++ = rcvr_mmc();
+   03A3 DD 6E 04      [19]  702 	ld	l,4 (ix)
+   03A6 DD 66 05      [19]  703 	ld	h,5 (ix)
+   03A9 E5            [11]  704 	push	hl
+   03AA CDr0Dr00      [17]  705 	call	_rcvr_mmc
+   03AD 7D            [ 4]  706 	ld	a,l
+   03AE E1            [10]  707 	pop	hl
+   03AF 77            [ 7]  708 	ld	(hl),a
+   03B0 23            [ 6]  709 	inc	hl
+   03B1 DD 75 04      [19]  710 	ld	4 (ix),l
+   03B4 DD 74 05      [19]  711 	ld	5 (ix),h
+                            712 ;mmc.c:273: *buff++ = rcvr_mmc();
+   03B7 DD 6E 04      [19]  713 	ld	l,4 (ix)
+   03BA DD 66 05      [19]  714 	ld	h,5 (ix)
+   03BD E5            [11]  715 	push	hl
+   03BE CDr0Dr00      [17]  716 	call	_rcvr_mmc
+   03C1 7D            [ 4]  717 	ld	a,l
+   03C2 E1            [10]  718 	pop	hl
+   03C3 77            [ 7]  719 	ld	(hl),a
+   03C4 23            [ 6]  720 	inc	hl
+   03C5 DD 75 04      [19]  721 	ld	4 (ix),l
+   03C8 DD 74 05      [19]  722 	ld	5 (ix),h
+                            723 ;mmc.c:274: *buff++ = rcvr_mmc();
+   03CB DD 6E 04      [19]  724 	ld	l,4 (ix)
+   03CE DD 66 05      [19]  725 	ld	h,5 (ix)
+   03D1 E5            [11]  726 	push	hl
+   03D2 CDr0Dr00      [17]  727 	call	_rcvr_mmc
+   03D5 7D            [ 4]  728 	ld	a,l
+   03D6 E1            [10]  729 	pop	hl
+   03D7 77            [ 7]  730 	ld	(hl),a
+   03D8 23            [ 6]  731 	inc	hl
+   03D9 DD 75 04      [19]  732 	ld	4 (ix),l
+   03DC DD 74 05      [19]  733 	ld	5 (ix),h
+                            734 ;mmc.c:275: *buff++ = rcvr_mmc();
+   03DF DD 6E 04      [19]  735 	ld	l,4 (ix)
+   03E2 DD 66 05      [19]  736 	ld	h,5 (ix)
+   03E5 E5            [11]  737 	push	hl
+   03E6 CDr0Dr00      [17]  738 	call	_rcvr_mmc
+   03E9 7D            [ 4]  739 	ld	a,l
+   03EA E1            [10]  740 	pop	hl
+   03EB 77            [ 7]  741 	ld	(hl),a
+   03EC 23            [ 6]  742 	inc	hl
+   03ED DD 75 04      [19]  743 	ld	4 (ix),l
+   03F0 DD 74 05      [19]  744 	ld	5 (ix),h
+                            745 ;mmc.c:276: *buff++ = rcvr_mmc();
+   03F3 DD 6E 04      [19]  746 	ld	l,4 (ix)
+   03F6 DD 66 05      [19]  747 	ld	h,5 (ix)
+   03F9 E5            [11]  748 	push	hl
+   03FA CDr0Dr00      [17]  749 	call	_rcvr_mmc
+   03FD 7D            [ 4]  750 	ld	a,l
+   03FE E1            [10]  751 	pop	hl
+   03FF 77            [ 7]  752 	ld	(hl),a
+   0400 23            [ 6]  753 	inc	hl
+   0401 DD 75 04      [19]  754 	ld	4 (ix),l
+   0404 DD 74 05      [19]  755 	ld	5 (ix),h
+   0407 DD 7E F3      [19]  756 	ld	a,-13 (ix)
+   040A C6 FF         [ 7]  757 	add	a,#0xFF
+                            758 ;mmc.c:268: for(c=0;c<64;c++) {
+   040C DD 77 F3      [19]  759 	ld	-13 (ix), a
+   040F B7            [ 4]  760 	or	a, a
+   0410 C2r67r03      [10]  761 	jp	NZ,00138$
+                            762 ;mmc.c:278: skip_mmc(2);
+   0413 21 02 00      [10]  763 	ld	hl,#0x0002
+   0416 E5            [11]  764 	push	hl
+   0417 CDr17r00      [17]  765 	call	_skip_mmc
+   041A F1            [10]  766 	pop	af
+   041B C3rFAr04      [10]  767 	jp	00130$
+   041E                     768 00129$:
+                            769 ;mmc.c:281: bc = 512 - offset - count;
+   041E AF            [ 4]  770 	xor	a, a
+   041F DD 96 0A      [19]  771 	sub	a, 10 (ix)
+   0422 6F            [ 4]  772 	ld	l,a
+   0423 3E 02         [ 7]  773 	ld	a,#0x02
+   0425 DD 9E 0B      [19]  774 	sbc	a, 11 (ix)
+   0428 67            [ 4]  775 	ld	h,a
+   0429 7D            [ 4]  776 	ld	a,l
+   042A DD 96 0C      [19]  777 	sub	a, 12 (ix)
+   042D 6F            [ 4]  778 	ld	l,a
+   042E 7C            [ 4]  779 	ld	a,h
+   042F DD 9E 0D      [19]  780 	sbc	a, 13 (ix)
+   0432 DD 75 F7      [19]  781 	ld	-9 (ix), l
+   0435 DD 77 F8      [19]  782 	ld	-8 (ix), a
+                            783 ;mmc.c:284: while(offset--)
+   0438 11r00r00      [10]  784 	ld	de,#_buffer
+   043B DD 7E 0A      [19]  785 	ld	a,10 (ix)
+   043E DD 77 FA      [19]  786 	ld	-6 (ix),a
+   0441 DD 7E 0B      [19]  787 	ld	a,11 (ix)
+   0444 DD 77 FB      [19]  788 	ld	-5 (ix),a
+   0447                     789 00113$:
+   0447 DD 4E FA      [19]  790 	ld	c,-6 (ix)
+   044A DD 46 FB      [19]  791 	ld	b,-5 (ix)
+   044D DD 6E FA      [19]  792 	ld	l,-6 (ix)
+   0450 DD 66 FB      [19]  793 	ld	h,-5 (ix)
+   0453 2B            [ 6]  794 	dec	hl
+   0454 DD 75 FA      [19]  795 	ld	-6 (ix),l
+   0457 DD 74 FB      [19]  796 	ld	-5 (ix),h
+   045A 78            [ 4]  797 	ld	a,b
+   045B B1            [ 4]  798 	or	a,c
+   045C 28 0A         [12]  799 	jr	Z,00115$
+                            800 ;mmc.c:285: *buff_sec++ = rcvr_mmc();
+   045E D5            [11]  801 	push	de
+   045F CDr0Dr00      [17]  802 	call	_rcvr_mmc
+   0462 7D            [ 4]  803 	ld	a,l
+   0463 D1            [10]  804 	pop	de
+   0464 12            [ 7]  805 	ld	(de),a
+   0465 13            [ 6]  806 	inc	de
+   0466 18 DF         [12]  807 	jr	00113$
+   0468                     808 00115$:
+                            809 ;mmc.c:288: if (buff) {	/* Store data to the memory */
+   0468 DD 7E 05      [19]  810 	ld	a,5 (ix)
+   046B DD B6 04      [19]  811 	or	a,4 (ix)
+   046E 28 36         [12]  812 	jr	Z,00157$
+                            813 ;mmc.c:289: do
+   0470 DD 4E FC      [19]  814 	ld	c,-4 (ix)
+   0473 DD 46 FD      [19]  815 	ld	b,-3 (ix)
+   0476 DD 73 F5      [19]  816 	ld	-11 (ix),e
+   0479 DD 72 F6      [19]  817 	ld	-10 (ix),d
+   047C DD 5E FE      [19]  818 	ld	e,-2 (ix)
+   047F DD 56 FF      [19]  819 	ld	d,-1 (ix)
+   0482                     820 00116$:
+                            821 ;mmc.c:290: *buff_sec++ = *buff++ = rcvr_mmc();
+   0482 C5            [11]  822 	push	bc
+   0483 D5            [11]  823 	push	de
+   0484 CDr0Dr00      [17]  824 	call	_rcvr_mmc
+   0487 7D            [ 4]  825 	ld	a,l
+   0488 D1            [10]  826 	pop	de
+   0489 C1            [10]  827 	pop	bc
+   048A 02            [ 7]  828 	ld	(bc),a
+   048B 03            [ 6]  829 	inc	bc
+   048C DD 6E F5      [19]  830 	ld	l,-11 (ix)
+   048F DD 66 F6      [19]  831 	ld	h,-10 (ix)
+   0492 77            [ 7]  832 	ld	(hl),a
+   0493 DD 34 F5      [23]  833 	inc	-11 (ix)
+   0496 20 03         [12]  834 	jr	NZ,00241$
+   0498 DD 34 F6      [23]  835 	inc	-10 (ix)
+   049B                     836 00241$:
+                            837 ;mmc.c:291: while (--count);
+   049B 1B            [ 6]  838 	dec	de
+   049C 7A            [ 4]  839 	ld	a,d
+   049D B3            [ 4]  840 	or	a,e
+   049E 20 E2         [12]  841 	jr	NZ,00116$
+   04A0 D1            [10]  842 	pop	de
+   04A1 C1            [10]  843 	pop	bc
+   04A2 C5            [11]  844 	push	bc
+   04A3 D5            [11]  845 	push	de
+   04A4 18 27         [12]  846 	jr	00159$
+                            847 ;mmc.c:293: do {
+   04A6                     848 00157$:
+   04A6 4B            [ 4]  849 	ld	c, e
+   04A7 42            [ 4]  850 	ld	b, d
+   04A8 DD 5E FE      [19]  851 	ld	e,-2 (ix)
+   04AB DD 56 FF      [19]  852 	ld	d,-1 (ix)
+   04AE                     853 00119$:
+                            854 ;mmc.c:294: *buff_sec++ = d = rcvr_mmc();
+   04AE C5            [11]  855 	push	bc
+   04AF D5            [11]  856 	push	de
+   04B0 CDr0Dr00      [17]  857 	call	_rcvr_mmc
+   04B3 7D            [ 4]  858 	ld	a,l
+   04B4 D1            [10]  859 	pop	de
+   04B5 C1            [10]  860 	pop	bc
+   04B6 DD 77 F4      [19]  861 	ld	-12 (ix),a
+   04B9 02            [ 7]  862 	ld	(bc),a
+   04BA 03            [ 6]  863 	inc	bc
+                            864 ;mmc.c:295: FORWARD(d);
+   04BB C5            [11]  865 	push	bc
+   04BC D5            [11]  866 	push	de
+   04BD DD 7E F4      [19]  867 	ld	a,-12 (ix)
+   04C0 F5            [11]  868 	push	af
+   04C1 33            [ 6]  869 	inc	sp
+   04C2 CDr0Cr00      [17]  870 	call	_forward
+   04C5 33            [ 6]  871 	inc	sp
+   04C6 D1            [10]  872 	pop	de
+   04C7 C1            [10]  873 	pop	bc
+                            874 ;mmc.c:296: } while (--count);
+   04C8 1B            [ 6]  875 	dec	de
+   04C9 7A            [ 4]  876 	ld	a,d
+   04CA B3            [ 4]  877 	or	a,e
+   04CB 20 E1         [12]  878 	jr	NZ,00119$
+                            879 ;mmc.c:300: while(bc--)
+   04CD                     880 00159$:
+   04CD DD 5E F7      [19]  881 	ld	e,-9 (ix)
+   04D0 DD 56 F8      [19]  882 	ld	d,-8 (ix)
+   04D3                     883 00125$:
+   04D3 63            [ 4]  884 	ld	h,e
+   04D4 6A            [ 4]  885 	ld	l,d
+   04D5 1B            [ 6]  886 	dec	de
+   04D6 7D            [ 4]  887 	ld	a,l
+   04D7 B4            [ 4]  888 	or	a,h
+   04D8 28 0C         [12]  889 	jr	Z,00127$
+                            890 ;mmc.c:301: *buff_sec++ = rcvr_mmc();
+   04DA C5            [11]  891 	push	bc
+   04DB D5            [11]  892 	push	de
+   04DC CDr0Dr00      [17]  893 	call	_rcvr_mmc
+   04DF 7D            [ 4]  894 	ld	a,l
+   04E0 D1            [10]  895 	pop	de
+   04E1 C1            [10]  896 	pop	bc
+   04E2 02            [ 7]  897 	ld	(bc),a
+   04E3 03            [ 6]  898 	inc	bc
+   04E4 18 ED         [12]  899 	jr	00125$
+   04E6                     900 00127$:
+                            901 ;mmc.c:304: skip_mmc(2);
+   04E6 21 02 00      [10]  902 	ld	hl,#0x0002
+   04E9 E5            [11]  903 	push	hl
+   04EA CDr17r00      [17]  904 	call	_skip_mmc
+   04ED F1            [10]  905 	pop	af
+                            906 ;mmc.c:306: buffer_sector = sector;
+   04EE 11r00r00      [10]  907 	ld	de, #_buffer_sector
+   04F1 21 13 00      [10]  908 	ld	hl, #19
+   04F4 39            [11]  909 	add	hl, sp
+   04F5 01 04 00      [10]  910 	ld	bc, #4
+   04F8 ED B0         [21]  911 	ldir
+   04FA                     912 00130$:
+                            913 ;mmc.c:309: res = RES_OK;
+   04FA DD 36 F9 00   [19]  914 	ld	-7 (ix),#0x00
+   04FE                     915 00135$:
+                            916 ;mmc.c:313: release_spi();
+   04FE CDr25r00      [17]  917 	call	_release_spi
+                            918 ;mmc.c:315: return res;
+   0501 DD 6E F9      [19]  919 	ld	l,-7 (ix)
+   0504                     920 00139$:
+   0504 DD F9         [10]  921 	ld	sp, ix
+   0506 DD E1         [14]  922 	pop	ix
+   0508 C9            [10]  923 	ret
+   0509                     924 _disk_readp_end::
+                            925 	.area _CODE
+                            926 	.area _INITIALIZER
+   0000                     927 __xinit__buffer_sector:
+   0000 FF FF FF FF         928 	.byte #0xFF,#0xFF,#0xFF,#0xFF	; 4294967295
+                            929 	.area _CABS (ABS)

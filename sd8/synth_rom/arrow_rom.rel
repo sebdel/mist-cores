@@ -1,0 +1,24 @@
+XL2
+H 9 areas 3 global symbols
+M arrow_rom
+O -mz80
+S .__.ABS. Def0000
+A _CODE size 10 flags 0 addr 0
+S _cursor_mask Def0008
+S _cursor_data Def0000
+A _DATA size 0 flags 0 addr 0
+A _INITIALIZED size 0 flags 0 addr 0
+A _DABS size 0 flags 8 addr 0
+A _HOME size 0 flags 0 addr 0
+A _GSINIT size 0 flags 0 addr 0
+A _GSFINAL size 0 flags 0 addr 0
+A _INITIALIZER size 0 flags 0 addr 0
+A _CABS size 0 flags 8 addr 0
+T 00 00
+R 00 00 00 00
+T 00 00 00 70 68 50 28 D4 08 00
+R 00 00 00 00
+T 08 00
+R 00 00 00 00
+T 08 00 F8 F8 F0 F8 DC 08 00 00
+R 00 00 00 00

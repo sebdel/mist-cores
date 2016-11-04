@@ -1,0 +1,60 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 1.
+Hexadecimal [16-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  2710 L
+    .__.ABS.                                                    =  0000 G
+    .__.CPU.                                                    =  0000 L
+    .__.H$L.                                                    =  0000 L
+    _FmgAddrPort                                                =  0040 
+    _FmgDataPort                                                =  0041 
+    _PsgAddrPort                                                =  0010 
+    _PsgDataPort                                                =  0011 
+  0 ___str_0                                                       0297 R
+  0 ___str_1                                                       03BC R
+  7 __xinit__cur_x                                                 0005 R
+  7 __xinit__cur_y                                                 0006 R
+  7 __xinit__mouse_b                                               0004 R
+  7 __xinit__mouse_x                                               0000 R
+  7 __xinit__mouse_y                                               0002 R
+  0 _clock50KHz                                                    00AF GR
+  0 _cls                                                           0222 GR
+  2 _cur_x                                                         0005 GR
+  2 _cur_y                                                         0006 GR
+    _cursor_data                                                   **** GX
+    _cursor_mask                                                   **** GX
+  0 _die                                                           027B GR
+  0 _ei                                                            02B9 GR
+    _font                                                          **** GX
+  0 _init_interrupt_table                                          02A2 GR
+    _keys                                                       =  0020 
+  0 _main                                                          02E2 GR
+  2 _mouse_b                                                       0004 GR
+    _mouse_but_reg                                              =  0032 
+  2 _mouse_x                                                       0000 GR
+    _mouse_x_reg                                                =  0030 
+  2 _mouse_y                                                       0002 GR
+    _mouse_y_reg                                                =  0031 
+  0 _move_mouse                                                    0000 GR
+    _printf                                                        **** GX
+  0 _put_pixel                                                     024F GR
+  0 _putchar                                                       00BE GR
+  0 _vbl                                                           009D GR
+  0 _ym2151_write                                                  02BD GR
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
+Hexadecimal [16-Bits]
+
+Area Table
+
+   0 _CODE                                      size  3E6   flags    0
+   1 _DATA                                      size    0   flags    0
+   2 _INITIALIZED                               size    7   flags    0
+   3 _DABS                                      size    0   flags    8
+   4 _HOME                                      size    0   flags    0
+   5 _GSINIT                                    size    0   flags    0
+   6 _GSFINAL                                   size    0   flags    0
+   7 _INITIALIZER                               size    7   flags    0
+   8 _CABS                                      size    0   flags    8
+

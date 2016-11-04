@@ -1,0 +1,128 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 1.
+Hexadecimal [16-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  2710 L
+    .__.ABS.                                                    =  0000 G
+    .__.CPU.                                                    =  0000 L
+    .__.H$L.                                                    =  0000 L
+  2 _B                                                             0009 GR
+  2 _G                                                             0008 GR
+    _PsgAddrPort                                                =  0010 
+    _PsgDataPort                                                =  0011 
+  2 _R                                                             0007 GR
+  0 ___str_1                                                       03CC R
+  0 ___str_2                                                       09E1 R
+  0 ___str_3                                                       09E9 R
+  0 ___str_4                                                       09F8 R
+  0 ___str_5                                                       0A05 R
+  0 ___str_6                                                       0A15 R
+  0 ___str_7                                                       0A24 R
+  7 __xinit__B                                                     0009 R
+  7 __xinit__G                                                     0008 R
+  7 __xinit__R                                                     0007 R
+  7 __xinit__cur_x                                                 000D R
+  7 __xinit__cur_y                                                 000E R
+  7 __xinit__curve_index                                           000B R
+  7 __xinit__frames                                                0000 R
+  7 __xinit__rgb_state                                             000A R
+  7 __xinit__rptr                                                  0004 R
+  7 __xinit__rsec                                                  0006 R
+  7 __xinit__vu_meter                                              000F R
+    _abs                                                           **** GX
+  0 _animation                                                     00AD GR
+  0 _clock50KHz                                                    022F GR
+  0 _clock50KHz_end                                                0241 GR
+  0 _clock50KHz_start                                              022F GR
+  0 _cls                                                           0365 GR
+  0 _cls_end                                                       038C GR
+  0 _cls_start                                                     0365 GR
+  2 _cur_x                                                         000D GR
+  2 _cur_y                                                         000E GR
+    _cursor_data                                                   **** GX
+    _cursor_mask                                                   **** GX
+    _curve                                                         **** GX
+  2 _curve_index                                                   000B GR
+    _curve_length                                                  **** GX
+  0 _cycle_colors                                                  0000 GR
+  0 _cycle_colors_end                                              00AD GR
+  0 _cycle_colors_start                                            0000 GR
+  0 _die                                                           03B0 GR
+  0 _die_end                                                       03CC GR
+  0 _die_start                                                     03B0 GR
+  0 _display_level                                                 05B6 GR
+  0 _display_level_end                                             0654 GR
+  0 _display_level_start                                           05B6 GR
+  0 _draw_line                                                     03D7 GR
+  0 _draw_line_end                                                 0512 GR
+  0 _draw_line_start                                               03D7 GR
+  0 _ei                                                            066B GR
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
+Hexadecimal [16-Bits]
+
+Symbol Table
+
+  0 _ei_end                                                        066F GR
+  0 _ei_start                                                      066B GR
+    _font                                                          **** GX
+  2 _frames                                                        0000 GR
+    _image                                                         **** GX
+  0 _init_interrupt_table                                          0654 GR
+  0 _init_interrupt_table_end                                      066B GR
+  0 _init_interrupt_table_start                                    0654 GR
+    _keys                                                       =  0020 
+  1 _level_a                                                       1000 GR
+  1 _level_b                                                       1001 GR
+  1 _level_c                                                       1002 GR
+  0 _main                                                          066F GR
+  0 _main_end                                                      09E1 GR
+  0 _main_start                                                    066F GR
+    _mouse_but_reg                                              =  0032 
+    _mouse_x_reg                                                =  0030 
+    _mouse_y_reg                                                =  0031 
+  0 _move_sprite                                                   01D9 GR
+  0 _move_sprite_end                                               021A GR
+  0 _move_sprite_start                                             01D9 GR
+    _pf_lseek                                                      **** GX
+    _pf_mount                                                      **** GX
+    _pf_open                                                       **** GX
+    _pf_read                                                       **** GX
+  0 _play_music                                                    00B2 GR
+  0 _play_music_end                                                01D9 GR
+  0 _play_music_start                                              00B2 GR
+    _printf                                                        **** GX
+  0 _put_pixel                                                     038C GR
+  0 _put_pixel_end                                                 03B0 GR
+  0 _put_pixel_start                                               038C GR
+  0 _putchar                                                       0241 GR
+  0 _putchar_end                                                   0365 GR
+  0 _putchar_start                                                 0241 GR
+  2 _rgb_state                                                     000A GR
+  2 _rptr                                                          0004 GR
+  2 _rsec                                                          0006 GR
+  0 _splash                                                        0512 GR
+  0 _splash_end                                                    05B6 GR
+  0 _splash_start                                                  0512 GR
+  0 _vbl                                                           021A GR
+  0 _vbl_end                                                       022F GR
+  0 _vbl_start                                                     021A GR
+  2 _vu_meter                                                      000F R
+  1 _ym_buffer                                                     0000 GR
+
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 3.
+Hexadecimal [16-Bits]
+
+Area Table
+
+   0 _CODE                                      size  A2B   flags    0
+   1 _DATA                                      size 1003   flags    0
+   2 _INITIALIZED                               size   1F   flags    0
+   3 _DABS                                      size    0   flags    8
+   4 _HOME                                      size    0   flags    0
+   5 _GSINIT                                    size    0   flags    0
+   6 _GSFINAL                                   size    0   flags    0
+   7 _INITIALIZER                               size   1F   flags    0
+   8 _CABS                                      size    0   flags    8
+

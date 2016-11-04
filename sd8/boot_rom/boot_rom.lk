@@ -1,0 +1,17 @@
+-mjwx
+-i boot_rom.ihx
+-b _CODE = 0x0200
+-b _DATA = 0x8100
+-k /usr/bin/../share/sdcc/lib/z80
+-k /usr/share/sdcc/lib/z80
+-l z80
+/usr/bin/../share/sdcc/lib/z80/crt0.rel
+boot_rom.rel
+font.rel
+pff.rel
+mmc.rel
+image_rom.rel
+curve_rom.rel
+heart_rom.rel
+
+-e

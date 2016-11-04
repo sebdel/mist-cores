@@ -1,0 +1,742 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ANSI-C Compiler
+                              3 ; Version 3.5.0 #9253 (Mar 24 2016) (Linux)
+                              4 ; This file was generated Fri Nov  4 17:05:16 2016
+                              5 ;--------------------------------------------------------
+                              6 	.module synth
+                              7 	.optsdcc -mz80
+                              8 	
+                              9 ;--------------------------------------------------------
+                             10 ; Public variables in this module
+                             11 ;--------------------------------------------------------
+                             12 	.globl _main
+                             13 	.globl _ym2151_write
+                             14 	.globl _ei
+                             15 	.globl _init_interrupt_table
+                             16 	.globl _die
+                             17 	.globl _put_pixel
+                             18 	.globl _cls
+                             19 	.globl _clock50KHz
+                             20 	.globl _vbl
+                             21 	.globl _move_mouse
+                             22 	.globl _printf
+                             23 	.globl _cur_y
+                             24 	.globl _cur_x
+                             25 	.globl _mouse_b
+                             26 	.globl _mouse_y
+                             27 	.globl _mouse_x
+                             28 	.globl _putchar
+                             29 ;--------------------------------------------------------
+                             30 ; special function registers
+                             31 ;--------------------------------------------------------
+                     0010    32 _PsgAddrPort	=	0x0010
+                     0011    33 _PsgDataPort	=	0x0011
+                     0020    34 _keys	=	0x0020
+                     0030    35 _mouse_x_reg	=	0x0030
+                     0031    36 _mouse_y_reg	=	0x0031
+                     0032    37 _mouse_but_reg	=	0x0032
+                     0040    38 _FmgAddrPort	=	0x0040
+                     0041    39 _FmgDataPort	=	0x0041
+                             40 ;--------------------------------------------------------
+                             41 ; ram data
+                             42 ;--------------------------------------------------------
+                             43 	.area _DATA
+                             44 ;--------------------------------------------------------
+                             45 ; ram data
+                             46 ;--------------------------------------------------------
+                             47 	.area _INITIALIZED
+   0000                      48 _mouse_x::
+   0000                      49 	.ds 2
+   0002                      50 _mouse_y::
+   0002                      51 	.ds 2
+   0004                      52 _mouse_b::
+   0004                      53 	.ds 1
+   0005                      54 _cur_x::
+   0005                      55 	.ds 1
+   0006                      56 _cur_y::
+   0006                      57 	.ds 1
+                             58 ;--------------------------------------------------------
+                             59 ; absolute external ram data
+                             60 ;--------------------------------------------------------
+                             61 	.area _DABS (ABS)
+                             62 ;--------------------------------------------------------
+                             63 ; global & static initialisations
+                             64 ;--------------------------------------------------------
+                             65 	.area _HOME
+                             66 	.area _GSINIT
+                             67 	.area _GSFINAL
+                             68 	.area _GSINIT
+                             69 ;--------------------------------------------------------
+                             70 ; Home
+                             71 ;--------------------------------------------------------
+                             72 	.area _HOME
+                             73 	.area _HOME
+                             74 ;--------------------------------------------------------
+                             75 ; code
+                             76 ;--------------------------------------------------------
+                             77 	.area _CODE
+                             78 ;synth.c:46: void move_mouse() {
+                             79 ;	---------------------------------
+                             80 ; Function move_mouse
+                             81 ; ---------------------------------
+   0000                      82 _move_mouse::
+                             83 ;synth.c:49: mouse_x += (char)mouse_x_reg;
+   0000 DB 30         [11]   84 	in	a,(_mouse_x_reg)
+   0002 57            [ 4]   85 	ld	d,a
+   0003 17            [ 4]   86 	rla
+   0004 9F            [ 4]   87 	sbc	a, a
+   0005 5F            [ 4]   88 	ld	e,a
+   0006 21r00r00      [10]   89 	ld	hl,#_mouse_x
+   0009 7E            [ 7]   90 	ld	a,(hl)
+   000A 82            [ 4]   91 	add	a, d
+   000B 77            [ 7]   92 	ld	(hl),a
+   000C 23            [ 6]   93 	inc	hl
+   000D 7E            [ 7]   94 	ld	a,(hl)
+   000E 8B            [ 4]   95 	adc	a, e
+   000F 77            [ 7]   96 	ld	(hl),a
+                             97 ;synth.c:50: mouse_y -= (char)mouse_y_reg;
+   0010 DB 31         [11]   98 	in	a,(_mouse_y_reg)
+   0012 57            [ 4]   99 	ld	d,a
+   0013 17            [ 4]  100 	rla
+   0014 9F            [ 4]  101 	sbc	a, a
+   0015 5F            [ 4]  102 	ld	e,a
+   0016 21r02r00      [10]  103 	ld	hl,#_mouse_y
+   0019 7E            [ 7]  104 	ld	a,(hl)
+   001A 92            [ 4]  105 	sub	a, d
+   001B 77            [ 7]  106 	ld	(hl),a
+   001C 23            [ 6]  107 	inc	hl
+   001D 7E            [ 7]  108 	ld	a,(hl)
+   001E 9B            [ 4]  109 	sbc	a, e
+   001F 77            [ 7]  110 	ld	(hl),a
+                            111 ;synth.c:51: mouse_b = (char)mouse_but_reg;
+   0020 DB 32         [11]  112 	in	a,(_mouse_but_reg)
+   0022 FD 21r04r00   [14]  113 	ld	iy,#_mouse_b
+   0026 FD 77 00      [19]  114 	ld	0 (iy),a
+                            115 ;synth.c:54: if(mouse_x < 0)   mouse_x = 0;
+   0029 3Ar01r00      [13]  116 	ld	a,(#_mouse_x + 1)
+   002C CB 7F         [ 8]  117 	bit	7,a
+   002E 28 06         [12]  118 	jr	Z,00102$
+   0030 21 00 00      [10]  119 	ld	hl,#0x0000
+   0033 22r00r00      [16]  120 	ld	(_mouse_x),hl
+   0036                     121 00102$:
+                            122 ;synth.c:55: if(mouse_x > 319) mouse_x = 319;
+   0036 3E 3F         [ 7]  123 	ld	a,#0x3F
+   0038 FD 21r00r00   [14]  124 	ld	iy,#_mouse_x
+   003C FD BE 00      [19]  125 	cp	a, 0 (iy)
+   003F 3E 01         [ 7]  126 	ld	a,#0x01
+   0041 FD 21r00r00   [14]  127 	ld	iy,#_mouse_x
+   0045 FD 9E 01      [19]  128 	sbc	a, 1 (iy)
+   0048 E2r4Dr00      [10]  129 	jp	PO, 00127$
+   004B EE 80         [ 7]  130 	xor	a, #0x80
+   004D                     131 00127$:
+   004D F2r56r00      [10]  132 	jp	P,00104$
+   0050 21 3F 01      [10]  133 	ld	hl,#0x013F
+   0053 22r00r00      [16]  134 	ld	(_mouse_x),hl
+   0056                     135 00104$:
+                            136 ;synth.c:56: if(mouse_y < 0)   mouse_y = 0;
+   0056 3Ar03r00      [13]  137 	ld	a,(#_mouse_y + 1)
+   0059 CB 7F         [ 8]  138 	bit	7,a
+   005B 28 06         [12]  139 	jr	Z,00106$
+   005D 21 00 00      [10]  140 	ld	hl,#0x0000
+   0060 22r02r00      [16]  141 	ld	(_mouse_y),hl
+   0063                     142 00106$:
+                            143 ;synth.c:57: if(mouse_y > 239)  mouse_y = 239;
+   0063 3E EF         [ 7]  144 	ld	a,#0xEF
+   0065 FD 21r02r00   [14]  145 	ld	iy,#_mouse_y
+   0069 FD BE 00      [19]  146 	cp	a, 0 (iy)
+   006C 3E 00         [ 7]  147 	ld	a,#0x00
+   006E FD 21r02r00   [14]  148 	ld	iy,#_mouse_y
+   0072 FD 9E 01      [19]  149 	sbc	a, 1 (iy)
+   0075 E2r7Ar00      [10]  150 	jp	PO, 00128$
+   0078 EE 80         [ 7]  151 	xor	a, #0x80
+   007A                     152 00128$:
+   007A F2r83r00      [10]  153 	jp	P,00108$
+   007D 21 EF 00      [10]  154 	ld	hl,#0x00EF
+   0080 22r02r00      [16]  155 	ld	(_mouse_y),hl
+   0083                     156 00108$:
+                            157 ;synth.c:60: *(unsigned char*)0x7efe = mouse_x;
+   0083 3Ar00r00      [13]  158 	ld	a,(#_mouse_x + 0)
+   0086 32 FE 7E      [13]  159 	ld	(#0x7EFE),a
+                            160 ;synth.c:61: *(unsigned char*)0x7eff = (mouse_x & 0x100) >> 8;
+   0089 3Ar01r00      [13]  161 	ld	a,(#_mouse_x + 1)
+   008C E6 01         [ 7]  162 	and	a, #0x01
+   008E 57            [ 4]  163 	ld	d,a
+   008F CB 07         [ 8]  164 	rlc	a
+   0091 9F            [ 4]  165 	sbc	a, a
+   0092 21 FF 7E      [10]  166 	ld	hl,#0x7EFF
+   0095 72            [ 7]  167 	ld	(hl),d
+                            168 ;synth.c:62: *(unsigned char*)0x7f00 = mouse_y;
+   0096 3Ar02r00      [13]  169 	ld	a,(#_mouse_y + 0)
+   0099 32 00 7F      [13]  170 	ld	(#0x7F00),a
+   009C C9            [10]  171 	ret
+                            172 ;synth.c:66: void vbl(void) __interrupt (0x30) {
+                            173 ;	---------------------------------
+                            174 ; Function vbl
+                            175 ; ---------------------------------
+   009D                     176 _vbl::
+   009D F5            [11]  177 	push	af
+   009E C5            [11]  178 	push	bc
+   009F D5            [11]  179 	push	de
+   00A0 E5            [11]  180 	push	hl
+   00A1 FD E5         [15]  181 	push	iy
+                            182 ;synth.c:68: move_mouse();
+   00A3 CDr00r00      [17]  183 	call	_move_mouse
+                            184 ;synth.c:73: __endasm;
+   00A6 FB            [ 4]  185 	ei
+   00A7 FD E1         [14]  186 	pop	iy
+   00A9 E1            [10]  187 	pop	hl
+   00AA D1            [10]  188 	pop	de
+   00AB C1            [10]  189 	pop	bc
+   00AC F1            [10]  190 	pop	af
+   00AD ED 4D         [14]  191 	reti
+                            192 ;synth.c:77: void clock50KHz(void) __interrupt (0x20) {
+                            193 ;	---------------------------------
+                            194 ; Function clock50KHz
+                            195 ; ---------------------------------
+   00AF                     196 _clock50KHz::
+   00AF F5            [11]  197 	push	af
+   00B0 C5            [11]  198 	push	bc
+   00B1 D5            [11]  199 	push	de
+   00B2 E5            [11]  200 	push	hl
+   00B3 FD E5         [15]  201 	push	iy
+                            202 ;synth.c:82: __endasm;
+   00B5 FB            [ 4]  203 	ei
+   00B6 FD E1         [14]  204 	pop	iy
+   00B8 E1            [10]  205 	pop	hl
+   00B9 D1            [10]  206 	pop	de
+   00BA C1            [10]  207 	pop	bc
+   00BB F1            [10]  208 	pop	af
+   00BC ED 4D         [14]  209 	reti
+                            210 ;synth.c:89: void putchar(char c) {
+                            211 ;	---------------------------------
+                            212 ; Function putchar
+                            213 ; ---------------------------------
+   00BE                     214 _putchar::
+   00BE DD E5         [15]  215 	push	ix
+   00C0 DD 21 00 00   [14]  216 	ld	ix,#0
+   00C4 DD 39         [15]  217 	add	ix,sp
+   00C6 21 FA FF      [10]  218 	ld	hl,#-6
+   00C9 39            [11]  219 	add	hl,sp
+   00CA F9            [ 6]  220 	ld	sp,hl
+                            221 ;synth.c:91: unsigned char *dptr = (unsigned char*)(80*(8*cur_y) + 2*cur_x);
+   00CB FD 21r06r00   [14]  222 	ld	iy,#_cur_y
+   00CF FD 6E 00      [19]  223 	ld	l,0 (iy)
+   00D2 26 00         [ 7]  224 	ld	h,#0x00
+   00D4 4D            [ 4]  225 	ld	c, l
+   00D5 44            [ 4]  226 	ld	b, h
+   00D6 29            [11]  227 	add	hl, hl
+   00D7 29            [11]  228 	add	hl, hl
+   00D8 09            [11]  229 	add	hl, bc
+   00D9 29            [11]  230 	add	hl, hl
+   00DA 29            [11]  231 	add	hl, hl
+   00DB 29            [11]  232 	add	hl, hl
+   00DC 29            [11]  233 	add	hl, hl
+   00DD 29            [11]  234 	add	hl, hl
+   00DE 29            [11]  235 	add	hl, hl
+   00DF 29            [11]  236 	add	hl, hl
+   00E0 EB            [ 4]  237 	ex	de,hl
+   00E1 FD 21r05r00   [14]  238 	ld	iy,#_cur_x
+   00E5 FD 6E 00      [19]  239 	ld	l,0 (iy)
+   00E8 26 00         [ 7]  240 	ld	h,#0x00
+   00EA 29            [11]  241 	add	hl, hl
+   00EB 19            [11]  242 	add	hl,de
+   00EC DD 75 FB      [19]  243 	ld	-5 (ix),l
+   00EF DD 74 FC      [19]  244 	ld	-4 (ix),h
+                            245 ;synth.c:94: if(c < 32) {
+   00F2 DD 7E 04      [19]  246 	ld	a,4 (ix)
+   00F5 EE 80         [ 7]  247 	xor	a, #0x80
+   00F7 D6 A0         [ 7]  248 	sub	a, #0xA0
+   00F9 30 2D         [12]  249 	jr	NC,00108$
+                            250 ;synth.c:95: if(c == '\r') 
+   00FB DD 7E 04      [19]  251 	ld	a,4 (ix)
+   00FE D6 0D         [ 7]  252 	sub	a, #0x0D
+   0100 20 05         [12]  253 	jr	NZ,00102$
+                            254 ;synth.c:96: cur_x=0;
+   0102 21r05r00      [10]  255 	ld	hl,#_cur_x + 0
+   0105 36 00         [10]  256 	ld	(hl), #0x00
+   0107                     257 00102$:
+                            258 ;synth.c:98: if(c == '\n') {
+   0107 DD 7E 04      [19]  259 	ld	a,4 (ix)
+   010A D6 0A         [ 7]  260 	sub	a, #0x0A
+   010C C2r1Dr02      [10]  261 	jp	NZ,00118$
+                            262 ;synth.c:99: cur_y++;
+   010F 21r06r00      [10]  263 	ld	hl, #_cur_y+0
+   0112 34            [11]  264 	inc	(hl)
+                            265 ;synth.c:100: cur_x=0;
+   0113 21r05r00      [10]  266 	ld	hl,#_cur_x + 0
+   0116 36 00         [10]  267 	ld	(hl), #0x00
+                            268 ;synth.c:102: if(cur_y >= 30)
+   0118 3Ar06r00      [13]  269 	ld	a,(#_cur_y + 0)
+   011B D6 1E         [ 7]  270 	sub	a, #0x1E
+   011D DAr1Dr02      [10]  271 	jp	C,00118$
+                            272 ;synth.c:103: cur_y = 0;
+   0120 21r06r00      [10]  273 	ld	hl,#_cur_y + 0
+   0123 36 00         [10]  274 	ld	(hl), #0x00
+                            275 ;synth.c:105: return;
+   0125 C3r1Dr02      [10]  276 	jp	00118$
+   0128                     277 00108$:
+                            278 ;synth.c:108: if(c < 0) return;
+   0128 DD CB 04 7E   [20]  279 	bit	7, 4 (ix)
+   012C C2r1Dr02      [10]  280 	jp	NZ,00118$
+                            281 ;synth.c:110: p = font+8*(unsigned char)(c-32);
+   012F DD 7E 04      [19]  282 	ld	a,4 (ix)
+   0132 C6 E0         [ 7]  283 	add	a,#0xE0
+   0134 6F            [ 4]  284 	ld	l,a
+   0135 26 00         [ 7]  285 	ld	h,#0x00
+   0137 29            [11]  286 	add	hl, hl
+   0138 29            [11]  287 	add	hl, hl
+   0139 29            [11]  288 	add	hl, hl
+   013A 11r00r00      [10]  289 	ld	de,#_font
+   013D 19            [11]  290 	add	hl,de
+   013E 4D            [ 4]  291 	ld	c, l
+   013F 44            [ 4]  292 	ld	b, h
+                            293 ;synth.c:111: for(i=0;i<8;i++) {
+   0140 DD 7E FB      [19]  294 	ld	a,-5 (ix)
+   0143 DD 77 FD      [19]  295 	ld	-3 (ix),a
+   0146 DD 7E FC      [19]  296 	ld	a,-4 (ix)
+   0149 DD 77 FE      [19]  297 	ld	-2 (ix),a
+   014C 1E 00         [ 7]  298 	ld	e,#0x00
+   014E                     299 00116$:
+                            300 ;synth.c:112: unsigned char l = *p++;
+   014E 0A            [ 7]  301 	ld	a,(bc)
+   014F DD 77 FA      [19]  302 	ld	-6 (ix),a
+   0152 03            [ 6]  303 	inc	bc
+                            304 ;synth.c:114: *dptr = ( 	((l & 0x80) ? 0x03:0x00) |
+   0153 DD 6E FD      [19]  305 	ld	l,-3 (ix)
+   0156 DD 66 FE      [19]  306 	ld	h,-2 (ix)
+   0159 DD CB FA 7E   [20]  307 	bit	7, -6 (ix)
+   015D 28 06         [12]  308 	jr	Z,00120$
+   015F DD 36 FF 03   [19]  309 	ld	-1 (ix),#0x03
+   0163 18 04         [12]  310 	jr	00121$
+   0165                     311 00120$:
+   0165 DD 36 FF 00   [19]  312 	ld	-1 (ix),#0x00
+   0169                     313 00121$:
+                            314 ;synth.c:115: ((l & 0x40) ? 0x0C:0x00) |
+   0169 DD CB FA 76   [20]  315 	bit	6, -6 (ix)
+   016D 28 04         [12]  316 	jr	Z,00122$
+   016F 3E 0C         [ 7]  317 	ld	a,#0x0C
+   0171 18 02         [12]  318 	jr	00123$
+   0173                     319 00122$:
+   0173 3E 00         [ 7]  320 	ld	a,#0x00
+   0175                     321 00123$:
+   0175 DD B6 FF      [19]  322 	or	a, -1 (ix)
+   0178 DD 77 FF      [19]  323 	ld	-1 (ix),a
+                            324 ;synth.c:116: ((l & 0x20) ? 0x30:0x00) |
+   017B DD CB FA 6E   [20]  325 	bit	5, -6 (ix)
+   017F 28 04         [12]  326 	jr	Z,00124$
+   0181 3E 30         [ 7]  327 	ld	a,#0x30
+   0183 18 02         [12]  328 	jr	00125$
+   0185                     329 00124$:
+   0185 3E 00         [ 7]  330 	ld	a,#0x00
+   0187                     331 00125$:
+   0187 DD B6 FF      [19]  332 	or	a, -1 (ix)
+   018A DD 77 FF      [19]  333 	ld	-1 (ix),a
+                            334 ;synth.c:117: ((l & 0x10) ? 0xC0:0x00));
+   018D DD CB FA 66   [20]  335 	bit	4, -6 (ix)
+   0191 28 04         [12]  336 	jr	Z,00126$
+   0193 3E C0         [ 7]  337 	ld	a,#0xC0
+   0195 18 02         [12]  338 	jr	00127$
+   0197                     339 00126$:
+   0197 3E 00         [ 7]  340 	ld	a,#0x00
+   0199                     341 00127$:
+   0199 DD B6 FF      [19]  342 	or	a, -1 (ix)
+   019C 77            [ 7]  343 	ld	(hl),a
+                            344 ;synth.c:118: *(dptr + 1) = (((l & 0x08) ? 0x03:0x00) |
+   019D DD 6E FD      [19]  345 	ld	l,-3 (ix)
+   01A0 DD 66 FE      [19]  346 	ld	h,-2 (ix)
+   01A3 23            [ 6]  347 	inc	hl
+   01A4 DD CB FA 5E   [20]  348 	bit	3, -6 (ix)
+   01A8 28 06         [12]  349 	jr	Z,00128$
+   01AA DD 36 FF 03   [19]  350 	ld	-1 (ix),#0x03
+   01AE 18 04         [12]  351 	jr	00129$
+   01B0                     352 00128$:
+   01B0 DD 36 FF 00   [19]  353 	ld	-1 (ix),#0x00
+   01B4                     354 00129$:
+                            355 ;synth.c:119: ((l & 0x04) ? 0x0C:0x00) |
+   01B4 DD CB FA 56   [20]  356 	bit	2, -6 (ix)
+   01B8 28 04         [12]  357 	jr	Z,00130$
+   01BA 3E 0C         [ 7]  358 	ld	a,#0x0C
+   01BC 18 02         [12]  359 	jr	00131$
+   01BE                     360 00130$:
+   01BE 3E 00         [ 7]  361 	ld	a,#0x00
+   01C0                     362 00131$:
+   01C0 DD B6 FF      [19]  363 	or	a, -1 (ix)
+   01C3 57            [ 4]  364 	ld	d,a
+                            365 ;synth.c:120: ((l & 0x02) ? 0x30:0x00) |
+   01C4 DD CB FA 4E   [20]  366 	bit	1, -6 (ix)
+   01C8 28 04         [12]  367 	jr	Z,00132$
+   01CA 3E 30         [ 7]  368 	ld	a,#0x30
+   01CC 18 02         [12]  369 	jr	00133$
+   01CE                     370 00132$:
+   01CE 3E 00         [ 7]  371 	ld	a,#0x00
+   01D0                     372 00133$:
+   01D0 B2            [ 4]  373 	or	a, d
+   01D1 DD 77 FF      [19]  374 	ld	-1 (ix),a
+                            375 ;synth.c:121: ((l & 0x01) ? 0xC0:0x00));
+   01D4 DD CB FA 46   [20]  376 	bit	0, -6 (ix)
+   01D8 28 04         [12]  377 	jr	Z,00134$
+   01DA 3E C0         [ 7]  378 	ld	a,#0xC0
+   01DC 18 02         [12]  379 	jr	00135$
+   01DE                     380 00134$:
+   01DE 3E 00         [ 7]  381 	ld	a,#0x00
+   01E0                     382 00135$:
+   01E0 DD B6 FF      [19]  383 	or	a, -1 (ix)
+   01E3 77            [ 7]  384 	ld	(hl),a
+                            385 ;synth.c:122: dptr += 80;
+   01E4 DD 7E FD      [19]  386 	ld	a,-3 (ix)
+   01E7 C6 50         [ 7]  387 	add	a, #0x50
+   01E9 DD 77 FD      [19]  388 	ld	-3 (ix),a
+   01EC DD 7E FE      [19]  389 	ld	a,-2 (ix)
+   01EF CE 00         [ 7]  390 	adc	a, #0x00
+   01F1 DD 77 FE      [19]  391 	ld	-2 (ix),a
+                            392 ;synth.c:111: for(i=0;i<8;i++) {
+   01F4 1C            [ 4]  393 	inc	e
+   01F5 7B            [ 4]  394 	ld	a,e
+   01F6 EE 80         [ 7]  395 	xor	a, #0x80
+   01F8 D6 88         [ 7]  396 	sub	a, #0x88
+   01FA DAr4Er01      [10]  397 	jp	C,00116$
+                            398 ;synth.c:125: cur_x++;
+   01FD 21r05r00      [10]  399 	ld	hl, #_cur_x+0
+   0200 34            [11]  400 	inc	(hl)
+                            401 ;synth.c:126: if(cur_x >= 40) {
+   0201 3Ar05r00      [13]  402 	ld	a,(#_cur_x + 0)
+   0204 D6 28         [ 7]  403 	sub	a, #0x28
+   0206 38 15         [12]  404 	jr	C,00118$
+                            405 ;synth.c:127: cur_x = 0;
+   0208 21r05r00      [10]  406 	ld	hl,#_cur_x + 0
+   020B 36 00         [10]  407 	ld	(hl), #0x00
+                            408 ;synth.c:128: cur_y++;
+   020D 21r06r00      [10]  409 	ld	hl, #_cur_y+0
+   0210 34            [11]  410 	inc	(hl)
+                            411 ;synth.c:130: if(cur_y >= 30)
+   0211 3Ar06r00      [13]  412 	ld	a,(#_cur_y + 0)
+   0214 D6 1E         [ 7]  413 	sub	a, #0x1E
+   0216 38 05         [12]  414 	jr	C,00118$
+                            415 ;synth.c:131: cur_y = 0;
+   0218 21r06r00      [10]  416 	ld	hl,#_cur_y + 0
+   021B 36 00         [10]  417 	ld	(hl), #0x00
+   021D                     418 00118$:
+   021D DD F9         [10]  419 	ld	sp, ix
+   021F DD E1         [14]  420 	pop	ix
+   0221 C9            [10]  421 	ret
+                            422 ;synth.c:135: void cls(void) {
+                            423 ;	---------------------------------
+                            424 ; Function cls
+                            425 ; ---------------------------------
+   0222                     426 _cls::
+                            427 ;synth.c:139: for(i = 0; i < 240; i++) {
+   0222 21 00 00      [10]  428 	ld	hl,#0x0000
+   0225 5D            [ 4]  429 	ld	e,l
+   0226 54            [ 4]  430 	ld	d,h
+   0227                     431 00102$:
+                            432 ;synth.c:140: memset(p, 0, 80);
+   0227 45            [ 4]  433 	ld	b,l
+   0228 4C            [ 4]  434 	ld	c,h
+   0229 E5            [11]  435 	push	hl
+   022A 68            [ 4]  436 	ld	l, b
+   022B 61            [ 4]  437 	ld	h, c
+   022C 06 50         [ 7]  438 	ld	b, #0x50
+   022E                     439 00115$:
+   022E 36 00         [10]  440 	ld	(hl), #0x00
+   0230 23            [ 6]  441 	inc	hl
+   0231 10 FB         [13]  442 	djnz	00115$
+   0233 E1            [10]  443 	pop	hl
+                            444 ;synth.c:141: p += 80;
+   0234 01 50 00      [10]  445 	ld	bc,#0x0050
+   0237 09            [11]  446 	add	hl,bc
+                            447 ;synth.c:139: for(i = 0; i < 240; i++) {
+   0238 13            [ 6]  448 	inc	de
+   0239 7B            [ 4]  449 	ld	a,e
+   023A D6 F0         [ 7]  450 	sub	a, #0xF0
+   023C 7A            [ 4]  451 	ld	a,d
+   023D 17            [ 4]  452 	rla
+   023E 3F            [ 4]  453 	ccf
+   023F 1F            [ 4]  454 	rra
+   0240 DE 80         [ 7]  455 	sbc	a, #0x80
+   0242 38 E3         [12]  456 	jr	C,00102$
+                            457 ;synth.c:143: cur_x = 0;
+   0244 21r05r00      [10]  458 	ld	hl,#_cur_x + 0
+   0247 36 00         [10]  459 	ld	(hl), #0x00
+                            460 ;synth.c:144: cur_y = 0;
+   0249 21r06r00      [10]  461 	ld	hl,#_cur_y + 0
+   024C 36 00         [10]  462 	ld	(hl), #0x00
+   024E C9            [10]  463 	ret
+                            464 ;synth.c:148: void put_pixel(int x, unsigned char y, unsigned char color) {
+                            465 ;	---------------------------------
+                            466 ; Function put_pixel
+                            467 ; ---------------------------------
+   024F                     468 _put_pixel::
+   024F DD E5         [15]  469 	push	ix
+   0251 DD 21 00 00   [14]  470 	ld	ix,#0
+   0255 DD 39         [15]  471 	add	ix,sp
+                            472 ;synth.c:149: *((unsigned char*)(80*y+(x>>2))) = color;
+   0257 DD 4E 06      [19]  473 	ld	c,6 (ix)
+   025A 06 00         [ 7]  474 	ld	b,#0x00
+   025C 69            [ 4]  475 	ld	l, c
+   025D 60            [ 4]  476 	ld	h, b
+   025E 29            [11]  477 	add	hl, hl
+   025F 29            [11]  478 	add	hl, hl
+   0260 09            [11]  479 	add	hl, bc
+   0261 29            [11]  480 	add	hl, hl
+   0262 29            [11]  481 	add	hl, hl
+   0263 29            [11]  482 	add	hl, hl
+   0264 29            [11]  483 	add	hl, hl
+   0265 DD 5E 04      [19]  484 	ld	e,4 (ix)
+   0268 DD 56 05      [19]  485 	ld	d,5 (ix)
+   026B CB 2A         [ 8]  486 	sra	d
+   026D CB 1B         [ 8]  487 	rr	e
+   026F CB 2A         [ 8]  488 	sra	d
+   0271 CB 1B         [ 8]  489 	rr	e
+   0273 19            [11]  490 	add	hl,de
+   0274 DD 7E 07      [19]  491 	ld	a,7 (ix)
+   0277 77            [ 7]  492 	ld	(hl),a
+   0278 DD E1         [14]  493 	pop	ix
+   027A C9            [10]  494 	ret
+                            495 ;synth.c:152: void die (FRESULT rc) {
+                            496 ;	---------------------------------
+                            497 ; Function die
+                            498 ; ---------------------------------
+   027B                     499 _die::
+   027B DD E5         [15]  500 	push	ix
+   027D DD 21 00 00   [14]  501 	ld	ix,#0
+   0281 DD 39         [15]  502 	add	ix,sp
+                            503 ;synth.c:153: printf("Fail rc=%u", rc);
+   0283 DD 5E 04      [19]  504 	ld	e,4 (ix)
+   0286 16 00         [ 7]  505 	ld	d,#0x00
+   0288 21r97r02      [10]  506 	ld	hl,#___str_0
+   028B D5            [11]  507 	push	de
+   028C E5            [11]  508 	push	hl
+   028D CDr00r00      [17]  509 	call	_printf
+   0290 F1            [10]  510 	pop	af
+   0291 F1            [10]  511 	pop	af
+   0292                     512 00103$:
+   0292 18 FE         [12]  513 	jr	00103$
+   0294 DD E1         [14]  514 	pop	ix
+   0296 C9            [10]  515 	ret
+   0297                     516 ___str_0:
+   0297 46 61 69 6C 20 72   517 	.ascii "Fail rc=%u"
+        63 3D 25 75
+   02A1 00                  518 	.db 0x00
+                            519 ;synth.c:163: void init_interrupt_table() {
+                            520 ;	---------------------------------
+                            521 ; Function init_interrupt_table
+                            522 ; ---------------------------------
+   02A2                     523 _init_interrupt_table::
+                            524 ;synth.c:175: __endasm;
+   02A2 21 00 80      [10]  525 	ld hl,#0x8000
+   02A5 7C            [ 4]  526 	ld a,h
+   02A6 ED 47         [ 9]  527 	ld i,a
+   02A8 FD 21rAFr00   [14]  528 	ld iy,#_clock50KHz
+   02AC FD 22 20 80   [20]  529 	ld (#0x8020),iy
+   02B0 FD 21r9Dr00   [14]  530 	ld iy,#_vbl
+   02B4 FD 22 30 80   [20]  531 	ld (#0x8030),iy
+   02B8 C9            [10]  532 	ret
+                            533 ;synth.c:178: void ei() {
+                            534 ;	---------------------------------
+                            535 ; Function ei
+                            536 ; ---------------------------------
+   02B9                     537 _ei::
+                            538 ;synth.c:183: __endasm;
+   02B9 ED 5E         [ 8]  539 	im 2
+   02BB FB            [ 4]  540 	ei
+   02BC C9            [10]  541 	ret
+                            542 ;synth.c:186: void ym2151_write(unsigned char reg, unsigned char value) {
+                            543 ;	---------------------------------
+                            544 ; Function ym2151_write
+                            545 ; ---------------------------------
+   02BD                     546 _ym2151_write::
+                            547 ;synth.c:190: for (i = 0; (FmgAddrPort & 0x80) && (i < 100); i++);
+   02BD 11 00 00      [10]  548 	ld	de,#0x0000
+   02C0                     549 00104$:
+   02C0 DB 40         [11]  550 	in	a,(_FmgAddrPort)
+   02C2 07            [ 4]  551 	rlca
+   02C3 30 0E         [12]  552 	jr	NC,00101$
+   02C5 7B            [ 4]  553 	ld	a,e
+   02C6 D6 64         [ 7]  554 	sub	a, #0x64
+   02C8 7A            [ 4]  555 	ld	a,d
+   02C9 17            [ 4]  556 	rla
+   02CA 3F            [ 4]  557 	ccf
+   02CB 1F            [ 4]  558 	rra
+   02CC DE 80         [ 7]  559 	sbc	a, #0x80
+   02CE 30 03         [12]  560 	jr	NC,00101$
+   02D0 13            [ 6]  561 	inc	de
+   02D1 18 ED         [12]  562 	jr	00104$
+   02D3                     563 00101$:
+                            564 ;synth.c:191: FmgAddrPort = reg;
+   02D3 21 02 00      [10]  565 	ld	hl, #2+0
+   02D6 39            [11]  566 	add	hl, sp
+   02D7 7E            [ 7]  567 	ld	a, (hl)
+   02D8 D3 40         [11]  568 	out	(_FmgAddrPort),a
+                            569 ;synth.c:192: FmgDataPort = value;
+   02DA 21 03 00      [10]  570 	ld	hl, #3+0
+   02DD 39            [11]  571 	add	hl, sp
+   02DE 7E            [ 7]  572 	ld	a, (hl)
+   02DF D3 41         [11]  573 	out	(_FmgDataPort),a
+   02E1 C9            [10]  574 	ret
+                            575 ;synth.c:195: void main() {
+                            576 ;	---------------------------------
+                            577 ; Function main
+                            578 ; ---------------------------------
+   02E2                     579 _main::
+   02E2 DD E5         [15]  580 	push	ix
+   02E4 DD 21 00 00   [14]  581 	ld	ix,#0
+   02E8 DD 39         [15]  582 	add	ix,sp
+   02EA 3B            [ 6]  583 	dec	sp
+                            584 ;synth.c:198: init_interrupt_table();
+   02EB CDrA2r02      [17]  585 	call	_init_interrupt_table
+                            586 ;synth.c:200: cls();
+   02EE CDr22r02      [17]  587 	call	_cls
+                            588 ;synth.c:202: printf("YM2151+YM2149 SoC ready.\r\nPress S or C...");
+   02F1 21rBCr03      [10]  589 	ld	hl,#___str_1+0
+   02F4 E5            [11]  590 	push	hl
+   02F5 CDr00r00      [17]  591 	call	_printf
+   02F8 F1            [10]  592 	pop	af
+                            593 ;synth.c:205: for(i = 0; i < 8; i++) {
+   02F9 1E 00         [ 7]  594 	ld	e,#0x00
+   02FB                     595 00111$:
+                            596 ;synth.c:206: *(char*)(0x7f10+i) = cursor_data[i];
+   02FB 7B            [ 4]  597 	ld	a,e
+   02FC 4F            [ 4]  598 	ld	c,a
+   02FD 17            [ 4]  599 	rla
+   02FE 9F            [ 4]  600 	sbc	a, a
+   02FF 47            [ 4]  601 	ld	b,a
+   0300 FD 21 10 7F   [14]  602 	ld	iy,#0x7F10
+   0304 FD 09         [15]  603 	add	iy, bc
+   0306 21r00r00      [10]  604 	ld	hl,#_cursor_data
+   0309 16 00         [ 7]  605 	ld	d,#0x00
+   030B 19            [11]  606 	add	hl, de
+   030C 7E            [ 7]  607 	ld	a,(hl)
+   030D FD 77 00      [19]  608 	ld	0 (iy), a
+                            609 ;synth.c:207: *(char*)(0x7f18+i) = cursor_mask[i];
+   0310 21 18 7F      [10]  610 	ld	hl,#0x7F18
+   0313 09            [11]  611 	add	hl,bc
+   0314 4D            [ 4]  612 	ld	c, l
+   0315 44            [ 4]  613 	ld	b, h
+   0316 21r00r00      [10]  614 	ld	hl,#_cursor_mask
+   0319 16 00         [ 7]  615 	ld	d,#0x00
+   031B 19            [11]  616 	add	hl, de
+   031C 7E            [ 7]  617 	ld	a,(hl)
+   031D 02            [ 7]  618 	ld	(bc),a
+                            619 ;synth.c:205: for(i = 0; i < 8; i++) {
+   031E 1C            [ 4]  620 	inc	e
+   031F 7B            [ 4]  621 	ld	a,e
+   0320 EE 80         [ 7]  622 	xor	a, #0x80
+   0322 D6 88         [ 7]  623 	sub	a, #0x88
+   0324 38 D5         [12]  624 	jr	C,00111$
+                            625 ;synth.c:210: *(unsigned char*)0x7efd = 0x00;
+   0326 21 FD 7E      [10]  626 	ld	hl,#0x7EFD
+   0329 36 00         [10]  627 	ld	(hl),#0x00
+                            628 ;synth.c:212: *(unsigned char*)0x7efb = CURSOR_COLOR1;
+   032B 2E FB         [ 7]  629 	ld	l, #0xFB
+   032D 36 FF         [10]  630 	ld	(hl),#0xFF
+                            631 ;synth.c:213: *(unsigned char*)0x7efc = CURSOR_COLOR2;
+   032F 2E FC         [ 7]  632 	ld	l, #0xFC
+   0331 36 E0         [10]  633 	ld	(hl),#0xE0
+                            634 ;synth.c:216: ei();
+   0333 CDrB9r02      [17]  635 	call	_ei
+                            636 ;synth.c:219: do {
+   0336                     637 00108$:
+                            638 ;synth.c:220: char c = keys;
+   0336 DB 20         [11]  639 	in	a,(_keys)
+   0338 DD 77 FF      [19]  640 	ld	-1 (ix),a
+                            641 ;synth.c:223: if (c & 0x1) { 	// Space
+   033B DD CB FF 46   [20]  642 	bit	0, -1 (ix)
+   033F 28 4A         [12]  643 	jr	Z,00103$
+                            644 ;synth.c:224: cls();
+   0341 CDr22r02      [17]  645 	call	_cls
+                            646 ;synth.c:225: ym2151_write(0x20, 0xC0);	// L/R
+   0344 21 20 C0      [10]  647 	ld	hl,#0xC020
+   0347 E5            [11]  648 	push	hl
+   0348 CDrBDr02      [17]  649 	call	_ym2151_write
+                            650 ;synth.c:227: ym2151_write(0x28 + ch, 0x00);
+   034B 21 28 00      [10]  651 	ld	hl, #0x0028
+   034E E3            [19]  652 	ex	(sp),hl
+   034F CDrBDr02      [17]  653 	call	_ym2151_write
+                            654 ;synth.c:228: ym2151_write(0x30 + ch, 0x00);
+   0352 21 30 00      [10]  655 	ld	hl, #0x0030
+   0355 E3            [19]  656 	ex	(sp),hl
+   0356 CDrBDr02      [17]  657 	call	_ym2151_write
+                            658 ;synth.c:229: ym2151_write(0x38 + ch, 0x00);
+   0359 21 38 00      [10]  659 	ld	hl, #0x0038
+   035C E3            [19]  660 	ex	(sp),hl
+   035D CDrBDr02      [17]  661 	call	_ym2151_write
+                            662 ;synth.c:230: ym2151_write(0x40 + ch, 0x00);
+   0360 21 40 00      [10]  663 	ld	hl, #0x0040
+   0363 E3            [19]  664 	ex	(sp),hl
+   0364 CDrBDr02      [17]  665 	call	_ym2151_write
+                            666 ;synth.c:231: ym2151_write(0x60 + ch, 0x00);
+   0367 21 60 00      [10]  667 	ld	hl, #0x0060
+   036A E3            [19]  668 	ex	(sp),hl
+   036B CDrBDr02      [17]  669 	call	_ym2151_write
+                            670 ;synth.c:232: ym2151_write(0x80 + ch, 0x00);
+   036E 21 80 00      [10]  671 	ld	hl, #0x0080
+   0371 E3            [19]  672 	ex	(sp),hl
+   0372 CDrBDr02      [17]  673 	call	_ym2151_write
+                            674 ;synth.c:233: ym2151_write(0xA0 + ch, 0x00);
+   0375 21 A0 00      [10]  675 	ld	hl, #0x00A0
+   0378 E3            [19]  676 	ex	(sp),hl
+   0379 CDrBDr02      [17]  677 	call	_ym2151_write
+                            678 ;synth.c:234: ym2151_write(0xC0 + ch, 0x00);
+   037C 21 C0 00      [10]  679 	ld	hl, #0x00C0
+   037F E3            [19]  680 	ex	(sp),hl
+   0380 CDrBDr02      [17]  681 	call	_ym2151_write
+                            682 ;synth.c:235: ym2151_write(0xE0 + ch, 0x00);
+   0383 21 E0 00      [10]  683 	ld	hl, #0x00E0
+   0386 E3            [19]  684 	ex	(sp),hl
+   0387 CDrBDr02      [17]  685 	call	_ym2151_write
+   038A F1            [10]  686 	pop	af
+   038B                     687 00103$:
+                            688 ;synth.c:237: if (c & 0x2) {	// S
+   038B DD CB FF 4E   [20]  689 	bit	1, -1 (ix)
+   038F 28 0F         [12]  690 	jr	Z,00105$
+                            691 ;synth.c:238: ym2151_write(0x1B, 0xC0);
+   0391 21 1B C0      [10]  692 	ld	hl,#0xC01B
+   0394 E5            [11]  693 	push	hl
+   0395 CDrBDr02      [17]  694 	call	_ym2151_write
+                            695 ;synth.c:239: ym2151_write(0x08, 0x40);	// K_ON, MOD1, CH0
+   0398 21 08 40      [10]  696 	ld	hl, #0x4008
+   039B E3            [19]  697 	ex	(sp),hl
+   039C CDrBDr02      [17]  698 	call	_ym2151_write
+   039F F1            [10]  699 	pop	af
+   03A0                     700 00105$:
+                            701 ;synth.c:242: if (c & 0x4) {	// C
+   03A0 DD CB FF 56   [20]  702 	bit	2, -1 (ix)
+   03A4 28 90         [12]  703 	jr	Z,00108$
+                            704 ;synth.c:243: ym2151_write(0x1B, 0x00);
+   03A6 21 1B 00      [10]  705 	ld	hl,#0x001B
+   03A9 E5            [11]  706 	push	hl
+   03AA CDrBDr02      [17]  707 	call	_ym2151_write
+                            708 ;synth.c:244: ym2151_write(0x08, 0x00);	// K_OFF, CH0
+   03AD 21 08 00      [10]  709 	ld	hl, #0x0008
+   03B0 E3            [19]  710 	ex	(sp),hl
+   03B1 CDrBDr02      [17]  711 	call	_ym2151_write
+   03B4 F1            [10]  712 	pop	af
+                            713 ;synth.c:251: } while(1);
+   03B5 C3r36r03      [10]  714 	jp	00108$
+   03B8 33            [ 6]  715 	inc	sp
+   03B9 DD E1         [14]  716 	pop	ix
+   03BB C9            [10]  717 	ret
+   03BC                     718 ___str_1:
+   03BC 59 4D 32 31 35 31   719 	.ascii "YM2151+YM2149 SoC ready."
+        2B 59 4D 32 31 34
+        39 20 53 6F 43 20
+        72 65 61 64 79 2E
+   03D4 0D                  720 	.db 0x0D
+   03D5 0A                  721 	.db 0x0A
+   03D6 50 72 65 73 73 20   722 	.ascii "Press S or C..."
+        53 20 6F 72 20 43
+        2E 2E 2E
+   03E5 00                  723 	.db 0x00
+                            724 	.area _CODE
+                            725 	.area _INITIALIZER
+   0000                     726 __xinit__mouse_x:
+   0000 A0 00               727 	.dw #0x00A0
+   0002                     728 __xinit__mouse_y:
+   0002 78 00               729 	.dw #0x0078
+   0004                     730 __xinit__mouse_b:
+   0004 00                  731 	.db #0x00	; 0
+   0005                     732 __xinit__cur_x:
+   0005 00                  733 	.db #0x00	; 0
+   0006                     734 __xinit__cur_y:
+   0006 00                  735 	.db #0x00	; 0
+                            736 	.area _CABS (ABS)
