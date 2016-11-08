@@ -233,10 +233,10 @@ wire ram_clock;
 assign SDRAM_CKE = 1'b1;
 
 // during ROM download data_io writes the ram. Otherwise the CPU
-wire [7:0] sdram_din = dio_download?dio_data:cpu_dout;
-wire [24:0] sdram_addr = dio_download?dio_addr:{ 9'd0, cpu_addr[15:0] };
-wire sdram_wr = dio_download?dio_write:(!cpu_wr_n && !cpu_mreq_n && cpu_addr[15]);
-wire sdram_oe = dio_download?1'b1:(!cpu_rd_n && !cpu_mreq_n);
+wire [7:0] sdram_din = dio_download ? dio_data : cpu_dout;
+wire [24:0] sdram_addr = dio_download ? dio_addr : { 9'd0, cpu_addr[15:0] };
+wire sdram_wr = dio_download ? dio_write : (!cpu_wr_n && !cpu_mreq_n && cpu_addr[15]);
+wire sdram_oe = dio_download ? 1'b1 : (!cpu_rd_n && !cpu_mreq_n);
 
 sdram sdram (
 	// interface to the MT48LC16M16 chip
@@ -291,11 +291,11 @@ T80s T80s (
 );
 
 // de-multiplex the IO data sources
-wire [7:0] io_dout = spi_sel?spi_dout:
-							psg_sel?psg_dout:
-							ym2151_sel?ym2151_dout:
-							kbd_sel?keys:
-							mouse_sel?mouse_dout:
+wire [7:0] io_dout = spi_sel ? spi_dout:
+							psg_sel ? psg_dout:
+							ym2151_sel ? ym2151_dout:
+							kbd_sel ? keys:
+							mouse_sel ? mouse_dout:
 							8'h00;
 
 // SPI controller uses IO addresses 0 and 1
@@ -321,8 +321,7 @@ spi spi (
 	.spi_sdi ( sd_sdo      )
 );	
 
-// Audio replay is supposed to run at 50Hz. Vsync is 60 Hz, so
-// we generate.
+// Clock to generate the 50Hz interrupt.
 reg clk50hz;
 reg [15:0] count_50hz;
 always @(posedge cpu_clock) begin
@@ -366,9 +365,9 @@ end
 
 // map 32k SDRAM into upper half of the address space (A15=1)
 // map ROM (now also placed in SDRAM) into the lower half (A15=0)
-// map Mode 2 interrupt to 0x20
+// or Mode 2 interrupt vector
 wire [7:0] ram_data_out;
-assign cpu_din = (!cpu_iorq_n)?((!cpu_m1_n)?vector_dout:io_dout):ram_data_out;
+assign cpu_din = (!cpu_iorq_n) ? ((!cpu_m1_n) ? vector_dout : io_dout) : ram_data_out;
 
 wire dio_download;
 wire [24:0] dio_addr;

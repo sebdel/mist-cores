@@ -7,9 +7,10 @@
 -l z80
 /usr/bin/../share/sdcc/lib/z80/crt0.rel
 synth.rel
+ym2151.rel
+widgets.rel
+text.rel
 font.rel
-pff.rel
-mmc.rel
 arrow_rom.rel
 
 -e

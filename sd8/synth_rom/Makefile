@@ -1,18 +1,15 @@
 SDCC=sdcc
 CPU=z80
 CODE=synth
-OBJ=$(CODE).rel font.rel pff.rel mmc.rel arrow_rom.rel 
+OBJ=$(CODE).rel ym2151.rel widgets.rel text.rel font.rel arrow_rom.rel 
 ROM=synth.rom
 
 all: $(ROM)
 
 bin2c: bin2c.c
 
-font.part: font.fnt
-	dd if=$< of=$@ bs=1 count=768 skip=256
-
-font.c: font.part bin2c
-	./bin2c font.part font.c "const unsigned char font[]"
+font.c: bin2c
+	./bin2c ../art/4x6.bin font.c "const unsigned char font[]"
 
 irqvec.rel: irqvec.s
 	sdasz80 -o $@ $<
@@ -39,6 +36,6 @@ disasm: $(CODE).bin
 	z80dasm -a -t -g 0 $<
 
 clean:
-	rm -rf *~ *.asm *.ihx *.lk *.lst *.map *.noi *.rel *.sym *.bin bin2c *.part
+	rm -rf *~ *.asm *.ihx *.lk *.lst *.map *.noi *.rel *.sym *.part
 
 

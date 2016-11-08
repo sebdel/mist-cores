@@ -5,7 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>	// for abs()
-#include "pff.h"	// FAT file system 
+
+#include "ym2151.h"
+#include "widgets.h"
+#include "text.h"
 
 // $0000-$4AFF: VRAM
 // $7EFB: CURSOR_COL_0
@@ -16,6 +19,9 @@
 // $7F00: CURSOR_Y
 // $7F10-$7F17: CURSOR_DATA
 // $7F18-$7F1F: CURSOR_MASK
+// $7F20-$7F23: Palette
+
+#define BG_COLOR 0x4A	// R:010 V:010 B:10
 
 // I/O Ports Adresses
 // PSG (YM2149)
@@ -38,17 +44,50 @@ __sfr __at 0x32 mouse_but_reg;
 __sfr __at 0x40 FmgAddrPort;
 __sfr __at 0x41 FmgDataPort;
 
+void ct1_clicked(T_Widget *widget) {
+	ym2151_setCT1(((T_Checkbox *)widget)->checked ? 1 : 0);
+}
 
+enum {
+	W_LED,
+	SPINNER1,
+	CHECKBOX1,
+
+	NB_WIDGETS
+};
+
+T_Widget *widgets[NB_WIDGETS];
+
+void init_ui() {
+	char i;
+
+	draw_label(0, 0, "YMSoC v0.1");
+
+	draw_label(0, 2, "CT1:");
+	widgets[W_LED] = (T_Widget *)new_checkbox(5, 2);
+	widgets[W_LED]->callback = ct1_clicked;
+ 
+	draw_label(0, 4, "Value1:");
+	widgets[SPINNER1] = (T_Widget *)new_spinner(10, 4);
+
+	draw_label(0, 5, "Value2:");
+	widgets[CHECKBOX1] = (T_Widget *)new_checkbox(10, 5);
+
+	// Draw the UI
+	for (i = 0; i < NB_WIDGETS; i++) {
+		widget_redraw(widgets[i]);
+	}
+}
+
+// Mouse position global vars
 int mouse_x = 160;
 int mouse_y = 120;        
-unsigned char mouse_b = 0;
 
 void move_mouse() {
 
 	// update mouse pos
 	mouse_x += (char)mouse_x_reg;
         mouse_y -= (char)mouse_y_reg;
-	mouse_b = (char)mouse_but_reg;
 
         // limit mouse movement
         if(mouse_x < 0)   mouse_x = 0;
@@ -62,74 +101,129 @@ void move_mouse() {
 	*(unsigned char*)0x7f00 = mouse_y;
 }
 
+void left_click_event() {
+	char i;
+
+	for (i = 0; i < NB_WIDGETS; i++)
+		if (isInLayout(&(widgets[i]->layout), mouse_x, mouse_y)) {
+			widget_event(widgets[i], EVENT_LEFT_CLICK);
+			if (widgets[i]->dirty)
+				widget_redraw(widgets[i]);
+		}
+}
+
+void right_click_event() {
+	char i;
+
+	for (i = 0; i < NB_WIDGETS; i++)
+		if (isInLayout(&(widgets[i]->layout), mouse_x, mouse_y)) {
+			widget_event(widgets[i], EVENT_RIGHT_CLICK);
+			if (widgets[i]->dirty)
+				widget_redraw(widgets[i]);
+		}
+}
+
+//Mouse buttons global var
+unsigned char mouse_buttons = 0;
+
+#define HOLD_CLICK	50
+#define REPEAT_CLICK	10
+
+void refresh_mouse_buttons() {
+	static unsigned char prev_buttons;
+	static unsigned char click_timer;
+	static unsigned char initial_click;
+
+	prev_buttons = mouse_buttons;
+	mouse_buttons = (char)mouse_but_reg;
+
+	if (!(prev_buttons & 1) && (mouse_buttons & 1)) {
+		click_timer = 0;
+		initial_click = 1;
+		left_click_event();		
+	} else if ((prev_buttons & 1) && (mouse_buttons & 1)) {
+		click_timer ++;
+		if (initial_click && (click_timer == HOLD_CLICK)) {
+			initial_click = 0;
+			click_timer = 0;
+		} else if (!initial_click && (click_timer == REPEAT_CLICK)) {
+			click_timer = 0;
+			left_click_event();
+		}
+	} else if (!(prev_buttons & 2) && (mouse_buttons & 2)) {
+		click_timer = 0;
+		initial_click = 1;
+		right_click_event();		
+	} else if ((prev_buttons & 2) && (mouse_buttons & 2)) {
+		click_timer ++;
+		if (initial_click && (click_timer == HOLD_CLICK)) {
+			initial_click = 0;
+			click_timer = 0;
+		} else if (!initial_click && (click_timer == REPEAT_CLICK)) {
+			click_timer = 0;
+			right_click_event();
+		}
+	} else {
+		initial_click = 0;
+	}
+}
+
 // VBL
 void vbl(void) __interrupt (0x30) {
 
-    move_mouse();
+	move_mouse();
 
-  // re-enable interrupt
-  __asm
-    ei    
-  __endasm;
+	// ACK interrupt
+	__asm
+	ei    
+	__endasm;
 }
+
+int tick50Hz = 0;
 
 //50KHz interrupt (useful for sound replay) 
 void clock50KHz(void) __interrupt (0x20) {
 
-  // re-enable interrupt
-  __asm
-    ei    
-  __endasm;
-}
+	refresh_mouse_buttons();
+	tick50Hz ++;
 
-extern unsigned char font[];
+	// ACK interrupt
+	__asm
+	ei    
+	__endasm;
+}
 
 unsigned char cur_x=0, cur_y=0;
 
 void putchar(char c) {
-  unsigned char *p;
-  unsigned char *dptr = (unsigned char*)(80*(8*cur_y) + 2*cur_x);
-  char i;
+	unsigned char *dptr = (unsigned char*)(80 * (FONT_HEIGHT * cur_y) + cur_x);
 
-  if(c < 32) {
-    if(c == '\r') 
-      cur_x=0;
+	if(c < 32) {
+		if(c == '\r') 
+			cur_x=0;
 
-    if(c == '\n') {
-      cur_y++;
-      cur_x=0;
+		if(c == '\n') {
+			cur_y++;
+			cur_x=0;
 
-      if(cur_y >= 30)
-	cur_y = 0;
-    }
-    return;
-  }
+			if(cur_y >= 240 / FONT_HEIGHT)
+				cur_y = 0;
+		}
+		return;
+	}
 
-  if(c < 0) return;
+	if(c < 0) return;
 
-  p = font+8*(unsigned char)(c-32);
-  for(i=0;i<8;i++) {
-    unsigned char l = *p++;
+	text_char(dptr, c);
 
-    *dptr = ( 	((l & 0x80) ? 0x03:0x00) |
-		((l & 0x40) ? 0x0C:0x00) |
-		((l & 0x20) ? 0x30:0x00) |
-		((l & 0x10) ? 0xC0:0x00));
-    *(dptr + 1) = (((l & 0x08) ? 0x03:0x00) |
-		((l & 0x04) ? 0x0C:0x00) |
-		((l & 0x02) ? 0x30:0x00) |
-		((l & 0x01) ? 0xC0:0x00));
-    dptr += 80;
-  }
+	cur_x++;
+	if(cur_x >= 320 / FONT_WIDTH) {
+		cur_x = 0;
+		cur_y++;
 
-  cur_x++;
-  if(cur_x >= 40) {
-    cur_x = 0;
-    cur_y++;
-
-    if(cur_y >= 30)
-      cur_y = 0;
-  }
+		if(cur_y >= 240 / FONT_HEIGHT)
+			cur_y = 0;
+	}
 }
 
 void cls(void) {
@@ -142,16 +236,6 @@ void cls(void) {
   }
   cur_x = 0;
   cur_y = 0;
-}
-
-// draw a pixel
-void put_pixel(int x, unsigned char y, unsigned char color) {
-  *((unsigned char*)(80*y+(x>>2))) = color;
-}
-
-void die (FRESULT rc) {
-  printf("Fail rc=%u", rc);
-  for (;;) ;
 }
 
 #define CURSOR_COLOR1 0xFF;    // white
@@ -183,23 +267,12 @@ void ei() {
 	__endasm;
 }
 
-void ym2151_write(unsigned char reg, unsigned char value) {
-
-	int i;
-
-	for (i = 0; (FmgAddrPort & 0x80) && (i < 100); i++);
-	FmgAddrPort = reg;
-	FmgDataPort = value;
-}
-
 void main() {
 	char i;
 
 	init_interrupt_table();
 
 	cls();
-
-	printf("YM2151+YM2149 SoC ready.\r\nPress S or C...");
 
 	// load cursor image into VGA controller
 	for(i = 0; i < 8; i++) {
@@ -212,6 +285,12 @@ void main() {
 	*(unsigned char*)0x7efb = CURSOR_COLOR1;
 	*(unsigned char*)0x7efc = CURSOR_COLOR2;
 
+	// Set palette
+	*(unsigned char*)0x7f20 = BG_COLOR;
+
+	// draw UI
+	init_ui();
+
 	// enable interrupts
 	ei();
 
@@ -221,7 +300,6 @@ void main() {
 		char ch = 0;
 
 		if (c & 0x1) { 	// Space
-			cls();
 			ym2151_write(0x20, 0xC0);	// L/R
 			// Setup
 			ym2151_write(0x28 + ch, 0x00);
@@ -235,19 +313,14 @@ void main() {
 			ym2151_write(0xE0 + ch, 0x00);
 		}
 		if (c & 0x2) {	// S
-			ym2151_write(0x1B, 0xC0);
+			ym2151_setCT1(1);
 			ym2151_write(0x08, 0x40);	// K_ON, MOD1, CH0
 
 		}
 		if (c & 0x4) {	// C
-			ym2151_write(0x1B, 0x00);
 			ym2151_write(0x08, 0x00);	// K_OFF, CH0
 		}
 
-//		if (mouse_b & 1) 
-//			printf ("left ");
-//		if (mouse_b & 2) 
-//			printf ("right ");
 	} while(1);
 
 }

@@ -1,0 +1,42 @@
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 1.
+Hexadecimal [16-Bits]
+
+Symbol Table
+
+    .__.$$$.                                                    =  2710 L
+    .__.ABS.                                                    =  0000 G
+    .__.CPU.                                                    =  0000 L
+    .__.H$L.                                                    =  0000 L
+    _FmgAddrPort                                                =  0040 
+    _FmgDataPort                                                =  0041 
+  0 __wait_busy                                                    0000 GR
+  0 _ym2151_read                                                   0026 GR
+  0 _ym2151_resetLFO                                               00E0 GR
+  0 _ym2151_setCT1                                                 0034 GR
+  0 _ym2151_setCT2                                                 005A GR
+  0 _ym2151_setChannels                                            0150 GR
+  0 _ym2151_setConnections                                         0169 GR
+  0 _ym2151_setKeyState                                            013B GR
+  0 _ym2151_setLFOAmplitude                                        00BF GR
+  0 _ym2151_setLFOFrequency                                        0099 GR
+  0 _ym2151_setLFOModulation                                       00A6 GR
+  0 _ym2151_setLFOWaveform                                         0080 GR
+  0 _ym2151_setNoiseEnable                                         00F4 GR
+  0 _ym2151_setNoiseFrequency                                      011A GR
+  0 _ym2151_write                                                  0014 GR
+
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
+Hexadecimal [16-Bits]
+
+Area Table
+
+   0 _CODE                                      size  18A   flags    0
+   1 _DATA                                      size    0   flags    0
+   2 _INITIALIZED                               size    0   flags    0
+   3 _DABS                                      size    0   flags    8
+   4 _HOME                                      size    0   flags    0
+   5 _GSINIT                                    size    0   flags    0
+   6 _GSFINAL                                   size    0   flags    0
+   7 _INITIALIZER                               size    0   flags    0
+   8 _CABS                                      size    0   flags    8
+

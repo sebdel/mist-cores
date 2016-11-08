@@ -112,6 +112,7 @@ reg [7:0] cursor_y;
 // $7F00: CURSOR_Y
 // $7F10-$7F17: CURSOR_DATA
 // $7F18-$7F1F: CURSOR_MASK
+// $7F20-$7F23: Palette
 
 always @(posedge cpu_clk) begin
 	if(reset)
@@ -137,10 +138,11 @@ always @(posedge cpu_clk) begin
 				cursor_data[cpu_addr[2:0]] <= cpu_data;
 			else if((cpu_addr >= 15'h7f18) && (cpu_addr < 15'h7f20))
 				cursor_mask[cpu_addr[2:0]] <= cpu_data;
+			else if((cpu_addr >= 15'h7f20) && (cpu_addr < 15'h7f24))
+				palette[cpu_addr[1:0]] <= cpu_data;
 		end
 	end
 end
-
 
 // add hot spot info to cursor position 
 wire [8:0] cursor_map_x = cursor_x - { 5'h0, cursor_hot_x } /* synthesis keep */;
