@@ -1,7 +1,7 @@
 // Aquarius for the MiST
 // (c) 2016 Sebastien Delestaing
 									  
-module soc (
+module aquarius (
    input [1:0]  CLOCK_27,
    
 	// for debug
@@ -111,10 +111,11 @@ wire [18:0] addr_pixel;
 wire [7:0] data_pixel;
 
 vga vga (
-	.pclk       ( pixel_clock ),	 
-	.addr_pixel ( addr_pixel  ),
-	.data       ( data_pixel  ),
-	.scanlines  ( !status[1]  ),
+	.clk100MHz	( clock_100mhz	),
+	.pclk       ( pixel_clock	),	 
+	.addr_pixel ( addr_pixel	),
+	.data       ( data_pixel	),
+	.scanlines  ( !status[1]	),
 	
 	// video output as fed into the VGA outputs
 	.hs    	( video_hs          ),

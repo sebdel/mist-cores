@@ -38,7 +38,7 @@
 
 set_global_assignment -name FAMILY "Cyclone III"
 set_global_assignment -name DEVICE EP3C25E144C8
-set_global_assignment -name TOP_LEVEL_ENTITY soc
+set_global_assignment -name TOP_LEVEL_ENTITY aquarius
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 11.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "17:14:01  APRIL 10, 2012"
 set_global_assignment -name LAST_QUARTUS_VERSION 13.1
@@ -47,9 +47,6 @@ set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name DEVICE_FILTER_PACKAGE "ANY QFP"
 set_global_assignment -name DEVICE_FILTER_SPEED_GRADE 8
 set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_global_assignment -name USE_CONFIGURATION_DEVICE OFF
 set_global_assignment -name CRC_ERROR_OPEN_DRAIN OFF
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_WEAK_PULLUP "AS INPUT TRI-STATED"
@@ -154,7 +151,16 @@ set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING ON
 set_global_assignment -name FITTER_EFFORT "FAST FIT"
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to VGA_*
+set_global_assignment -name VHDL_FILE T80/T80s.vhd
+set_global_assignment -name VHDL_FILE T80/T80_Reg.vhd
+set_global_assignment -name VHDL_FILE T80/T80_Pack.vhd
+set_global_assignment -name VHDL_FILE T80/T80_MCode.vhd
+set_global_assignment -name VHDL_FILE T80/T80_ALU.vhd
+set_global_assignment -name VHDL_FILE T80/T80.vhd
 set_global_assignment -name VERILOG_FILE sigma_delta_dac.v
 set_global_assignment -name VHDL_FILE vol_table_array.vhd
 set_global_assignment -name VHDL_FILE YM2149_volmix.vhd
@@ -167,18 +173,14 @@ set_global_assignment -name VERILOG_FILE user_io.v
 set_global_assignment -name VHDL_FILE Pla2.vhdl
 set_global_assignment -name VHDL_FILE Pla1.vhdl
 set_global_assignment -name VHDL_FILE PS2_to_matrix.vhdl
-set_global_assignment -name VHDL_FILE T80s.vhd
-set_global_assignment -name VHDL_FILE T80_Reg.vhd
-set_global_assignment -name VHDL_FILE T80_Pack.vhd
-set_global_assignment -name VHDL_FILE T80_MCode.vhd
-set_global_assignment -name VHDL_FILE T80_ALU.vhd
-set_global_assignment -name VHDL_FILE T80.vhd
 set_global_assignment -name QIP_FILE pll.qip
-set_global_assignment -name VERILOG_FILE soc.v
 set_global_assignment -name VERILOG_FILE vga.v
 set_global_assignment -name SIGNALTAP_FILE soc.stp
 set_global_assignment -name QIP_FILE aquarius_rom.qip
 set_global_assignment -name QIP_FILE character_rom.qip
 set_global_assignment -name QIP_FILE vram2k.qip
 set_global_assignment -name VERILOG_FILE pads.v
+set_global_assignment -name VERILOG_FILE aquarius.v
+set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
