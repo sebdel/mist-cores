@@ -1,10 +1,13 @@
 // widgets.h
 
+#include "text.h"
+
 #define SCRPTR(x,y)	((unsigned char*)((x)+((y)<<3)*80))
 
 typedef enum {
 	SPINNER,
-	CHECKBOX
+	CHECKBOX,
+	BUTTON
 } E_Type;
 
 typedef enum {
@@ -21,6 +24,7 @@ typedef struct s_widget {
 	T_Layout layout;
 	unsigned char dirty;
 	void (*callback)(struct s_widget *);
+	void *user_data;
 } T_Widget;
 	
 typedef struct s_spinner {
@@ -35,6 +39,11 @@ typedef struct s_checkbox {
 	unsigned char checked;
 } T_Checkbox;
 
+typedef struct s_button {
+	T_Widget widget;
+	char *label;
+} T_Button;
+	
 unsigned char isInLayout(T_Layout *layout, int x, int y);
 
 void widget_redraw(T_Widget *widget);
@@ -51,5 +60,8 @@ T_Checkbox *new_checkbox(unsigned char x, unsigned char y);
 void checkbox_setValue(T_Checkbox *checkbox, unsigned char checked);
 void checkbox_changeValue(T_Checkbox *checkbox);
 void checkbox_redraw(T_Checkbox *checkbox);
+
+T_Button *new_button(unsigned char x, unsigned char y, char *label);
+void button_redraw(T_Button *button);
 
 void draw_label(unsigned char x, unsigned char y, char *text);

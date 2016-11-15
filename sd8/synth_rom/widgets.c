@@ -1,9 +1,9 @@
 // widgets.c
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "widgets.h"
-#include "text.h"
 
 unsigned char isInLayout(T_Layout *layout, int x, int y) {
 	unsigned char lx = x >> 2;
@@ -27,6 +27,9 @@ void widget_redraw(T_Widget *widget) {
 				break;
 			case CHECKBOX:
 				checkbox_redraw((T_Checkbox *)widget);
+				break;
+			case BUTTON:
+				button_redraw((T_Button *)widget);
 				break;
 			default:
 				break;
@@ -54,21 +57,31 @@ void widget_event(T_Widget *widget, E_Event event) {
 	}
 }
 
+void init_widget(T_Widget *widget, unsigned char type) {
+
+	widget->type = type;
+	widget->layout.x = 0;
+	widget->layout.y = 0;
+	widget->layout.w = 2;
+	widget->layout.h = 1;
+	widget->callback = NULL;
+	widget->user_data = NULL;
+	widget->dirty = 0;
+}
+
 T_Spinner *new_spinner(unsigned char x, unsigned char y) {
 
 	T_Spinner *spinner = (T_Spinner *) malloc(sizeof(T_Spinner));
 	
-	spinner->widget.type = SPINNER;
+	init_widget(&(spinner->widget), SPINNER);
 	spinner->widget.layout.x = x;
 	spinner->widget.layout.y = y;
 	spinner->widget.layout.w = 2;
 	spinner->widget.layout.h = 1;
-	spinner->widget.callback = NULL;
-	spinner->widget.dirty = 0;
 	
 	spinner->min = 0;
 	spinner->max = 255;
-	spinner->value = 127;
+	spinner->value = 0;
 	
 	return spinner;
 }
@@ -121,13 +134,11 @@ void spinner_redraw(T_Spinner *spinner) {
 T_Checkbox *new_checkbox(unsigned char x, unsigned char y) {
 	T_Checkbox *checkbox = (T_Checkbox *) malloc(sizeof(T_Checkbox));
 
-	checkbox->widget.type = CHECKBOX;
+	init_widget(&(checkbox->widget), CHECKBOX);
 	checkbox->widget.layout.x = x;
 	checkbox->widget.layout.y = y;
 	checkbox->widget.layout.w = 2;
 	checkbox->widget.layout.h = 1;
-	checkbox->widget.callback = NULL;
-	checkbox->widget.dirty = 0;
 	
 	checkbox->checked = 0;
 
@@ -177,6 +188,32 @@ void checkbox_redraw(T_Checkbox *checkbox) {
 		*dst = 0xFC; *(dst+1) = 0x3F;
 	}
 	checkbox->widget.dirty = 0;
+}
+
+T_Button *new_button(unsigned char x, unsigned char y, char *label) {
+	T_Button *button = (T_Button *) malloc(sizeof(T_Button));
+	char len = strlen(label);
+
+	init_widget(&(button->widget), BUTTON);
+	button->widget.layout.x = x;
+	button->widget.layout.y = y;
+	button->widget.layout.w = 2 + len;
+	button->widget.layout.h = 1;
+	
+	button->label = (char *)malloc(len + 1);
+	strcpy(button->label, label);
+
+	return button;
+}
+
+void button_redraw(T_Button *button) {
+	unsigned char *dst = SCRPTR(button->widget.layout.x, button->widget.layout.y);
+	char *p = button->label;
+	char c;
+
+	text_char(dst++, '[');
+	while(c = *p++) text_char(dst++, c);
+	text_char(dst++, ']');
 }
 
 void draw_label(unsigned char x, unsigned char y, char *text) {

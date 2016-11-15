@@ -444,8 +444,11 @@ assign LED = !led;
 );
 
 wire [13:0] ym2149_audio = { psg_audio_out, 7'h00 } - 15'h4000;
-wire [14:0] audio_l = ym2149_audio + ym2151_audio_l[15:2];
-wire [14:0] audio_r = ym2149_audio + ym2151_audio_r[15:2];
+//wire [14:0] audio_l = ym2149_audio + ym2151_audio_l[15:2];
+//wire [14:0] audio_r = ym2149_audio + ym2151_audio_r[15:2];
+
+wire [14:0] audio_l = ym2151_audio_l[15:1] - 15'h4000;
+wire [14:0] audio_r = ym2151_audio_r[15:1] - 15'h4000;
 
 sigma_delta_dac sigma_delta_dac (
    .clk      ( ram_clock	),
@@ -474,7 +477,7 @@ always @(posedge ram_clock)
 	clk16m <= !clk16m;
 
 // derive 15kHz ps2 clock from 32Mhz sdram clock
-wire ps2_clock = clk_div[13];
+wire ps2_clock = clk_div[10];
 reg [13:0] clk_div;
 always @(posedge ram_clock)
    clk_div <= clk_div + 14'd1;

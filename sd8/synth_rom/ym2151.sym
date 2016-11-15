@@ -9,29 +9,44 @@ Symbol Table
     .__.H$L.                                                    =  0000 L
     _FmgAddrPort                                                =  0040 
     _FmgDataPort                                                =  0041 
-  0 __wait_busy                                                    0000 GR
-  0 _ym2151_read                                                   0026 GR
-  0 _ym2151_resetLFO                                               00E0 GR
-  0 _ym2151_setCT1                                                 0034 GR
-  0 _ym2151_setCT2                                                 005A GR
-  0 _ym2151_setChannels                                            0150 GR
-  0 _ym2151_setConnections                                         0169 GR
-  0 _ym2151_setKeyState                                            013B GR
-  0 _ym2151_setLFOAmplitude                                        00BF GR
-  0 _ym2151_setLFOFrequency                                        0099 GR
-  0 _ym2151_setLFOModulation                                       00A6 GR
-  0 _ym2151_setLFOWaveform                                         0080 GR
-  0 _ym2151_setNoiseEnable                                         00F4 GR
-  0 _ym2151_setNoiseFrequency                                      011A GR
-  0 _ym2151_write                                                  0014 GR
+  0 __wait_busy                                                    00D6 GR
+  0 _dbg_print                                                     0000 GR
+  0 _nb_bits                                                       005B GR
+  1 _registers                                                     0000 GR
+    _text_char                                                     **** GX
+    _text_hex                                                      **** GX
+  0 _ym2151_init                                                   00E7 GR
+  0 _ym2151_resetLFO                                               021A GR
+  0 _ym2151_setAMSEnableDecayRate1                                 04B2 GR
+  0 _ym2151_setAmplitudeModulationSensitivity                      0316 GR
+  0 _ym2151_setCT1                                                 0175 GR
+  0 _ym2151_setCT2                                                 0194 GR
+  0 _ym2151_setChannels                                            02C0 GR
+  0 _ym2151_setConnections                                         02EA GR
+  0 _ym2151_setDecayLevelReleaseRate                               05BD GR
+  0 _ym2151_setDetune1PhaseMultiply                                036E GR
+  0 _ym2151_setDetune2DecayRate2                                   054D GR
+  0 _ym2151_setKeyFraction                                         02A6 GR
+  0 _ym2151_setKeyNote                                             027B GR
+  0 _ym2151_setKeyScalingAttackRate                                0442 GR
+  0 _ym2151_setKeyState                                            0266 GR
+  0 _ym2151_setLFOAmplitude                                        01FD GR
+  0 _ym2151_setLFOFrequency                                        01CC GR
+  0 _ym2151_setLFOModulation                                       01E4 GR
+  0 _ym2151_setLFOWaveform                                         01B3 GR
+  0 _ym2151_setNoiseEnable                                         022A GR
+  0 _ym2151_setNoiseFrequency                                      0249 GR
+  0 _ym2151_setPhaseModulationSensitivity                          0342 GR
+  0 _ym2151_setTotalLevel                                          03E0 GR
+  0 _ym2151_write                                                  0145 GR
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
 Hexadecimal [16-Bits]
 
 Area Table
 
-   0 _CODE                                      size  18A   flags    0
-   1 _DATA                                      size    0   flags    0
+   0 _CODE                                      size  62F   flags    0
+   1 _DATA                                      size   15   flags    0
    2 _INITIALIZED                               size    0   flags    0
    3 _DABS                                      size    0   flags    8
    4 _HOME                                      size    0   flags    0

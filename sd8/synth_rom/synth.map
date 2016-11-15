@@ -36,95 +36,120 @@ Area                                    Addr        Size        Decimal Bytes (A
      00000002  l__HEADER6                      
      00000002  l__HEADER7                      
      00000003  l__HEADER0                      
-     00000009  l__DATA                         
      0000000C  l__HEADER8                      
      00000012  l__GSINIT                       
-     00000019  l__INITIALIZED                  
-     00000019  l__INITIALIZER                  
+     0000001C  l__INITIALIZED                  
+     0000001C  l__INITIALIZER                  
+     00000048  l__DATA                         
      00000200  s__CODE                         
      000003FF  l__HEAP                         
-     00000F43  l__CODE                         
-     00001143  s__HOME                         
-     00001143  s__INITIALIZER                  
-     0000115C  s__GSINIT                       
-     0000116E  s__GSFINAL                      
+     00001DC6  l__CODE                         
+     00001FC6  s__HOME                         
+     00001FC6  s__INITIALIZER                  
+     00001FE2  s__GSINIT                       
+     00001FF4  s__GSFINAL                      
      00008100  s__DATA                         
-     00008109  s__INITIALIZED                  
-     00008122  s__BSEG                         
-     00008122  s__BSS                          
-     00008122  s__HEAP                         
-     00008521  s__HEAP_END                     
+     00008148  s__INITIALIZED                  
+     00008164  s__BSEG                         
+     00008164  s__BSS                          
+     00008164  s__HEAP                         
+     00008563  s__HEAP_END                     
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 2.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_CODE                               00000200    00000F43 =        3907. bytes (REL,CON)
+_CODE                               00000200    00001DC6 =        7622. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
      00000200  __clock                            crt0
      00000204  _exit                              crt0
      0000020A  _ct1_clicked                       synth
-     00000223  _init_ui                           synth
-     000002C2  _move_mouse                        synth
-     00000356  _left_click_event                  synth
-     000003C2  _right_click_event                 synth
-     0000042F  _refresh_mouse_buttons             synth
-     000004F3  _vbl                               synth
-     00000505  _clock50KHz                        synth
-     00000527  _putchar                           synth
-     000005C3  _cls                               synth
-     000005F0  _init_interrupt_table              synth
-     00000607  _ei                                synth
-     0000060B  _main                              synth
-     000006DB  __wait_busy                        ym2151
-     000006EF  _ym2151_write                      ym2151
-     00000701  _ym2151_read                       ym2151
-     0000070F  _ym2151_setCT1                     ym2151
-     00000735  _ym2151_setCT2                     ym2151
-     0000075B  _ym2151_setLFOWaveform             ym2151
-     00000774  _ym2151_setLFOFrequency            ym2151
-     00000781  _ym2151_setLFOModulation           ym2151
-     0000079A  _ym2151_setLFOAmplitude            ym2151
-     000007BB  _ym2151_resetLFO                   ym2151
-     000007CF  _ym2151_setNoiseEnable             ym2151
-     000007F5  _ym2151_setNoiseFrequency          ym2151
-     00000816  _ym2151_setKeyState                ym2151
-     0000082B  _ym2151_setChannels                ym2151
-     00000844  _ym2151_setConnections             ym2151
-     00000865  _isInLayout                        widgets
-     000008ED  _widget_redraw                     widgets
-     00000916  _widget_event                      widgets
-     0000097C  _new_spinner                       widgets
-     000009D1  _spinner_setMin                    widgets
-     00000A26  _spinner_setMax                    widgets
-     00000A7A  _spinner_incValue                  widgets
-     00000AB3  _spinner_decValue                  widgets
-     00000AEB  _spinner_redraw                    widgets
-     00000B2D  _new_checkbox                      widgets
-     00000B77  _checkbox_setValue                 widgets
-     00000BA1  _checkbox_changeValue              widgets
-     00000BD1  _checkbox_redraw                   widgets
-     00000CA7  _draw_label                        widgets
-     00000CEA  _text_char                         text
-     00000D7C  _text_hex                          text
-     00000DBF  _font                              font
-     00000FFF  _cursor_data                       arrow_rom
-     00001007  _cursor_mask                       arrow_rom
-     0000100F  __sdcc_heap_init                   _malloc
+     00000223  _key_config_clicked                synth
+     00000289  _channels_config_clicked           synth
+     000002BE  _reset_lfo_clicked                 synth
+     000002C1  _connection_changed                synth
+     000002D7  _lfo_waveform_changed              synth
+     000002E7  _lfo_frequency_changed             synth
+     000002F7  _lfo_modulation_clicked            synth
+     00000310  _lfo_amplitude_changed             synth
+     00000320  _op_value_changed                  synth
+     0000045E  _init_ui                           synth
+     00000B68  _move_mouse                        synth
+     00000BFC  _left_click_event                  synth
+     00000C6C  _right_click_event                 synth
+     00000CDD  _refresh_mouse_buttons             synth
+     00000DA1  _vbl                               synth
+     00000DB3  _clock50KHz                        synth
+     00000DD5  _putchar                           synth
+     00000E71  _cls                               synth
+     00000E9E  _init_interrupt_table              synth
+     00000EB5  _ei                                synth
+     00000EB9  _main                              synth
+     00000F84  _dbg_print                         ym2151
+     00000FDF  _nb_bits                           ym2151
+     0000105A  __wait_busy                        ym2151
+     0000106B  _ym2151_init                       ym2151
+     000010C9  _ym2151_write                      ym2151
+     000010F9  _ym2151_setCT1                     ym2151
+     00001118  _ym2151_setCT2                     ym2151
+     00001137  _ym2151_setLFOWaveform             ym2151
+     00001150  _ym2151_setLFOFrequency            ym2151
+     00001168  _ym2151_setLFOModulation           ym2151
+     00001181  _ym2151_setLFOAmplitude            ym2151
+     0000119E  _ym2151_resetLFO                   ym2151
+     000011AE  _ym2151_setNoiseEnable             ym2151
+     000011CD  _ym2151_setNoiseFrequency          ym2151
+     000011EA  _ym2151_setKeyState                ym2151
+     000011FF  _ym2151_setKeyNote                 ym2151
+     0000122A  _ym2151_setKeyFraction             ym2151
+     00001244  _ym2151_setChannels                ym2151
+     0000126E  _ym2151_setConnections             ym2151
+     0000129A  _ym2151_setAmplitudeModulationSe   ym2151
+     000012C6  _ym2151_setPhaseModulationSensit   ym2151
+     000012F2  _ym2151_setDetune1PhaseMultiply    ym2151
+     00001364  _ym2151_setTotalLevel              ym2151
+     000013C6  _ym2151_setKeyScalingAttackRate    ym2151
+     00001436  _ym2151_setAMSEnableDecayRate1     ym2151
+     000014D1  _ym2151_setDetune2DecayRate2       ym2151
 ASxxxx Linker V03.00 + NoICE + sdld,  page 3.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_CODE                               00000200    00000F43 =        3907. bytes (REL,CON)
+_CODE                               00000200    00001DC6 =        7622. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00001038  _malloc                            _malloc
-     00001142  ___sdcc_call_hl                    
+     00001541  _ym2151_setDecayLevelReleaseRate   ym2151
+     000015B3  _isInLayout                        widgets
+     0000163B  _widget_redraw                     widgets
+     0000167D  _widget_event                      widgets
+     000016E3  _init_widget                       widgets
+     0000171C  _new_spinner                       widgets
+     00001769  _spinner_setMin                    widgets
+     000017BE  _spinner_setMax                    widgets
+     00001812  _spinner_incValue                  widgets
+     0000184B  _spinner_decValue                  widgets
+     00001883  _spinner_redraw                    widgets
+     000018C5  _new_checkbox                      widgets
+     00001907  _checkbox_setValue                 widgets
+     00001931  _checkbox_changeValue              widgets
+     00001961  _checkbox_redraw                   widgets
+     00001A37  _new_button                        widgets
+     00001AAE  _button_redraw                     widgets
+     00001B1B  _draw_label                        widgets
+     00001B5E  _text_char                         text
+     00001BF0  _text_hex                          text
+     00001C33  _font                              font
+     00001E73  _cursor_data                       arrow_rom
+     00001E7B  _cursor_mask                       arrow_rom
+     00001E83  __sdcc_heap_init                   _malloc
+     00001EAC  _malloc                            _malloc
+     00001FB6  ___sdcc_call_hl                    
+     00001FB7  _strlen                            
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 4.
 Hexadecimal  [32-Bits]
@@ -212,7 +237,7 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_INITIALIZER                        00001143    00000019 =          25. bytes (REL,CON)
+_INITIALIZER                        00001FC6    0000001C =          28. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -221,18 +246,18 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_GSINIT                             0000115C    00000012 =          18. bytes (REL,CON)
+_GSINIT                             00001FE2    00000012 =          18. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     0000115C  gsinit                             crt0
+     00001FE2  gsinit                             crt0
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 15.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_GSFINAL                            0000116E    00000001 =           1. bytes (REL,CON)
+_GSFINAL                            00001FF4    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
@@ -241,50 +266,52 @@ Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_DATA                               00008100    00000009 =           9. bytes (REL,CON)
+_DATA                               00008100    00000048 =          72. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
      00008100  _widgets                           synth
+     00008133  _registers                         ym2151
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 17.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_INITIALIZED                        00008109    00000019 =          25. bytes (REL,CON)
+_INITIALIZED                        00008148    0000001C =          28. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00008109  _mouse_x                           synth
-     0000810B  _mouse_y                           synth
-     0000810D  _mouse_buttons                     synth
-     0000810E  _tick50Hz                          synth
-     00008110  _cur_x                             synth
-     00008111  _cur_y                             synth
-     00008112  _hex                               text
-
+     00008148  _current_channel                   synth
+     0000814A  _key_config                        synth
+     0000814B  _mouse_x                           synth
+     0000814D  _mouse_y                           synth
+     0000814F  _mouse_buttons                     synth
+     00008150  _tick50Hz                          synth
+     00008152  _cur_x                             synth
+     00008153  _cur_y                             synth
+     00008154  _hex                               text
 ASxxxx Linker V03.00 + NoICE + sdld,  page 18.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_HEAP                               00008122    000003FF =        1023. bytes (REL,CON)
+_HEAP                               00008164    000003FF =        1023. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00008122  __sdcc_heap_start                  
+     00008164  __sdcc_heap_start                  
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 19.
 Hexadecimal  [32-Bits]
 
 Area                                    Addr        Size        Decimal Bytes (Attributes)
 --------------------------------        ----        ----        ------- ----- ------------
-_HEAP_END                           00008521    00000001 =           1. bytes (REL,CON)
+_HEAP_END                           00008563    00000001 =           1. bytes (REL,CON)
 
       Value  Global                              Global Defined In Module
       -----  --------------------------------   ------------------------
-     00008521  __sdcc_heap_end                    
+     00008563  __sdcc_heap_end                    
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 20.
 
@@ -304,6 +331,7 @@ Libraries Linked                          [ object file ]
 /usr/bin/../share/sdcc/lib/z80/z80.lib    [ _malloc.rel ]
 /usr/bin/../share/sdcc/lib/z80/z80.lib    [ heap.rel ]
 /usr/bin/../share/sdcc/lib/z80/z80.lib    [ __sdcc_call_hl.rel ]
+/usr/bin/../share/sdcc/lib/z80/z80.lib    [ strlen.rel ]
 
 ASxxxx Linker V03.00 + NoICE + sdld,  page 21.
 

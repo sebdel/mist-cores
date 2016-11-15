@@ -1,7 +1,7 @@
                               1 ;--------------------------------------------------------
                               2 ; File Created by SDCC : free open source ANSI-C Compiler
                               3 ; Version 3.5.0 #9253 (Mar 24 2016) (Linux)
-                              4 ; This file was generated Tue Nov  8 14:27:13 2016
+                              4 ; This file was generated Thu Nov 10 14:41:07 2016
                               5 ;--------------------------------------------------------
                               6 	.module widgets
                               7 	.optsdcc -mz80
@@ -9,918 +9,1170 @@
                               9 ;--------------------------------------------------------
                              10 ; Public variables in this module
                              11 ;--------------------------------------------------------
-                             12 	.globl _text_hex
-                             13 	.globl _text_char
-                             14 	.globl _malloc
-                             15 	.globl _isInLayout
-                             16 	.globl _widget_redraw
-                             17 	.globl _widget_event
-                             18 	.globl _new_spinner
-                             19 	.globl _spinner_setMin
-                             20 	.globl _spinner_setMax
-                             21 	.globl _spinner_incValue
-                             22 	.globl _spinner_decValue
-                             23 	.globl _spinner_redraw
-                             24 	.globl _new_checkbox
-                             25 	.globl _checkbox_setValue
-                             26 	.globl _checkbox_changeValue
-                             27 	.globl _checkbox_redraw
-                             28 	.globl _draw_label
-                             29 ;--------------------------------------------------------
-                             30 ; special function registers
-                             31 ;--------------------------------------------------------
-                             32 ;--------------------------------------------------------
-                             33 ; ram data
-                             34 ;--------------------------------------------------------
-                             35 	.area _DATA
+                             12 	.globl _init_widget
+                             13 	.globl _text_hex
+                             14 	.globl _text_char
+                             15 	.globl _strlen
+                             16 	.globl _malloc
+                             17 	.globl _isInLayout
+                             18 	.globl _widget_redraw
+                             19 	.globl _widget_event
+                             20 	.globl _new_spinner
+                             21 	.globl _spinner_setMin
+                             22 	.globl _spinner_setMax
+                             23 	.globl _spinner_incValue
+                             24 	.globl _spinner_decValue
+                             25 	.globl _spinner_redraw
+                             26 	.globl _new_checkbox
+                             27 	.globl _checkbox_setValue
+                             28 	.globl _checkbox_changeValue
+                             29 	.globl _checkbox_redraw
+                             30 	.globl _new_button
+                             31 	.globl _button_redraw
+                             32 	.globl _draw_label
+                             33 ;--------------------------------------------------------
+                             34 ; special function registers
+                             35 ;--------------------------------------------------------
                              36 ;--------------------------------------------------------
                              37 ; ram data
                              38 ;--------------------------------------------------------
-                             39 	.area _INITIALIZED
+                             39 	.area _DATA
                              40 ;--------------------------------------------------------
-                             41 ; absolute external ram data
+                             41 ; ram data
                              42 ;--------------------------------------------------------
-                             43 	.area _DABS (ABS)
+                             43 	.area _INITIALIZED
                              44 ;--------------------------------------------------------
-                             45 ; global & static initialisations
+                             45 ; absolute external ram data
                              46 ;--------------------------------------------------------
-                             47 	.area _HOME
-                             48 	.area _GSINIT
-                             49 	.area _GSFINAL
-                             50 	.area _GSINIT
-                             51 ;--------------------------------------------------------
-                             52 ; Home
-                             53 ;--------------------------------------------------------
-                             54 	.area _HOME
-                             55 	.area _HOME
-                             56 ;--------------------------------------------------------
-                             57 ; code
-                             58 ;--------------------------------------------------------
-                             59 	.area _CODE
-                             60 ;widgets.c:8: unsigned char isInLayout(T_Layout *layout, int x, int y) {
-                             61 ;	---------------------------------
-                             62 ; Function isInLayout
-                             63 ; ---------------------------------
-   0000                      64 _isInLayout::
-   0000 DD E5         [15]   65 	push	ix
-   0002 DD 21 00 00   [14]   66 	ld	ix,#0
-   0006 DD 39         [15]   67 	add	ix,sp
-   0008 F5            [11]   68 	push	af
-                             69 ;widgets.c:9: unsigned char lx = x >> 2;
-   0009 DD 6E 06      [19]   70 	ld	l,6 (ix)
-   000C DD 66 07      [19]   71 	ld	h,7 (ix)
-   000F CB 2C         [ 8]   72 	sra	h
-   0011 CB 1D         [ 8]   73 	rr	l
-   0013 CB 2C         [ 8]   74 	sra	h
-   0015 CB 1D         [ 8]   75 	rr	l
-   0017 DD 75 FF      [19]   76 	ld	-1 (ix),l
-                             77 ;widgets.c:10: unsigned char ly = y >> 3;
-   001A DD 6E 08      [19]   78 	ld	l,8 (ix)
-   001D DD 66 09      [19]   79 	ld	h,9 (ix)
-   0020 CB 2C         [ 8]   80 	sra	h
-   0022 CB 1D         [ 8]   81 	rr	l
-   0024 CB 2C         [ 8]   82 	sra	h
-   0026 CB 1D         [ 8]   83 	rr	l
-   0028 CB 2C         [ 8]   84 	sra	h
-   002A CB 1D         [ 8]   85 	rr	l
-   002C DD 75 FE      [19]   86 	ld	-2 (ix),l
-                             87 ;widgets.c:12: if (	lx >= layout->x &&
-   002F DD 5E 04      [19]   88 	ld	e,4 (ix)
-   0032 DD 56 05      [19]   89 	ld	d,5 (ix)
-   0035 1A            [ 7]   90 	ld	a,(de)
-   0036 4F            [ 4]   91 	ld	c,a
-   0037 DD 7E FF      [19]   92 	ld	a,-1 (ix)
-   003A 91            [ 4]   93 	sub	a, c
-   003B 38 44         [12]   94 	jr	C,00102$
-                             95 ;widgets.c:13: lx < layout->x + layout->w &&
-   003D 06 00         [ 7]   96 	ld	b,#0x00
-   003F 6B            [ 4]   97 	ld	l, e
-   0040 62            [ 4]   98 	ld	h, d
-   0041 23            [ 6]   99 	inc	hl
-   0042 23            [ 6]  100 	inc	hl
-   0043 6E            [ 7]  101 	ld	l,(hl)
-   0044 26 00         [ 7]  102 	ld	h,#0x00
-   0046 09            [11]  103 	add	hl,bc
-   0047 DD 46 FF      [19]  104 	ld	b,-1 (ix)
-   004A 0E 00         [ 7]  105 	ld	c,#0x00
-   004C 78            [ 4]  106 	ld	a,b
-   004D 95            [ 4]  107 	sub	a, l
-   004E 79            [ 4]  108 	ld	a,c
-   004F 9C            [ 4]  109 	sbc	a, h
-   0050 E2r55r00      [10]  110 	jp	PO, 00124$
-   0053 EE 80         [ 7]  111 	xor	a, #0x80
-   0055                     112 00124$:
-   0055 F2r81r00      [10]  113 	jp	P,00102$
-                            114 ;widgets.c:14: ly >= layout->y &&
-   0058 6B            [ 4]  115 	ld	l, e
-   0059 62            [ 4]  116 	ld	h, d
-   005A 23            [ 6]  117 	inc	hl
-   005B 4E            [ 7]  118 	ld	c,(hl)
-   005C DD 7E FE      [19]  119 	ld	a,-2 (ix)
-   005F 91            [ 4]  120 	sub	a, c
-   0060 38 1F         [12]  121 	jr	C,00102$
-                            122 ;widgets.c:15: ly < layout->y + layout->h) {
-   0062 06 00         [ 7]  123 	ld	b,#0x00
-   0064 EB            [ 4]  124 	ex	de,hl
-   0065 23            [ 6]  125 	inc	hl
-   0066 23            [ 6]  126 	inc	hl
-   0067 23            [ 6]  127 	inc	hl
-   0068 6E            [ 7]  128 	ld	l,(hl)
-   0069 26 00         [ 7]  129 	ld	h,#0x00
-   006B 09            [11]  130 	add	hl,bc
-   006C DD 5E FE      [19]  131 	ld	e,-2 (ix)
-   006F 16 00         [ 7]  132 	ld	d,#0x00
-   0071 7B            [ 4]  133 	ld	a,e
-   0072 95            [ 4]  134 	sub	a, l
-   0073 7A            [ 4]  135 	ld	a,d
-   0074 9C            [ 4]  136 	sbc	a, h
-   0075 E2r7Ar00      [10]  137 	jp	PO, 00125$
-   0078 EE 80         [ 7]  138 	xor	a, #0x80
-   007A                     139 00125$:
-   007A F2r81r00      [10]  140 	jp	P,00102$
-                            141 ;widgets.c:16: return 1;
-   007D 2E 01         [ 7]  142 	ld	l,#0x01
-   007F 18 02         [12]  143 	jr	00106$
-   0081                     144 00102$:
-                            145 ;widgets.c:18: return 0;
-   0081 2E 00         [ 7]  146 	ld	l,#0x00
-   0083                     147 00106$:
-   0083 DD F9         [10]  148 	ld	sp, ix
-   0085 DD E1         [14]  149 	pop	ix
-   0087 C9            [10]  150 	ret
-                            151 ;widgets.c:21: void widget_redraw(T_Widget *widget) {
-                            152 ;	---------------------------------
-                            153 ; Function widget_redraw
-                            154 ; ---------------------------------
-   0088                     155 _widget_redraw::
-                            156 ;widgets.c:23: if (widget != NULL)
-   0088 21 03 00      [10]  157 	ld	hl, #2+1
-   008B 39            [11]  158 	add	hl, sp
-   008C 7E            [ 7]  159 	ld	a, (hl)
-   008D 2B            [ 6]  160 	dec	hl
-   008E B6            [ 7]  161 	or	a,(hl)
-   008F C8            [11]  162 	ret	Z
-                            163 ;widgets.c:24: switch(widget->type) {
-   0090 C1            [10]  164 	pop	bc
-   0091 E1            [10]  165 	pop	hl
-   0092 E5            [11]  166 	push	hl
-   0093 C5            [11]  167 	push	bc
-   0094 66            [ 7]  168 	ld	h,(hl)
-   0095 7C            [ 4]  169 	ld	a,h
-   0096 B7            [ 4]  170 	or	a, a
-   0097 28 04         [12]  171 	jr	Z,00101$
-   0099 25            [ 4]  172 	dec	h
-   009A 28 0B         [12]  173 	jr	Z,00102$
-   009C C9            [10]  174 	ret
-                            175 ;widgets.c:25: case SPINNER:
-   009D                     176 00101$:
-                            177 ;widgets.c:26: spinner_redraw((T_Spinner *)widget);
-   009D C1            [10]  178 	pop	bc
-   009E E1            [10]  179 	pop	hl
-   009F E5            [11]  180 	push	hl
-   00A0 C5            [11]  181 	push	bc
-   00A1 E5            [11]  182 	push	hl
-   00A2 CDr86r02      [17]  183 	call	_spinner_redraw
-   00A5 F1            [10]  184 	pop	af
-                            185 ;widgets.c:27: break;
-   00A6 C9            [10]  186 	ret
-                            187 ;widgets.c:28: case CHECKBOX:
-   00A7                     188 00102$:
-                            189 ;widgets.c:29: checkbox_redraw((T_Checkbox *)widget);
-   00A7 C1            [10]  190 	pop	bc
-   00A8 E1            [10]  191 	pop	hl
-   00A9 E5            [11]  192 	push	hl
-   00AA C5            [11]  193 	push	bc
-   00AB E5            [11]  194 	push	hl
-   00AC CDr6Cr03      [17]  195 	call	_checkbox_redraw
-   00AF F1            [10]  196 	pop	af
-                            197 ;widgets.c:33: }
-   00B0 C9            [10]  198 	ret
-                            199 ;widgets.c:36: void widget_event(T_Widget *widget, E_Event event) {
-                            200 ;	---------------------------------
-                            201 ; Function widget_event
-                            202 ; ---------------------------------
-   00B1                     203 _widget_event::
-   00B1 DD E5         [15]  204 	push	ix
-   00B3 DD 21 00 00   [14]  205 	ld	ix,#0
-   00B7 DD 39         [15]  206 	add	ix,sp
-                            207 ;widgets.c:38: if (widget != NULL) {
-   00B9 DD 7E 05      [19]  208 	ld	a,5 (ix)
-   00BC DD B6 04      [19]  209 	or	a,4 (ix)
-   00BF 28 53         [12]  210 	jr	Z,00114$
-                            211 ;widgets.c:39: switch(widget->type) {
-   00C1 DD 4E 04      [19]  212 	ld	c,4 (ix)
-   00C4 DD 46 05      [19]  213 	ld	b,5 (ix)
-   00C7 0A            [ 7]  214 	ld	a,(bc)
-   00C8 67            [ 4]  215 	ld	h,a
-   00C9 B7            [ 4]  216 	or	a, a
-   00CA 28 05         [12]  217 	jr	Z,00101$
-   00CC 25            [ 4]  218 	dec	h
-   00CD 28 26         [12]  219 	jr	Z,00107$
-   00CF 18 31         [12]  220 	jr	00109$
-                            221 ;widgets.c:40: case SPINNER:
-   00D1                     222 00101$:
-                            223 ;widgets.c:42: spinner_incValue((T_Spinner *)widget);
-   00D1 DD 6E 04      [19]  224 	ld	l,4 (ix)
-   00D4 DD 66 05      [19]  225 	ld	h,5 (ix)
-                            226 ;widgets.c:41: if (event == EVENT_LEFT_CLICK)
-   00D7 DD 7E 06      [19]  227 	ld	a,6 (ix)
-   00DA B7            [ 4]  228 	or	a, a
-   00DB 20 09         [12]  229 	jr	NZ,00105$
-                            230 ;widgets.c:42: spinner_incValue((T_Spinner *)widget);
-   00DD C5            [11]  231 	push	bc
-   00DE E5            [11]  232 	push	hl
-   00DF CDr15r02      [17]  233 	call	_spinner_incValue
-   00E2 F1            [10]  234 	pop	af
-   00E3 C1            [10]  235 	pop	bc
-   00E4 18 1C         [12]  236 	jr	00109$
-   00E6                     237 00105$:
-                            238 ;widgets.c:43: else if (event == EVENT_RIGHT_CLICK)
-   00E6 DD 7E 06      [19]  239 	ld	a,6 (ix)
-   00E9 3D            [ 4]  240 	dec	a
-   00EA 20 16         [12]  241 	jr	NZ,00109$
-                            242 ;widgets.c:44: spinner_decValue((T_Spinner *)widget);
-   00EC C5            [11]  243 	push	bc
-   00ED E5            [11]  244 	push	hl
-   00EE CDr4Er02      [17]  245 	call	_spinner_decValue
-   00F1 F1            [10]  246 	pop	af
-   00F2 C1            [10]  247 	pop	bc
-                            248 ;widgets.c:45: break;
-   00F3 18 0D         [12]  249 	jr	00109$
-                            250 ;widgets.c:46: case CHECKBOX:
-   00F5                     251 00107$:
-                            252 ;widgets.c:47: checkbox_changeValue((T_Checkbox *)widget);
-   00F5 DD 6E 04      [19]  253 	ld	l,4 (ix)
-   00F8 DD 66 05      [19]  254 	ld	h,5 (ix)
-   00FB C5            [11]  255 	push	bc
-   00FC E5            [11]  256 	push	hl
-   00FD CDr3Cr03      [17]  257 	call	_checkbox_changeValue
-   0100 F1            [10]  258 	pop	af
-   0101 C1            [10]  259 	pop	bc
-                            260 ;widgets.c:51: }
-   0102                     261 00109$:
-                            262 ;widgets.c:52: if (widget->callback != NULL)
-   0102 C5            [11]  263 	push	bc
-   0103 FD E1         [14]  264 	pop	iy
-   0105 FD 6E 06      [19]  265 	ld	l,6 (iy)
-   0108 FD 66 07      [19]  266 	ld	h,7 (iy)
-   010B 7C            [ 4]  267 	ld	a,h
-   010C B5            [ 4]  268 	or	a,l
-   010D 28 05         [12]  269 	jr	Z,00114$
-                            270 ;widgets.c:53: widget->callback(widget);
-   010F C5            [11]  271 	push	bc
-   0110 CDr00r00      [17]  272 	call	___sdcc_call_hl
-   0113 F1            [10]  273 	pop	af
-   0114                     274 00114$:
-   0114 DD E1         [14]  275 	pop	ix
-   0116 C9            [10]  276 	ret
-                            277 ;widgets.c:57: T_Spinner *new_spinner(unsigned char x, unsigned char y) {
-                            278 ;	---------------------------------
-                            279 ; Function new_spinner
-                            280 ; ---------------------------------
-   0117                     281 _new_spinner::
-                            282 ;widgets.c:59: T_Spinner *spinner = (T_Spinner *) malloc(sizeof(T_Spinner));
-   0117 21 0B 00      [10]  283 	ld	hl,#0x000B
-   011A E5            [11]  284 	push	hl
-   011B CDr00r00      [17]  285 	call	_malloc
-   011E F1            [10]  286 	pop	af
-   011F EB            [ 4]  287 	ex	de,hl
-                            288 ;widgets.c:61: spinner->widget.type = SPINNER;
-   0120 AF            [ 4]  289 	xor	a, a
-   0121 12            [ 7]  290 	ld	(de),a
-                            291 ;widgets.c:62: spinner->widget.layout.x = x;
-   0122 6B            [ 4]  292 	ld	l, e
-   0123 62            [ 4]  293 	ld	h, d
-   0124 23            [ 6]  294 	inc	hl
-   0125 FD 21 02 00   [14]  295 	ld	iy,#2
-   0129 FD 39         [15]  296 	add	iy,sp
-   012B FD 7E 00      [19]  297 	ld	a,0 (iy)
-   012E 77            [ 7]  298 	ld	(hl),a
-                            299 ;widgets.c:63: spinner->widget.layout.y = y;
-   012F 6B            [ 4]  300 	ld	l, e
-   0130 62            [ 4]  301 	ld	h, d
-   0131 23            [ 6]  302 	inc	hl
-   0132 23            [ 6]  303 	inc	hl
-   0133 FD 21 03 00   [14]  304 	ld	iy,#3
-   0137 FD 39         [15]  305 	add	iy,sp
-   0139 FD 7E 00      [19]  306 	ld	a,0 (iy)
-   013C 77            [ 7]  307 	ld	(hl),a
-                            308 ;widgets.c:64: spinner->widget.layout.w = 2;
-   013D 6B            [ 4]  309 	ld	l, e
-   013E 62            [ 4]  310 	ld	h, d
-   013F 23            [ 6]  311 	inc	hl
-   0140 23            [ 6]  312 	inc	hl
-   0141 23            [ 6]  313 	inc	hl
-   0142 36 02         [10]  314 	ld	(hl),#0x02
-                            315 ;widgets.c:65: spinner->widget.layout.h = 1;
-   0144 21 04 00      [10]  316 	ld	hl,#0x0004
-   0147 19            [11]  317 	add	hl,de
-   0148 36 01         [10]  318 	ld	(hl),#0x01
-                            319 ;widgets.c:66: spinner->widget.callback = NULL;
-   014A 21 06 00      [10]  320 	ld	hl,#0x0006
-   014D 19            [11]  321 	add	hl,de
-   014E AF            [ 4]  322 	xor	a, a
-   014F 77            [ 7]  323 	ld	(hl), a
-   0150 23            [ 6]  324 	inc	hl
-   0151 77            [ 7]  325 	ld	(hl), a
-                            326 ;widgets.c:67: spinner->widget.dirty = 0;
-   0152 21 05 00      [10]  327 	ld	hl,#0x0005
-   0155 19            [11]  328 	add	hl,de
-   0156 36 00         [10]  329 	ld	(hl),#0x00
-                            330 ;widgets.c:69: spinner->min = 0;
-   0158 21 08 00      [10]  331 	ld	hl,#0x0008
-   015B 19            [11]  332 	add	hl,de
-   015C 36 00         [10]  333 	ld	(hl),#0x00
-                            334 ;widgets.c:70: spinner->max = 255;
-   015E 21 09 00      [10]  335 	ld	hl,#0x0009
-   0161 19            [11]  336 	add	hl,de
-   0162 36 FF         [10]  337 	ld	(hl),#0xFF
-                            338 ;widgets.c:71: spinner->value = 127;
-   0164 21 0A 00      [10]  339 	ld	hl,#0x000A
-   0167 19            [11]  340 	add	hl,de
-   0168 36 7F         [10]  341 	ld	(hl),#0x7F
-                            342 ;widgets.c:73: return spinner;
-   016A EB            [ 4]  343 	ex	de,hl
-   016B C9            [10]  344 	ret
-                            345 ;widgets.c:76: void spinner_setMin(T_Spinner *spinner, unsigned char min) {
-                            346 ;	---------------------------------
-                            347 ; Function spinner_setMin
-                            348 ; ---------------------------------
-   016C                     349 _spinner_setMin::
-   016C DD E5         [15]  350 	push	ix
-   016E DD 21 00 00   [14]  351 	ld	ix,#0
-   0172 DD 39         [15]  352 	add	ix,sp
-   0174 F5            [11]  353 	push	af
-                            354 ;widgets.c:78: if (spinner != NULL && min < spinner->max) {
-   0175 DD 7E 05      [19]  355 	ld	a,5 (ix)
-   0178 DD B6 04      [19]  356 	or	a,4 (ix)
-   017B 28 3F         [12]  357 	jr	Z,00106$
-   017D DD 4E 04      [19]  358 	ld	c,4 (ix)
-   0180 DD 46 05      [19]  359 	ld	b,5 (ix)
-   0183 C5            [11]  360 	push	bc
-   0184 FD E1         [14]  361 	pop	iy
-   0186 FD 66 09      [19]  362 	ld	h,9 (iy)
-   0189 DD 7E 06      [19]  363 	ld	a,6 (ix)
-   018C 94            [ 4]  364 	sub	a, h
-   018D 30 2D         [12]  365 	jr	NC,00106$
-                            366 ;widgets.c:79: spinner->min = min;
-   018F FD 21 08 00   [14]  367 	ld	iy,#0x0008
-   0193 FD 09         [15]  368 	add	iy, bc
-   0195 DD 7E 06      [19]  369 	ld	a,6 (ix)
-   0198 FD 77 00      [19]  370 	ld	0 (iy), a
-                            371 ;widgets.c:80: if (spinner->value < spinner->min) {
-   019B 21 0A 00      [10]  372 	ld	hl,#0x000A
-   019E 09            [11]  373 	add	hl,bc
-   019F EB            [ 4]  374 	ex	de,hl
-   01A0 1A            [ 7]  375 	ld	a,(de)
-   01A1 DD 77 FE      [19]  376 	ld	-2 (ix),a
-   01A4 FD 7E 00      [19]  377 	ld	a, 0 (iy)
-   01A7 DD 77 FF      [19]  378 	ld	-1 (ix),a
-   01AA DD 7E FE      [19]  379 	ld	a,-2 (ix)
-   01AD DD 96 06      [19]  380 	sub	a, 6 (ix)
-   01B0 30 04         [12]  381 	jr	NC,00102$
-                            382 ;widgets.c:81: spinner->value = spinner->min;
-   01B2 DD 7E FF      [19]  383 	ld	a,-1 (ix)
-   01B5 12            [ 7]  384 	ld	(de),a
-   01B6                     385 00102$:
-                            386 ;widgets.c:83: spinner->widget.dirty = 1;
-   01B6 21 05 00      [10]  387 	ld	hl,#0x0005
-   01B9 09            [11]  388 	add	hl,bc
-   01BA 36 01         [10]  389 	ld	(hl),#0x01
-   01BC                     390 00106$:
-   01BC DD F9         [10]  391 	ld	sp, ix
-   01BE DD E1         [14]  392 	pop	ix
-   01C0 C9            [10]  393 	ret
-                            394 ;widgets.c:87: void spinner_setMax(T_Spinner *spinner, unsigned char max) {
-                            395 ;	---------------------------------
-                            396 ; Function spinner_setMax
-                            397 ; ---------------------------------
-   01C1                     398 _spinner_setMax::
-   01C1 DD E5         [15]  399 	push	ix
-   01C3 DD 21 00 00   [14]  400 	ld	ix,#0
-   01C7 DD 39         [15]  401 	add	ix,sp
-   01C9 F5            [11]  402 	push	af
-                            403 ;widgets.c:89: if (spinner != NULL && max > spinner->min) {
-   01CA DD 7E 05      [19]  404 	ld	a,5 (ix)
-   01CD DD B6 04      [19]  405 	or	a,4 (ix)
-   01D0 28 3E         [12]  406 	jr	Z,00106$
-   01D2 DD 4E 04      [19]  407 	ld	c,4 (ix)
-   01D5 DD 46 05      [19]  408 	ld	b,5 (ix)
-   01D8 C5            [11]  409 	push	bc
-   01D9 FD E1         [14]  410 	pop	iy
-   01DB FD 7E 08      [19]  411 	ld	a, 8 (iy)
-   01DE DD 96 06      [19]  412 	sub	a, 6 (ix)
-   01E1 30 2D         [12]  413 	jr	NC,00106$
-                            414 ;widgets.c:90: spinner->max = max;
-   01E3 FD 21 09 00   [14]  415 	ld	iy,#0x0009
-   01E7 FD 09         [15]  416 	add	iy, bc
-   01E9 DD 7E 06      [19]  417 	ld	a,6 (ix)
-   01EC FD 77 00      [19]  418 	ld	0 (iy), a
-                            419 ;widgets.c:91: if (spinner->value > spinner->max) {
-   01EF 21 0A 00      [10]  420 	ld	hl,#0x000A
-   01F2 09            [11]  421 	add	hl,bc
-   01F3 EB            [ 4]  422 	ex	de,hl
-   01F4 1A            [ 7]  423 	ld	a,(de)
-   01F5 DD 77 FF      [19]  424 	ld	-1 (ix),a
-   01F8 FD 7E 00      [19]  425 	ld	a, 0 (iy)
-   01FB DD 77 FE      [19]  426 	ld	-2 (ix),a
-   01FE DD 7E 06      [19]  427 	ld	a,6 (ix)
-   0201 DD 96 FF      [19]  428 	sub	a, -1 (ix)
-   0204 30 04         [12]  429 	jr	NC,00102$
-                            430 ;widgets.c:92: spinner->value = spinner->max;
-   0206 DD 7E FE      [19]  431 	ld	a,-2 (ix)
-   0209 12            [ 7]  432 	ld	(de),a
-   020A                     433 00102$:
-                            434 ;widgets.c:94: spinner->widget.dirty = 1;
-   020A 21 05 00      [10]  435 	ld	hl,#0x0005
-   020D 09            [11]  436 	add	hl,bc
-   020E 36 01         [10]  437 	ld	(hl),#0x01
-   0210                     438 00106$:
-   0210 DD F9         [10]  439 	ld	sp, ix
-   0212 DD E1         [14]  440 	pop	ix
-   0214 C9            [10]  441 	ret
-                            442 ;widgets.c:98: void spinner_incValue(T_Spinner *spinner) {
-                            443 ;	---------------------------------
-                            444 ; Function spinner_incValue
-                            445 ; ---------------------------------
-   0215                     446 _spinner_incValue::
-   0215 DD E5         [15]  447 	push	ix
-   0217 DD 21 00 00   [14]  448 	ld	ix,#0
-   021B DD 39         [15]  449 	add	ix,sp
-                            450 ;widgets.c:100: if (spinner != NULL && spinner->value < spinner->max) {
-   021D DD 7E 05      [19]  451 	ld	a,5 (ix)
-   0220 DD B6 04      [19]  452 	or	a,4 (ix)
-   0223 28 26         [12]  453 	jr	Z,00104$
-   0225 DD 5E 04      [19]  454 	ld	e,4 (ix)
-   0228 DD 56 05      [19]  455 	ld	d,5 (ix)
-   022B FD 21 0A 00   [14]  456 	ld	iy,#0x000A
-   022F FD 19         [15]  457 	add	iy, de
-   0231 FD 4E 00      [19]  458 	ld	c, 0 (iy)
-   0234 6B            [ 4]  459 	ld	l, e
-   0235 62            [ 4]  460 	ld	h, d
-   0236 C5            [11]  461 	push	bc
-   0237 01 09 00      [10]  462 	ld	bc, #0x0009
-   023A 09            [11]  463 	add	hl, bc
-   023B C1            [10]  464 	pop	bc
-   023C 6E            [ 7]  465 	ld	l,(hl)
-   023D 79            [ 4]  466 	ld	a,c
-   023E 95            [ 4]  467 	sub	a, l
-   023F 30 0A         [12]  468 	jr	NC,00104$
-                            469 ;widgets.c:101: spinner->value ++;
-   0241 0C            [ 4]  470 	inc	c
-   0242 FD 71 00      [19]  471 	ld	0 (iy), c
-                            472 ;widgets.c:102: spinner->widget.dirty = 1;
-   0245 21 05 00      [10]  473 	ld	hl,#0x0005
-   0248 19            [11]  474 	add	hl,de
-   0249 36 01         [10]  475 	ld	(hl),#0x01
-   024B                     476 00104$:
-   024B DD E1         [14]  477 	pop	ix
-   024D C9            [10]  478 	ret
-                            479 ;widgets.c:106: void spinner_decValue(T_Spinner *spinner) {
-                            480 ;	---------------------------------
-                            481 ; Function spinner_decValue
-                            482 ; ---------------------------------
-   024E                     483 _spinner_decValue::
-   024E DD E5         [15]  484 	push	ix
-   0250 DD 21 00 00   [14]  485 	ld	ix,#0
-   0254 DD 39         [15]  486 	add	ix,sp
-                            487 ;widgets.c:108: if (spinner != NULL && spinner->value > spinner->min) {
-   0256 DD 7E 05      [19]  488 	ld	a,5 (ix)
-   0259 DD B6 04      [19]  489 	or	a,4 (ix)
-   025C 28 25         [12]  490 	jr	Z,00104$
-   025E DD 5E 04      [19]  491 	ld	e,4 (ix)
-   0261 DD 56 05      [19]  492 	ld	d,5 (ix)
-   0264 FD 21 0A 00   [14]  493 	ld	iy,#0x000A
-   0268 FD 19         [15]  494 	add	iy, de
-   026A FD 4E 00      [19]  495 	ld	c, 0 (iy)
-   026D 6B            [ 4]  496 	ld	l, e
-   026E 62            [ 4]  497 	ld	h, d
-   026F C5            [11]  498 	push	bc
-   0270 01 08 00      [10]  499 	ld	bc, #0x0008
-   0273 09            [11]  500 	add	hl, bc
-   0274 C1            [10]  501 	pop	bc
-   0275 7E            [ 7]  502 	ld	a, (hl)
-   0276 91            [ 4]  503 	sub	a, c
-   0277 30 0A         [12]  504 	jr	NC,00104$
-                            505 ;widgets.c:109: spinner->value --;
-   0279 0D            [ 4]  506 	dec	c
-   027A FD 71 00      [19]  507 	ld	0 (iy), c
-                            508 ;widgets.c:110: spinner->widget.dirty = 1;
-   027D 21 05 00      [10]  509 	ld	hl,#0x0005
-   0280 19            [11]  510 	add	hl,de
-   0281 36 01         [10]  511 	ld	(hl),#0x01
-   0283                     512 00104$:
-   0283 DD E1         [14]  513 	pop	ix
-   0285 C9            [10]  514 	ret
-                            515 ;widgets.c:114: void spinner_redraw(T_Spinner *spinner) {
+                             47 	.area _DABS (ABS)
+                             48 ;--------------------------------------------------------
+                             49 ; global & static initialisations
+                             50 ;--------------------------------------------------------
+                             51 	.area _HOME
+                             52 	.area _GSINIT
+                             53 	.area _GSFINAL
+                             54 	.area _GSINIT
+                             55 ;--------------------------------------------------------
+                             56 ; Home
+                             57 ;--------------------------------------------------------
+                             58 	.area _HOME
+                             59 	.area _HOME
+                             60 ;--------------------------------------------------------
+                             61 ; code
+                             62 ;--------------------------------------------------------
+                             63 	.area _CODE
+                             64 ;widgets.c:8: unsigned char isInLayout(T_Layout *layout, int x, int y) {
+                             65 ;	---------------------------------
+                             66 ; Function isInLayout
+                             67 ; ---------------------------------
+   0000                      68 _isInLayout::
+   0000 DD E5         [15]   69 	push	ix
+   0002 DD 21 00 00   [14]   70 	ld	ix,#0
+   0006 DD 39         [15]   71 	add	ix,sp
+   0008 F5            [11]   72 	push	af
+                             73 ;widgets.c:9: unsigned char lx = x >> 2;
+   0009 DD 6E 06      [19]   74 	ld	l,6 (ix)
+   000C DD 66 07      [19]   75 	ld	h,7 (ix)
+   000F CB 2C         [ 8]   76 	sra	h
+   0011 CB 1D         [ 8]   77 	rr	l
+   0013 CB 2C         [ 8]   78 	sra	h
+   0015 CB 1D         [ 8]   79 	rr	l
+   0017 DD 75 FF      [19]   80 	ld	-1 (ix),l
+                             81 ;widgets.c:10: unsigned char ly = y >> 3;
+   001A DD 6E 08      [19]   82 	ld	l,8 (ix)
+   001D DD 66 09      [19]   83 	ld	h,9 (ix)
+   0020 CB 2C         [ 8]   84 	sra	h
+   0022 CB 1D         [ 8]   85 	rr	l
+   0024 CB 2C         [ 8]   86 	sra	h
+   0026 CB 1D         [ 8]   87 	rr	l
+   0028 CB 2C         [ 8]   88 	sra	h
+   002A CB 1D         [ 8]   89 	rr	l
+   002C DD 75 FE      [19]   90 	ld	-2 (ix),l
+                             91 ;widgets.c:12: if (	lx >= layout->x &&
+   002F DD 5E 04      [19]   92 	ld	e,4 (ix)
+   0032 DD 56 05      [19]   93 	ld	d,5 (ix)
+   0035 1A            [ 7]   94 	ld	a,(de)
+   0036 4F            [ 4]   95 	ld	c,a
+   0037 DD 7E FF      [19]   96 	ld	a,-1 (ix)
+   003A 91            [ 4]   97 	sub	a, c
+   003B 38 44         [12]   98 	jr	C,00102$
+                             99 ;widgets.c:13: lx < layout->x + layout->w &&
+   003D 06 00         [ 7]  100 	ld	b,#0x00
+   003F 6B            [ 4]  101 	ld	l, e
+   0040 62            [ 4]  102 	ld	h, d
+   0041 23            [ 6]  103 	inc	hl
+   0042 23            [ 6]  104 	inc	hl
+   0043 6E            [ 7]  105 	ld	l,(hl)
+   0044 26 00         [ 7]  106 	ld	h,#0x00
+   0046 09            [11]  107 	add	hl,bc
+   0047 DD 46 FF      [19]  108 	ld	b,-1 (ix)
+   004A 0E 00         [ 7]  109 	ld	c,#0x00
+   004C 78            [ 4]  110 	ld	a,b
+   004D 95            [ 4]  111 	sub	a, l
+   004E 79            [ 4]  112 	ld	a,c
+   004F 9C            [ 4]  113 	sbc	a, h
+   0050 E2r55r00      [10]  114 	jp	PO, 00124$
+   0053 EE 80         [ 7]  115 	xor	a, #0x80
+   0055                     116 00124$:
+   0055 F2r81r00      [10]  117 	jp	P,00102$
+                            118 ;widgets.c:14: ly >= layout->y &&
+   0058 6B            [ 4]  119 	ld	l, e
+   0059 62            [ 4]  120 	ld	h, d
+   005A 23            [ 6]  121 	inc	hl
+   005B 4E            [ 7]  122 	ld	c,(hl)
+   005C DD 7E FE      [19]  123 	ld	a,-2 (ix)
+   005F 91            [ 4]  124 	sub	a, c
+   0060 38 1F         [12]  125 	jr	C,00102$
+                            126 ;widgets.c:15: ly < layout->y + layout->h) {
+   0062 06 00         [ 7]  127 	ld	b,#0x00
+   0064 EB            [ 4]  128 	ex	de,hl
+   0065 23            [ 6]  129 	inc	hl
+   0066 23            [ 6]  130 	inc	hl
+   0067 23            [ 6]  131 	inc	hl
+   0068 6E            [ 7]  132 	ld	l,(hl)
+   0069 26 00         [ 7]  133 	ld	h,#0x00
+   006B 09            [11]  134 	add	hl,bc
+   006C DD 5E FE      [19]  135 	ld	e,-2 (ix)
+   006F 16 00         [ 7]  136 	ld	d,#0x00
+   0071 7B            [ 4]  137 	ld	a,e
+   0072 95            [ 4]  138 	sub	a, l
+   0073 7A            [ 4]  139 	ld	a,d
+   0074 9C            [ 4]  140 	sbc	a, h
+   0075 E2r7Ar00      [10]  141 	jp	PO, 00125$
+   0078 EE 80         [ 7]  142 	xor	a, #0x80
+   007A                     143 00125$:
+   007A F2r81r00      [10]  144 	jp	P,00102$
+                            145 ;widgets.c:16: return 1;
+   007D 2E 01         [ 7]  146 	ld	l,#0x01
+   007F 18 02         [12]  147 	jr	00106$
+   0081                     148 00102$:
+                            149 ;widgets.c:18: return 0;
+   0081 2E 00         [ 7]  150 	ld	l,#0x00
+   0083                     151 00106$:
+   0083 DD F9         [10]  152 	ld	sp, ix
+   0085 DD E1         [14]  153 	pop	ix
+   0087 C9            [10]  154 	ret
+                            155 ;widgets.c:21: void widget_redraw(T_Widget *widget) {
+                            156 ;	---------------------------------
+                            157 ; Function widget_redraw
+                            158 ; ---------------------------------
+   0088                     159 _widget_redraw::
+                            160 ;widgets.c:23: if (widget != NULL)
+   0088 FD 21 02 00   [14]  161 	ld	iy,#2
+   008C FD 39         [15]  162 	add	iy,sp
+   008E FD 7E 01      [19]  163 	ld	a,1 (iy)
+   0091 FD B6 00      [19]  164 	or	a,0 (iy)
+   0094 C8            [11]  165 	ret	Z
+                            166 ;widgets.c:24: switch(widget->type) {
+   0095 C1            [10]  167 	pop	bc
+   0096 E1            [10]  168 	pop	hl
+   0097 E5            [11]  169 	push	hl
+   0098 C5            [11]  170 	push	bc
+   0099 5E            [ 7]  171 	ld	e,(hl)
+   009A 3E 02         [ 7]  172 	ld	a,#0x02
+   009C 93            [ 4]  173 	sub	a, e
+   009D D8            [11]  174 	ret	C
+   009E 16 00         [ 7]  175 	ld	d,#0x00
+   00A0 21rA6r00      [10]  176 	ld	hl,#00118$
+   00A3 19            [11]  177 	add	hl,de
+   00A4 19            [11]  178 	add	hl,de
+                            179 ;widgets.c:25: case SPINNER:
+   00A5 E9            [ 4]  180 	jp	(hl)
+   00A6                     181 00118$:
+   00A6 18 04         [12]  182 	jr	00101$
+   00A8 18 0C         [12]  183 	jr	00102$
+   00AA 18 14         [12]  184 	jr	00103$
+   00AC                     185 00101$:
+                            186 ;widgets.c:26: spinner_redraw((T_Spinner *)widget);
+   00AC C1            [10]  187 	pop	bc
+   00AD E1            [10]  188 	pop	hl
+   00AE E5            [11]  189 	push	hl
+   00AF C5            [11]  190 	push	bc
+   00B0 E5            [11]  191 	push	hl
+   00B1 CDrD0r02      [17]  192 	call	_spinner_redraw
+   00B4 F1            [10]  193 	pop	af
+                            194 ;widgets.c:27: break;
+   00B5 C9            [10]  195 	ret
+                            196 ;widgets.c:28: case CHECKBOX:
+   00B6                     197 00102$:
+                            198 ;widgets.c:29: checkbox_redraw((T_Checkbox *)widget);
+   00B6 C1            [10]  199 	pop	bc
+   00B7 E1            [10]  200 	pop	hl
+   00B8 E5            [11]  201 	push	hl
+   00B9 C5            [11]  202 	push	bc
+   00BA E5            [11]  203 	push	hl
+   00BB CDrAEr03      [17]  204 	call	_checkbox_redraw
+   00BE F1            [10]  205 	pop	af
+                            206 ;widgets.c:30: break;
+   00BF C9            [10]  207 	ret
+                            208 ;widgets.c:31: case BUTTON:
+   00C0                     209 00103$:
+                            210 ;widgets.c:32: button_redraw((T_Button *)widget);
+   00C0 C1            [10]  211 	pop	bc
+   00C1 E1            [10]  212 	pop	hl
+   00C2 E5            [11]  213 	push	hl
+   00C3 C5            [11]  214 	push	bc
+   00C4 E5            [11]  215 	push	hl
+   00C5 CDrFBr04      [17]  216 	call	_button_redraw
+   00C8 F1            [10]  217 	pop	af
+                            218 ;widgets.c:36: }
+   00C9 C9            [10]  219 	ret
+                            220 ;widgets.c:39: void widget_event(T_Widget *widget, E_Event event) {
+                            221 ;	---------------------------------
+                            222 ; Function widget_event
+                            223 ; ---------------------------------
+   00CA                     224 _widget_event::
+   00CA DD E5         [15]  225 	push	ix
+   00CC DD 21 00 00   [14]  226 	ld	ix,#0
+   00D0 DD 39         [15]  227 	add	ix,sp
+                            228 ;widgets.c:41: if (widget != NULL) {
+   00D2 DD 7E 05      [19]  229 	ld	a,5 (ix)
+   00D5 DD B6 04      [19]  230 	or	a,4 (ix)
+   00D8 28 53         [12]  231 	jr	Z,00114$
+                            232 ;widgets.c:42: switch(widget->type) {
+   00DA DD 4E 04      [19]  233 	ld	c,4 (ix)
+   00DD DD 46 05      [19]  234 	ld	b,5 (ix)
+   00E0 0A            [ 7]  235 	ld	a,(bc)
+   00E1 67            [ 4]  236 	ld	h,a
+   00E2 B7            [ 4]  237 	or	a, a
+   00E3 28 05         [12]  238 	jr	Z,00101$
+   00E5 25            [ 4]  239 	dec	h
+   00E6 28 26         [12]  240 	jr	Z,00107$
+   00E8 18 31         [12]  241 	jr	00109$
+                            242 ;widgets.c:43: case SPINNER:
+   00EA                     243 00101$:
+                            244 ;widgets.c:45: spinner_incValue((T_Spinner *)widget);
+   00EA DD 6E 04      [19]  245 	ld	l,4 (ix)
+   00ED DD 66 05      [19]  246 	ld	h,5 (ix)
+                            247 ;widgets.c:44: if (event == EVENT_LEFT_CLICK)
+   00F0 DD 7E 06      [19]  248 	ld	a,6 (ix)
+   00F3 B7            [ 4]  249 	or	a, a
+   00F4 20 09         [12]  250 	jr	NZ,00105$
+                            251 ;widgets.c:45: spinner_incValue((T_Spinner *)widget);
+   00F6 C5            [11]  252 	push	bc
+   00F7 E5            [11]  253 	push	hl
+   00F8 CDr5Fr02      [17]  254 	call	_spinner_incValue
+   00FB F1            [10]  255 	pop	af
+   00FC C1            [10]  256 	pop	bc
+   00FD 18 1C         [12]  257 	jr	00109$
+   00FF                     258 00105$:
+                            259 ;widgets.c:46: else if (event == EVENT_RIGHT_CLICK)
+   00FF DD 7E 06      [19]  260 	ld	a,6 (ix)
+   0102 3D            [ 4]  261 	dec	a
+   0103 20 16         [12]  262 	jr	NZ,00109$
+                            263 ;widgets.c:47: spinner_decValue((T_Spinner *)widget);
+   0105 C5            [11]  264 	push	bc
+   0106 E5            [11]  265 	push	hl
+   0107 CDr98r02      [17]  266 	call	_spinner_decValue
+   010A F1            [10]  267 	pop	af
+   010B C1            [10]  268 	pop	bc
+                            269 ;widgets.c:48: break;
+   010C 18 0D         [12]  270 	jr	00109$
+                            271 ;widgets.c:49: case CHECKBOX:
+   010E                     272 00107$:
+                            273 ;widgets.c:50: checkbox_changeValue((T_Checkbox *)widget);
+   010E DD 6E 04      [19]  274 	ld	l,4 (ix)
+   0111 DD 66 05      [19]  275 	ld	h,5 (ix)
+   0114 C5            [11]  276 	push	bc
+   0115 E5            [11]  277 	push	hl
+   0116 CDr7Er03      [17]  278 	call	_checkbox_changeValue
+   0119 F1            [10]  279 	pop	af
+   011A C1            [10]  280 	pop	bc
+                            281 ;widgets.c:54: }
+   011B                     282 00109$:
+                            283 ;widgets.c:55: if (widget->callback != NULL)
+   011B C5            [11]  284 	push	bc
+   011C FD E1         [14]  285 	pop	iy
+   011E FD 6E 06      [19]  286 	ld	l,6 (iy)
+   0121 FD 66 07      [19]  287 	ld	h,7 (iy)
+   0124 7C            [ 4]  288 	ld	a,h
+   0125 B5            [ 4]  289 	or	a,l
+   0126 28 05         [12]  290 	jr	Z,00114$
+                            291 ;widgets.c:56: widget->callback(widget);
+   0128 C5            [11]  292 	push	bc
+   0129 CDr00r00      [17]  293 	call	___sdcc_call_hl
+   012C F1            [10]  294 	pop	af
+   012D                     295 00114$:
+   012D DD E1         [14]  296 	pop	ix
+   012F C9            [10]  297 	ret
+                            298 ;widgets.c:60: void init_widget(T_Widget *widget, unsigned char type) {
+                            299 ;	---------------------------------
+                            300 ; Function init_widget
+                            301 ; ---------------------------------
+   0130                     302 _init_widget::
+                            303 ;widgets.c:62: widget->type = type;
+   0130 C1            [10]  304 	pop	bc
+   0131 D1            [10]  305 	pop	de
+   0132 D5            [11]  306 	push	de
+   0133 C5            [11]  307 	push	bc
+   0134 21 04 00      [10]  308 	ld	hl, #4+0
+   0137 39            [11]  309 	add	hl, sp
+   0138 7E            [ 7]  310 	ld	a, (hl)
+   0139 12            [ 7]  311 	ld	(de),a
+                            312 ;widgets.c:63: widget->layout.x = 0;
+   013A 6B            [ 4]  313 	ld	l, e
+   013B 62            [ 4]  314 	ld	h, d
+   013C 23            [ 6]  315 	inc	hl
+   013D 36 00         [10]  316 	ld	(hl),#0x00
+                            317 ;widgets.c:64: widget->layout.y = 0;
+   013F 6B            [ 4]  318 	ld	l, e
+   0140 62            [ 4]  319 	ld	h, d
+   0141 23            [ 6]  320 	inc	hl
+   0142 23            [ 6]  321 	inc	hl
+   0143 36 00         [10]  322 	ld	(hl),#0x00
+                            323 ;widgets.c:65: widget->layout.w = 2;
+   0145 6B            [ 4]  324 	ld	l, e
+   0146 62            [ 4]  325 	ld	h, d
+   0147 23            [ 6]  326 	inc	hl
+   0148 23            [ 6]  327 	inc	hl
+   0149 23            [ 6]  328 	inc	hl
+   014A 36 02         [10]  329 	ld	(hl),#0x02
+                            330 ;widgets.c:66: widget->layout.h = 1;
+   014C 21 04 00      [10]  331 	ld	hl,#0x0004
+   014F 19            [11]  332 	add	hl,de
+   0150 36 01         [10]  333 	ld	(hl),#0x01
+                            334 ;widgets.c:67: widget->callback = NULL;
+   0152 21 06 00      [10]  335 	ld	hl,#0x0006
+   0155 19            [11]  336 	add	hl,de
+   0156 AF            [ 4]  337 	xor	a, a
+   0157 77            [ 7]  338 	ld	(hl), a
+   0158 23            [ 6]  339 	inc	hl
+   0159 77            [ 7]  340 	ld	(hl), a
+                            341 ;widgets.c:68: widget->user_data = NULL;
+   015A 21 08 00      [10]  342 	ld	hl,#0x0008
+   015D 19            [11]  343 	add	hl,de
+   015E AF            [ 4]  344 	xor	a, a
+   015F 77            [ 7]  345 	ld	(hl), a
+   0160 23            [ 6]  346 	inc	hl
+   0161 77            [ 7]  347 	ld	(hl), a
+                            348 ;widgets.c:69: widget->dirty = 0;
+   0162 21 05 00      [10]  349 	ld	hl,#0x0005
+   0165 19            [11]  350 	add	hl,de
+   0166 36 00         [10]  351 	ld	(hl),#0x00
+   0168 C9            [10]  352 	ret
+                            353 ;widgets.c:72: T_Spinner *new_spinner(unsigned char x, unsigned char y) {
+                            354 ;	---------------------------------
+                            355 ; Function new_spinner
+                            356 ; ---------------------------------
+   0169                     357 _new_spinner::
+   0169 DD E5         [15]  358 	push	ix
+   016B DD 21 00 00   [14]  359 	ld	ix,#0
+   016F DD 39         [15]  360 	add	ix,sp
+                            361 ;widgets.c:74: T_Spinner *spinner = (T_Spinner *) malloc(sizeof(T_Spinner));
+   0171 21 0D 00      [10]  362 	ld	hl,#0x000D
+   0174 E5            [11]  363 	push	hl
+   0175 CDr00r00      [17]  364 	call	_malloc
+   0178 F1            [10]  365 	pop	af
+   0179 EB            [ 4]  366 	ex	de,hl
+                            367 ;widgets.c:76: init_widget(&(spinner->widget), SPINNER);
+   017A D5            [11]  368 	push	de
+   017B AF            [ 4]  369 	xor	a, a
+   017C F5            [11]  370 	push	af
+   017D 33            [ 6]  371 	inc	sp
+   017E D5            [11]  372 	push	de
+   017F CDr30r01      [17]  373 	call	_init_widget
+   0182 F1            [10]  374 	pop	af
+   0183 33            [ 6]  375 	inc	sp
+   0184 D1            [10]  376 	pop	de
+                            377 ;widgets.c:77: spinner->widget.layout.x = x;
+   0185 4B            [ 4]  378 	ld	c, e
+   0186 42            [ 4]  379 	ld	b, d
+   0187 03            [ 6]  380 	inc	bc
+   0188 DD 7E 04      [19]  381 	ld	a,4 (ix)
+   018B 02            [ 7]  382 	ld	(bc),a
+                            383 ;widgets.c:78: spinner->widget.layout.y = y;
+   018C 69            [ 4]  384 	ld	l, c
+   018D 60            [ 4]  385 	ld	h, b
+   018E 23            [ 6]  386 	inc	hl
+   018F DD 7E 05      [19]  387 	ld	a,5 (ix)
+   0192 77            [ 7]  388 	ld	(hl),a
+                            389 ;widgets.c:79: spinner->widget.layout.w = 2;
+   0193 69            [ 4]  390 	ld	l, c
+   0194 60            [ 4]  391 	ld	h, b
+   0195 23            [ 6]  392 	inc	hl
+   0196 23            [ 6]  393 	inc	hl
+   0197 36 02         [10]  394 	ld	(hl),#0x02
+                            395 ;widgets.c:80: spinner->widget.layout.h = 1;
+   0199 69            [ 4]  396 	ld	l,c
+   019A 60            [ 4]  397 	ld	h,b
+   019B 23            [ 6]  398 	inc	hl
+   019C 23            [ 6]  399 	inc	hl
+   019D 23            [ 6]  400 	inc	hl
+   019E 36 01         [10]  401 	ld	(hl),#0x01
+                            402 ;widgets.c:82: spinner->min = 0;
+   01A0 21 0A 00      [10]  403 	ld	hl,#0x000A
+   01A3 19            [11]  404 	add	hl,de
+   01A4 36 00         [10]  405 	ld	(hl),#0x00
+                            406 ;widgets.c:83: spinner->max = 255;
+   01A6 21 0B 00      [10]  407 	ld	hl,#0x000B
+   01A9 19            [11]  408 	add	hl,de
+   01AA 36 FF         [10]  409 	ld	(hl),#0xFF
+                            410 ;widgets.c:84: spinner->value = 0;
+   01AC 21 0C 00      [10]  411 	ld	hl,#0x000C
+   01AF 19            [11]  412 	add	hl,de
+   01B0 36 00         [10]  413 	ld	(hl),#0x00
+                            414 ;widgets.c:86: return spinner;
+   01B2 EB            [ 4]  415 	ex	de,hl
+   01B3 DD E1         [14]  416 	pop	ix
+   01B5 C9            [10]  417 	ret
+                            418 ;widgets.c:89: void spinner_setMin(T_Spinner *spinner, unsigned char min) {
+                            419 ;	---------------------------------
+                            420 ; Function spinner_setMin
+                            421 ; ---------------------------------
+   01B6                     422 _spinner_setMin::
+   01B6 DD E5         [15]  423 	push	ix
+   01B8 DD 21 00 00   [14]  424 	ld	ix,#0
+   01BC DD 39         [15]  425 	add	ix,sp
+   01BE F5            [11]  426 	push	af
+                            427 ;widgets.c:91: if (spinner != NULL && min < spinner->max) {
+   01BF DD 7E 05      [19]  428 	ld	a,5 (ix)
+   01C2 DD B6 04      [19]  429 	or	a,4 (ix)
+   01C5 28 3F         [12]  430 	jr	Z,00106$
+   01C7 DD 4E 04      [19]  431 	ld	c,4 (ix)
+   01CA DD 46 05      [19]  432 	ld	b,5 (ix)
+   01CD C5            [11]  433 	push	bc
+   01CE FD E1         [14]  434 	pop	iy
+   01D0 FD 66 0B      [19]  435 	ld	h,11 (iy)
+   01D3 DD 7E 06      [19]  436 	ld	a,6 (ix)
+   01D6 94            [ 4]  437 	sub	a, h
+   01D7 30 2D         [12]  438 	jr	NC,00106$
+                            439 ;widgets.c:92: spinner->min = min;
+   01D9 FD 21 0A 00   [14]  440 	ld	iy,#0x000A
+   01DD FD 09         [15]  441 	add	iy, bc
+   01DF DD 7E 06      [19]  442 	ld	a,6 (ix)
+   01E2 FD 77 00      [19]  443 	ld	0 (iy), a
+                            444 ;widgets.c:93: if (spinner->value < spinner->min) {
+   01E5 21 0C 00      [10]  445 	ld	hl,#0x000C
+   01E8 09            [11]  446 	add	hl,bc
+   01E9 EB            [ 4]  447 	ex	de,hl
+   01EA 1A            [ 7]  448 	ld	a,(de)
+   01EB DD 77 FF      [19]  449 	ld	-1 (ix),a
+   01EE FD 7E 00      [19]  450 	ld	a, 0 (iy)
+   01F1 DD 77 FE      [19]  451 	ld	-2 (ix),a
+   01F4 DD 7E FF      [19]  452 	ld	a,-1 (ix)
+   01F7 DD 96 06      [19]  453 	sub	a, 6 (ix)
+   01FA 30 04         [12]  454 	jr	NC,00102$
+                            455 ;widgets.c:94: spinner->value = spinner->min;
+   01FC DD 7E FE      [19]  456 	ld	a,-2 (ix)
+   01FF 12            [ 7]  457 	ld	(de),a
+   0200                     458 00102$:
+                            459 ;widgets.c:96: spinner->widget.dirty = 1;
+   0200 21 05 00      [10]  460 	ld	hl,#0x0005
+   0203 09            [11]  461 	add	hl,bc
+   0204 36 01         [10]  462 	ld	(hl),#0x01
+   0206                     463 00106$:
+   0206 DD F9         [10]  464 	ld	sp, ix
+   0208 DD E1         [14]  465 	pop	ix
+   020A C9            [10]  466 	ret
+                            467 ;widgets.c:100: void spinner_setMax(T_Spinner *spinner, unsigned char max) {
+                            468 ;	---------------------------------
+                            469 ; Function spinner_setMax
+                            470 ; ---------------------------------
+   020B                     471 _spinner_setMax::
+   020B DD E5         [15]  472 	push	ix
+   020D DD 21 00 00   [14]  473 	ld	ix,#0
+   0211 DD 39         [15]  474 	add	ix,sp
+   0213 F5            [11]  475 	push	af
+                            476 ;widgets.c:102: if (spinner != NULL && max > spinner->min) {
+   0214 DD 7E 05      [19]  477 	ld	a,5 (ix)
+   0217 DD B6 04      [19]  478 	or	a,4 (ix)
+   021A 28 3E         [12]  479 	jr	Z,00106$
+   021C DD 4E 04      [19]  480 	ld	c,4 (ix)
+   021F DD 46 05      [19]  481 	ld	b,5 (ix)
+   0222 C5            [11]  482 	push	bc
+   0223 FD E1         [14]  483 	pop	iy
+   0225 FD 7E 0A      [19]  484 	ld	a, 10 (iy)
+   0228 DD 96 06      [19]  485 	sub	a, 6 (ix)
+   022B 30 2D         [12]  486 	jr	NC,00106$
+                            487 ;widgets.c:103: spinner->max = max;
+   022D FD 21 0B 00   [14]  488 	ld	iy,#0x000B
+   0231 FD 09         [15]  489 	add	iy, bc
+   0233 DD 7E 06      [19]  490 	ld	a,6 (ix)
+   0236 FD 77 00      [19]  491 	ld	0 (iy), a
+                            492 ;widgets.c:104: if (spinner->value > spinner->max) {
+   0239 21 0C 00      [10]  493 	ld	hl,#0x000C
+   023C 09            [11]  494 	add	hl,bc
+   023D EB            [ 4]  495 	ex	de,hl
+   023E 1A            [ 7]  496 	ld	a,(de)
+   023F DD 77 FE      [19]  497 	ld	-2 (ix),a
+   0242 FD 7E 00      [19]  498 	ld	a, 0 (iy)
+   0245 DD 77 FF      [19]  499 	ld	-1 (ix),a
+   0248 DD 7E 06      [19]  500 	ld	a,6 (ix)
+   024B DD 96 FE      [19]  501 	sub	a, -2 (ix)
+   024E 30 04         [12]  502 	jr	NC,00102$
+                            503 ;widgets.c:105: spinner->value = spinner->max;
+   0250 DD 7E FF      [19]  504 	ld	a,-1 (ix)
+   0253 12            [ 7]  505 	ld	(de),a
+   0254                     506 00102$:
+                            507 ;widgets.c:107: spinner->widget.dirty = 1;
+   0254 21 05 00      [10]  508 	ld	hl,#0x0005
+   0257 09            [11]  509 	add	hl,bc
+   0258 36 01         [10]  510 	ld	(hl),#0x01
+   025A                     511 00106$:
+   025A DD F9         [10]  512 	ld	sp, ix
+   025C DD E1         [14]  513 	pop	ix
+   025E C9            [10]  514 	ret
+                            515 ;widgets.c:111: void spinner_incValue(T_Spinner *spinner) {
                             516 ;	---------------------------------
-                            517 ; Function spinner_redraw
+                            517 ; Function spinner_incValue
                             518 ; ---------------------------------
-   0286                     519 _spinner_redraw::
-   0286 DD E5         [15]  520 	push	ix
-   0288 DD 21 00 00   [14]  521 	ld	ix,#0
-   028C DD 39         [15]  522 	add	ix,sp
-                            523 ;widgets.c:115: unsigned char *dst = SCRPTR(spinner->widget.layout.x, spinner->widget.layout.y);
-   028E DD 4E 04      [19]  524 	ld	c,4 (ix)
-   0291 DD 46 05      [19]  525 	ld	b,5 (ix)
-   0294 69            [ 4]  526 	ld	l, c
-   0295 60            [ 4]  527 	ld	h, b
-   0296 23            [ 6]  528 	inc	hl
-   0297 5E            [ 7]  529 	ld	e,(hl)
-   0298 16 00         [ 7]  530 	ld	d,#0x00
-   029A 69            [ 4]  531 	ld	l, c
-   029B 60            [ 4]  532 	ld	h, b
-   029C 23            [ 6]  533 	inc	hl
-   029D 23            [ 6]  534 	inc	hl
-   029E 6E            [ 7]  535 	ld	l,(hl)
-   029F 26 00         [ 7]  536 	ld	h,#0x00
-   02A1 29            [11]  537 	add	hl, hl
-   02A2 29            [11]  538 	add	hl, hl
-   02A3 29            [11]  539 	add	hl, hl
-   02A4 D5            [11]  540 	push	de
-   02A5 5D            [ 4]  541 	ld	e, l
-   02A6 54            [ 4]  542 	ld	d, h
-   02A7 29            [11]  543 	add	hl, hl
-   02A8 29            [11]  544 	add	hl, hl
-   02A9 19            [11]  545 	add	hl, de
-   02AA 29            [11]  546 	add	hl, hl
-   02AB 29            [11]  547 	add	hl, hl
-   02AC 29            [11]  548 	add	hl, hl
-   02AD 29            [11]  549 	add	hl, hl
-   02AE D1            [10]  550 	pop	de
-   02AF 19            [11]  551 	add	hl,de
-   02B0 EB            [ 4]  552 	ex	de,hl
-                            553 ;widgets.c:117: spinner->widget.dirty = 0;
-   02B1 21 05 00      [10]  554 	ld	hl,#0x0005
-   02B4 09            [11]  555 	add	hl,bc
-   02B5 36 00         [10]  556 	ld	(hl),#0x00
-                            557 ;widgets.c:118: text_hex(dst, spinner->value);
-   02B7 C5            [11]  558 	push	bc
-   02B8 FD E1         [14]  559 	pop	iy
-   02BA FD 66 0A      [19]  560 	ld	h,10 (iy)
-   02BD E5            [11]  561 	push	hl
-   02BE 33            [ 6]  562 	inc	sp
-   02BF D5            [11]  563 	push	de
-   02C0 CDr00r00      [17]  564 	call	_text_hex
-   02C3 F1            [10]  565 	pop	af
-   02C4 33            [ 6]  566 	inc	sp
-   02C5 DD E1         [14]  567 	pop	ix
-   02C7 C9            [10]  568 	ret
-                            569 ;widgets.c:121: T_Checkbox *new_checkbox(unsigned char x, unsigned char y) {
-                            570 ;	---------------------------------
-                            571 ; Function new_checkbox
-                            572 ; ---------------------------------
-   02C8                     573 _new_checkbox::
-                            574 ;widgets.c:122: T_Checkbox *checkbox = (T_Checkbox *) malloc(sizeof(T_Checkbox));
-   02C8 21 09 00      [10]  575 	ld	hl,#0x0009
-   02CB E5            [11]  576 	push	hl
-   02CC CDr00r00      [17]  577 	call	_malloc
-   02CF F1            [10]  578 	pop	af
-   02D0 EB            [ 4]  579 	ex	de,hl
-                            580 ;widgets.c:124: checkbox->widget.type = CHECKBOX;
-   02D1 3E 01         [ 7]  581 	ld	a,#0x01
-   02D3 12            [ 7]  582 	ld	(de),a
-                            583 ;widgets.c:125: checkbox->widget.layout.x = x;
-   02D4 6B            [ 4]  584 	ld	l, e
-   02D5 62            [ 4]  585 	ld	h, d
-   02D6 23            [ 6]  586 	inc	hl
-   02D7 FD 21 02 00   [14]  587 	ld	iy,#2
-   02DB FD 39         [15]  588 	add	iy,sp
-   02DD FD 7E 00      [19]  589 	ld	a,0 (iy)
-   02E0 77            [ 7]  590 	ld	(hl),a
-                            591 ;widgets.c:126: checkbox->widget.layout.y = y;
-   02E1 6B            [ 4]  592 	ld	l, e
-   02E2 62            [ 4]  593 	ld	h, d
-   02E3 23            [ 6]  594 	inc	hl
-   02E4 23            [ 6]  595 	inc	hl
-   02E5 FD 21 03 00   [14]  596 	ld	iy,#3
-   02E9 FD 39         [15]  597 	add	iy,sp
-   02EB FD 7E 00      [19]  598 	ld	a,0 (iy)
-   02EE 77            [ 7]  599 	ld	(hl),a
-                            600 ;widgets.c:127: checkbox->widget.layout.w = 2;
-   02EF 6B            [ 4]  601 	ld	l, e
-   02F0 62            [ 4]  602 	ld	h, d
-   02F1 23            [ 6]  603 	inc	hl
-   02F2 23            [ 6]  604 	inc	hl
-   02F3 23            [ 6]  605 	inc	hl
-   02F4 36 02         [10]  606 	ld	(hl),#0x02
-                            607 ;widgets.c:128: checkbox->widget.layout.h = 1;
-   02F6 21 04 00      [10]  608 	ld	hl,#0x0004
-   02F9 19            [11]  609 	add	hl,de
-   02FA 36 01         [10]  610 	ld	(hl),#0x01
-                            611 ;widgets.c:129: checkbox->widget.callback = NULL;
-   02FC 21 06 00      [10]  612 	ld	hl,#0x0006
-   02FF 19            [11]  613 	add	hl,de
-   0300 AF            [ 4]  614 	xor	a, a
-   0301 77            [ 7]  615 	ld	(hl), a
-   0302 23            [ 6]  616 	inc	hl
-   0303 77            [ 7]  617 	ld	(hl), a
-                            618 ;widgets.c:130: checkbox->widget.dirty = 0;
-   0304 21 05 00      [10]  619 	ld	hl,#0x0005
-   0307 19            [11]  620 	add	hl,de
-   0308 36 00         [10]  621 	ld	(hl),#0x00
-                            622 ;widgets.c:132: checkbox->checked = 0;
-   030A 21 08 00      [10]  623 	ld	hl,#0x0008
-   030D 19            [11]  624 	add	hl,de
-   030E 36 00         [10]  625 	ld	(hl),#0x00
-                            626 ;widgets.c:134: return checkbox;
-   0310 EB            [ 4]  627 	ex	de,hl
-   0311 C9            [10]  628 	ret
-                            629 ;widgets.c:137: void checkbox_setValue(T_Checkbox *checkbox, unsigned char checked) {
-                            630 ;	---------------------------------
-                            631 ; Function checkbox_setValue
-                            632 ; ---------------------------------
-   0312                     633 _checkbox_setValue::
-                            634 ;widgets.c:138: if (checkbox != NULL) {
-   0312 21 03 00      [10]  635 	ld	hl, #2+1
-   0315 39            [11]  636 	add	hl, sp
-   0316 7E            [ 7]  637 	ld	a, (hl)
-   0317 2B            [ 6]  638 	dec	hl
-   0318 B6            [ 7]  639 	or	a,(hl)
-   0319 C8            [11]  640 	ret	Z
-                            641 ;widgets.c:139: checkbox->checked = checked ? -1 : 0;
-   031A D1            [10]  642 	pop	de
-   031B C1            [10]  643 	pop	bc
-   031C C5            [11]  644 	push	bc
-   031D D5            [11]  645 	push	de
-   031E 21 08 00      [10]  646 	ld	hl,#0x0008
-   0321 09            [11]  647 	add	hl,bc
-   0322 FD 21 04 00   [14]  648 	ld	iy,#4
-   0326 FD 39         [15]  649 	add	iy,sp
-   0328 FD 7E 00      [19]  650 	ld	a,0 (iy)
-   032B B7            [ 4]  651 	or	a, a
-   032C 28 04         [12]  652 	jr	Z,00105$
-   032E 3E FF         [ 7]  653 	ld	a,#0xFF
-   0330 18 02         [12]  654 	jr	00106$
-   0332                     655 00105$:
-   0332 3E 00         [ 7]  656 	ld	a,#0x00
-   0334                     657 00106$:
-   0334 77            [ 7]  658 	ld	(hl),a
-                            659 ;widgets.c:140: checkbox->widget.dirty = 1;
-   0335 21 05 00      [10]  660 	ld	hl,#0x0005
-   0338 09            [11]  661 	add	hl,bc
-   0339 36 01         [10]  662 	ld	(hl),#0x01
-   033B C9            [10]  663 	ret
-                            664 ;widgets.c:144: void checkbox_changeValue(T_Checkbox *checkbox) {
-                            665 ;	---------------------------------
-                            666 ; Function checkbox_changeValue
-                            667 ; ---------------------------------
-   033C                     668 _checkbox_changeValue::
-   033C DD E5         [15]  669 	push	ix
-   033E DD 21 00 00   [14]  670 	ld	ix,#0
-   0342 DD 39         [15]  671 	add	ix,sp
-                            672 ;widgets.c:145: if (checkbox != NULL) {
-   0344 DD 7E 05      [19]  673 	ld	a,5 (ix)
-   0347 DD B6 04      [19]  674 	or	a,4 (ix)
-   034A 28 1D         [12]  675 	jr	Z,00103$
-                            676 ;widgets.c:146: checkbox->checked = !checkbox->checked;
-   034C DD 5E 04      [19]  677 	ld	e,4 (ix)
-   034F DD 56 05      [19]  678 	ld	d,5 (ix)
-   0352 FD 21 08 00   [14]  679 	ld	iy,#0x0008
-   0356 FD 19         [15]  680 	add	iy, de
-   0358 FD 7E 00      [19]  681 	ld	a, 0 (iy)
-   035B D6 01         [ 7]  682 	sub	a,#0x01
-   035D 3E 00         [ 7]  683 	ld	a,#0x00
-   035F 17            [ 4]  684 	rla
-   0360 FD 77 00      [19]  685 	ld	0 (iy), a
-                            686 ;widgets.c:147: checkbox->widget.dirty = 1;
-   0363 21 05 00      [10]  687 	ld	hl,#0x0005
-   0366 19            [11]  688 	add	hl,de
-   0367 36 01         [10]  689 	ld	(hl),#0x01
-   0369                     690 00103$:
-   0369 DD E1         [14]  691 	pop	ix
-   036B C9            [10]  692 	ret
-                            693 ;widgets.c:151: void checkbox_redraw(T_Checkbox *checkbox) {
-                            694 ;	---------------------------------
-                            695 ; Function checkbox_redraw
-                            696 ; ---------------------------------
-   036C                     697 _checkbox_redraw::
-   036C DD E5         [15]  698 	push	ix
-   036E DD 21 00 00   [14]  699 	ld	ix,#0
-   0372 DD 39         [15]  700 	add	ix,sp
-   0374 F5            [11]  701 	push	af
-                            702 ;widgets.c:152: unsigned char *dst = SCRPTR(checkbox->widget.layout.x, checkbox->widget.layout.y);
-   0375 DD 4E 04      [19]  703 	ld	c,4 (ix)
-   0378 DD 46 05      [19]  704 	ld	b,5 (ix)
-   037B 69            [ 4]  705 	ld	l, c
-   037C 60            [ 4]  706 	ld	h, b
-   037D 23            [ 6]  707 	inc	hl
-   037E 5E            [ 7]  708 	ld	e,(hl)
-   037F 16 00         [ 7]  709 	ld	d,#0x00
-   0381 69            [ 4]  710 	ld	l, c
-   0382 60            [ 4]  711 	ld	h, b
-   0383 23            [ 6]  712 	inc	hl
-   0384 23            [ 6]  713 	inc	hl
-   0385 6E            [ 7]  714 	ld	l,(hl)
-   0386 26 00         [ 7]  715 	ld	h,#0x00
-   0388 29            [11]  716 	add	hl, hl
-   0389 29            [11]  717 	add	hl, hl
-   038A 29            [11]  718 	add	hl, hl
-   038B D5            [11]  719 	push	de
-   038C 5D            [ 4]  720 	ld	e, l
-   038D 54            [ 4]  721 	ld	d, h
-   038E 29            [11]  722 	add	hl, hl
-   038F 29            [11]  723 	add	hl, hl
-   0390 19            [11]  724 	add	hl, de
-   0391 29            [11]  725 	add	hl, hl
-   0392 29            [11]  726 	add	hl, hl
-   0393 29            [11]  727 	add	hl, hl
-   0394 29            [11]  728 	add	hl, hl
-   0395 D1            [10]  729 	pop	de
-   0396 19            [11]  730 	add	hl,de
-   0397 EB            [ 4]  731 	ex	de,hl
-                            732 ;widgets.c:154: if (checkbox->checked) {
-   0398 C5            [11]  733 	push	bc
-   0399 FD E1         [14]  734 	pop	iy
-   039B FD 6E 08      [19]  735 	ld	l,8 (iy)
-                            736 ;widgets.c:155: *dst = 0xFC; *(dst+1) = 0x3F;
-   039E D5            [11]  737 	push	de
-   039F FD E1         [14]  738 	pop	iy
-   03A1 FD 23         [10]  739 	inc	iy
-                            740 ;widgets.c:156: dst += 80;
-   03A3 7B            [ 4]  741 	ld	a,e
-   03A4 C6 50         [ 7]  742 	add	a, #0x50
-   03A6 DD 77 FE      [19]  743 	ld	-2 (ix),a
-   03A9 7A            [ 4]  744 	ld	a,d
-   03AA CE 00         [ 7]  745 	adc	a, #0x00
-   03AC DD 77 FF      [19]  746 	ld	-1 (ix),a
-                            747 ;widgets.c:154: if (checkbox->checked) {
-   03AF 7D            [ 4]  748 	ld	a,l
-   03B0 B7            [ 4]  749 	or	a, a
-   03B1 28 43         [12]  750 	jr	Z,00102$
-                            751 ;widgets.c:155: *dst = 0xFC; *(dst+1) = 0x3F;
-   03B3 3E FC         [ 7]  752 	ld	a,#0xFC
-   03B5 12            [ 7]  753 	ld	(de),a
-   03B6 FD 36 00 3F   [19]  754 	ld	0 (iy), #0x3F
-                            755 ;widgets.c:156: dst += 80;
-   03BA D1            [10]  756 	pop	de
-   03BB D5            [11]  757 	push	de
-                            758 ;widgets.c:157: *dst = 0x0C; *(dst+1) = 0x30;
-   03BC 3E 0C         [ 7]  759 	ld	a,#0x0C
-   03BE 12            [ 7]  760 	ld	(de),a
-   03BF 6B            [ 4]  761 	ld	l, e
-   03C0 62            [ 4]  762 	ld	h, d
-   03C1 23            [ 6]  763 	inc	hl
-   03C2 36 30         [10]  764 	ld	(hl),#0x30
-                            765 ;widgets.c:158: dst += 80;
-   03C4 21 50 00      [10]  766 	ld	hl,#0x0050
-   03C7 19            [11]  767 	add	hl,de
-   03C8 EB            [ 4]  768 	ex	de,hl
-                            769 ;widgets.c:159: *dst = 0xCC; *(dst+1) = 0x33;
-   03C9 3E CC         [ 7]  770 	ld	a,#0xCC
-   03CB 12            [ 7]  771 	ld	(de),a
-   03CC 6B            [ 4]  772 	ld	l, e
-   03CD 62            [ 4]  773 	ld	h, d
-   03CE 23            [ 6]  774 	inc	hl
-   03CF 36 33         [10]  775 	ld	(hl),#0x33
-                            776 ;widgets.c:160: dst += 80;
-   03D1 21 50 00      [10]  777 	ld	hl,#0x0050
-   03D4 19            [11]  778 	add	hl,de
-   03D5 EB            [ 4]  779 	ex	de,hl
-                            780 ;widgets.c:161: *dst = 0xCC; *(dst+1) = 0x33;
-   03D6 3E CC         [ 7]  781 	ld	a,#0xCC
-   03D8 12            [ 7]  782 	ld	(de),a
-   03D9 6B            [ 4]  783 	ld	l, e
-   03DA 62            [ 4]  784 	ld	h, d
-   03DB 23            [ 6]  785 	inc	hl
-   03DC 36 33         [10]  786 	ld	(hl),#0x33
-                            787 ;widgets.c:162: dst += 80;
-   03DE 21 50 00      [10]  788 	ld	hl,#0x0050
-   03E1 19            [11]  789 	add	hl,de
-   03E2 EB            [ 4]  790 	ex	de,hl
-                            791 ;widgets.c:163: *dst = 0x0C; *(dst+1) = 0x30;
-   03E3 3E 0C         [ 7]  792 	ld	a,#0x0C
-   03E5 12            [ 7]  793 	ld	(de),a
-   03E6 6B            [ 4]  794 	ld	l, e
-   03E7 62            [ 4]  795 	ld	h, d
-   03E8 23            [ 6]  796 	inc	hl
-   03E9 36 30         [10]  797 	ld	(hl),#0x30
-                            798 ;widgets.c:164: dst += 80;
-   03EB 21 50 00      [10]  799 	ld	hl,#0x0050
-   03EE 19            [11]  800 	add	hl,de
-                            801 ;widgets.c:165: *dst = 0xFC; *(dst+1) = 0x3F;
-   03EF 36 FC         [10]  802 	ld	(hl),#0xFC
-   03F1 23            [ 6]  803 	inc	hl
-   03F2 36 3F         [10]  804 	ld	(hl),#0x3F
-   03F4 18 41         [12]  805 	jr	00103$
-   03F6                     806 00102$:
-                            807 ;widgets.c:167: *dst = 0xFC; *(dst+1) = 0x3F;
-   03F6 3E FC         [ 7]  808 	ld	a,#0xFC
-   03F8 12            [ 7]  809 	ld	(de),a
-   03F9 FD 36 00 3F   [19]  810 	ld	0 (iy), #0x3F
-                            811 ;widgets.c:168: dst += 80;
-   03FD D1            [10]  812 	pop	de
-   03FE D5            [11]  813 	push	de
-                            814 ;widgets.c:169: *dst = 0x0C; *(dst+1) = 0x30;
-   03FF 3E 0C         [ 7]  815 	ld	a,#0x0C
-   0401 12            [ 7]  816 	ld	(de),a
-   0402 6B            [ 4]  817 	ld	l, e
-   0403 62            [ 4]  818 	ld	h, d
-   0404 23            [ 6]  819 	inc	hl
-   0405 36 30         [10]  820 	ld	(hl),#0x30
-                            821 ;widgets.c:170: dst += 80;
-   0407 21 50 00      [10]  822 	ld	hl,#0x0050
-   040A 19            [11]  823 	add	hl,de
-   040B EB            [ 4]  824 	ex	de,hl
-                            825 ;widgets.c:171: *dst = 0x0C; *(dst+1) = 0x30;
-   040C 3E 0C         [ 7]  826 	ld	a,#0x0C
-   040E 12            [ 7]  827 	ld	(de),a
-   040F 6B            [ 4]  828 	ld	l, e
-   0410 62            [ 4]  829 	ld	h, d
-   0411 23            [ 6]  830 	inc	hl
-   0412 36 30         [10]  831 	ld	(hl),#0x30
-                            832 ;widgets.c:172: dst += 80;
-   0414 21 50 00      [10]  833 	ld	hl,#0x0050
-   0417 19            [11]  834 	add	hl,de
-   0418 EB            [ 4]  835 	ex	de,hl
-                            836 ;widgets.c:173: *dst = 0x0C; *(dst+1) = 0x30;
-   0419 3E 0C         [ 7]  837 	ld	a,#0x0C
-   041B 12            [ 7]  838 	ld	(de),a
-   041C 6B            [ 4]  839 	ld	l, e
-   041D 62            [ 4]  840 	ld	h, d
-   041E 23            [ 6]  841 	inc	hl
-   041F 36 30         [10]  842 	ld	(hl),#0x30
-                            843 ;widgets.c:174: dst += 80;
-   0421 21 50 00      [10]  844 	ld	hl,#0x0050
-   0424 19            [11]  845 	add	hl,de
-   0425 EB            [ 4]  846 	ex	de,hl
-                            847 ;widgets.c:175: *dst = 0x0C; *(dst+1) = 0x30;
-   0426 3E 0C         [ 7]  848 	ld	a,#0x0C
-   0428 12            [ 7]  849 	ld	(de),a
-   0429 6B            [ 4]  850 	ld	l, e
-   042A 62            [ 4]  851 	ld	h, d
-   042B 23            [ 6]  852 	inc	hl
-   042C 36 30         [10]  853 	ld	(hl),#0x30
-                            854 ;widgets.c:176: dst += 80;
-   042E 21 50 00      [10]  855 	ld	hl,#0x0050
-   0431 19            [11]  856 	add	hl,de
-                            857 ;widgets.c:177: *dst = 0xFC; *(dst+1) = 0x3F;
-   0432 36 FC         [10]  858 	ld	(hl),#0xFC
-   0434 23            [ 6]  859 	inc	hl
-   0435 36 3F         [10]  860 	ld	(hl),#0x3F
-   0437                     861 00103$:
-                            862 ;widgets.c:179: checkbox->widget.dirty = 0;
-   0437 21 05 00      [10]  863 	ld	hl,#0x0005
-   043A 09            [11]  864 	add	hl,bc
-   043B 36 00         [10]  865 	ld	(hl),#0x00
-   043D DD F9         [10]  866 	ld	sp, ix
-   043F DD E1         [14]  867 	pop	ix
-   0441 C9            [10]  868 	ret
-                            869 ;widgets.c:182: void draw_label(unsigned char x, unsigned char y, char *text) {
-                            870 ;	---------------------------------
-                            871 ; Function draw_label
-                            872 ; ---------------------------------
-   0442                     873 _draw_label::
-   0442 DD E5         [15]  874 	push	ix
-   0444 DD 21 00 00   [14]  875 	ld	ix,#0
-   0448 DD 39         [15]  876 	add	ix,sp
-                            877 ;widgets.c:183: unsigned char *dst = SCRPTR(x, y);
-   044A DD 5E 04      [19]  878 	ld	e,4 (ix)
-   044D 16 00         [ 7]  879 	ld	d,#0x00
-   044F DD 6E 05      [19]  880 	ld	l,5 (ix)
-   0452 26 00         [ 7]  881 	ld	h,#0x00
-   0454 29            [11]  882 	add	hl, hl
-   0455 29            [11]  883 	add	hl, hl
-   0456 29            [11]  884 	add	hl, hl
-   0457 4D            [ 4]  885 	ld	c, l
-   0458 44            [ 4]  886 	ld	b, h
-   0459 29            [11]  887 	add	hl, hl
-   045A 29            [11]  888 	add	hl, hl
-   045B 09            [11]  889 	add	hl, bc
-   045C 29            [11]  890 	add	hl, hl
-   045D 29            [11]  891 	add	hl, hl
-   045E 29            [11]  892 	add	hl, hl
-   045F 29            [11]  893 	add	hl, hl
-   0460 19            [11]  894 	add	hl,de
-   0461 5D            [ 4]  895 	ld	e, l
-   0462 54            [ 4]  896 	ld	d, h
-                            897 ;widgets.c:184: char *p = text;
-   0463 DD 4E 06      [19]  898 	ld	c,6 (ix)
-   0466 DD 46 07      [19]  899 	ld	b,7 (ix)
-                            900 ;widgets.c:187: while(c = *p++) text_char(dst++, c);
-   0469                     901 00101$:
-   0469 0A            [ 7]  902 	ld	a,(bc)
-   046A 03            [ 6]  903 	inc	bc
-   046B 67            [ 4]  904 	ld	h,a
-   046C B7            [ 4]  905 	or	a, a
-   046D 28 13         [12]  906 	jr	Z,00104$
-   046F D5            [11]  907 	push	de
-   0470 FD E1         [14]  908 	pop	iy
-   0472 13            [ 6]  909 	inc	de
-   0473 C5            [11]  910 	push	bc
-   0474 D5            [11]  911 	push	de
-   0475 E5            [11]  912 	push	hl
-   0476 33            [ 6]  913 	inc	sp
-   0477 FD E5         [15]  914 	push	iy
-   0479 CDr00r00      [17]  915 	call	_text_char
-   047C F1            [10]  916 	pop	af
-   047D 33            [ 6]  917 	inc	sp
-   047E D1            [10]  918 	pop	de
-   047F C1            [10]  919 	pop	bc
-   0480 18 E7         [12]  920 	jr	00101$
-   0482                     921 00104$:
-   0482 DD E1         [14]  922 	pop	ix
-   0484 C9            [10]  923 	ret
-                            924 	.area _CODE
-                            925 	.area _INITIALIZER
-                            926 	.area _CABS (ABS)
+   025F                     519 _spinner_incValue::
+   025F DD E5         [15]  520 	push	ix
+   0261 DD 21 00 00   [14]  521 	ld	ix,#0
+   0265 DD 39         [15]  522 	add	ix,sp
+                            523 ;widgets.c:113: if (spinner != NULL && spinner->value < spinner->max) {
+   0267 DD 7E 05      [19]  524 	ld	a,5 (ix)
+   026A DD B6 04      [19]  525 	or	a,4 (ix)
+   026D 28 26         [12]  526 	jr	Z,00104$
+   026F DD 5E 04      [19]  527 	ld	e,4 (ix)
+   0272 DD 56 05      [19]  528 	ld	d,5 (ix)
+   0275 FD 21 0C 00   [14]  529 	ld	iy,#0x000C
+   0279 FD 19         [15]  530 	add	iy, de
+   027B FD 4E 00      [19]  531 	ld	c, 0 (iy)
+   027E 6B            [ 4]  532 	ld	l, e
+   027F 62            [ 4]  533 	ld	h, d
+   0280 C5            [11]  534 	push	bc
+   0281 01 0B 00      [10]  535 	ld	bc, #0x000B
+   0284 09            [11]  536 	add	hl, bc
+   0285 C1            [10]  537 	pop	bc
+   0286 6E            [ 7]  538 	ld	l,(hl)
+   0287 79            [ 4]  539 	ld	a,c
+   0288 95            [ 4]  540 	sub	a, l
+   0289 30 0A         [12]  541 	jr	NC,00104$
+                            542 ;widgets.c:114: spinner->value ++;
+   028B 0C            [ 4]  543 	inc	c
+   028C FD 71 00      [19]  544 	ld	0 (iy), c
+                            545 ;widgets.c:115: spinner->widget.dirty = 1;
+   028F 21 05 00      [10]  546 	ld	hl,#0x0005
+   0292 19            [11]  547 	add	hl,de
+   0293 36 01         [10]  548 	ld	(hl),#0x01
+   0295                     549 00104$:
+   0295 DD E1         [14]  550 	pop	ix
+   0297 C9            [10]  551 	ret
+                            552 ;widgets.c:119: void spinner_decValue(T_Spinner *spinner) {
+                            553 ;	---------------------------------
+                            554 ; Function spinner_decValue
+                            555 ; ---------------------------------
+   0298                     556 _spinner_decValue::
+   0298 DD E5         [15]  557 	push	ix
+   029A DD 21 00 00   [14]  558 	ld	ix,#0
+   029E DD 39         [15]  559 	add	ix,sp
+                            560 ;widgets.c:121: if (spinner != NULL && spinner->value > spinner->min) {
+   02A0 DD 7E 05      [19]  561 	ld	a,5 (ix)
+   02A3 DD B6 04      [19]  562 	or	a,4 (ix)
+   02A6 28 25         [12]  563 	jr	Z,00104$
+   02A8 DD 5E 04      [19]  564 	ld	e,4 (ix)
+   02AB DD 56 05      [19]  565 	ld	d,5 (ix)
+   02AE FD 21 0C 00   [14]  566 	ld	iy,#0x000C
+   02B2 FD 19         [15]  567 	add	iy, de
+   02B4 FD 4E 00      [19]  568 	ld	c, 0 (iy)
+   02B7 6B            [ 4]  569 	ld	l, e
+   02B8 62            [ 4]  570 	ld	h, d
+   02B9 C5            [11]  571 	push	bc
+   02BA 01 0A 00      [10]  572 	ld	bc, #0x000A
+   02BD 09            [11]  573 	add	hl, bc
+   02BE C1            [10]  574 	pop	bc
+   02BF 7E            [ 7]  575 	ld	a, (hl)
+   02C0 91            [ 4]  576 	sub	a, c
+   02C1 30 0A         [12]  577 	jr	NC,00104$
+                            578 ;widgets.c:122: spinner->value --;
+   02C3 0D            [ 4]  579 	dec	c
+   02C4 FD 71 00      [19]  580 	ld	0 (iy), c
+                            581 ;widgets.c:123: spinner->widget.dirty = 1;
+   02C7 21 05 00      [10]  582 	ld	hl,#0x0005
+   02CA 19            [11]  583 	add	hl,de
+   02CB 36 01         [10]  584 	ld	(hl),#0x01
+   02CD                     585 00104$:
+   02CD DD E1         [14]  586 	pop	ix
+   02CF C9            [10]  587 	ret
+                            588 ;widgets.c:127: void spinner_redraw(T_Spinner *spinner) {
+                            589 ;	---------------------------------
+                            590 ; Function spinner_redraw
+                            591 ; ---------------------------------
+   02D0                     592 _spinner_redraw::
+   02D0 DD E5         [15]  593 	push	ix
+   02D2 DD 21 00 00   [14]  594 	ld	ix,#0
+   02D6 DD 39         [15]  595 	add	ix,sp
+                            596 ;widgets.c:128: unsigned char *dst = SCRPTR(spinner->widget.layout.x, spinner->widget.layout.y);
+   02D8 DD 4E 04      [19]  597 	ld	c,4 (ix)
+   02DB DD 46 05      [19]  598 	ld	b,5 (ix)
+   02DE 69            [ 4]  599 	ld	l, c
+   02DF 60            [ 4]  600 	ld	h, b
+   02E0 23            [ 6]  601 	inc	hl
+   02E1 5E            [ 7]  602 	ld	e,(hl)
+   02E2 16 00         [ 7]  603 	ld	d,#0x00
+   02E4 69            [ 4]  604 	ld	l, c
+   02E5 60            [ 4]  605 	ld	h, b
+   02E6 23            [ 6]  606 	inc	hl
+   02E7 23            [ 6]  607 	inc	hl
+   02E8 6E            [ 7]  608 	ld	l,(hl)
+   02E9 26 00         [ 7]  609 	ld	h,#0x00
+   02EB 29            [11]  610 	add	hl, hl
+   02EC 29            [11]  611 	add	hl, hl
+   02ED 29            [11]  612 	add	hl, hl
+   02EE D5            [11]  613 	push	de
+   02EF 5D            [ 4]  614 	ld	e, l
+   02F0 54            [ 4]  615 	ld	d, h
+   02F1 29            [11]  616 	add	hl, hl
+   02F2 29            [11]  617 	add	hl, hl
+   02F3 19            [11]  618 	add	hl, de
+   02F4 29            [11]  619 	add	hl, hl
+   02F5 29            [11]  620 	add	hl, hl
+   02F6 29            [11]  621 	add	hl, hl
+   02F7 29            [11]  622 	add	hl, hl
+   02F8 D1            [10]  623 	pop	de
+   02F9 19            [11]  624 	add	hl,de
+   02FA EB            [ 4]  625 	ex	de,hl
+                            626 ;widgets.c:130: spinner->widget.dirty = 0;
+   02FB 21 05 00      [10]  627 	ld	hl,#0x0005
+   02FE 09            [11]  628 	add	hl,bc
+   02FF 36 00         [10]  629 	ld	(hl),#0x00
+                            630 ;widgets.c:131: text_hex(dst, spinner->value);
+   0301 C5            [11]  631 	push	bc
+   0302 FD E1         [14]  632 	pop	iy
+   0304 FD 66 0C      [19]  633 	ld	h,12 (iy)
+   0307 E5            [11]  634 	push	hl
+   0308 33            [ 6]  635 	inc	sp
+   0309 D5            [11]  636 	push	de
+   030A CDr00r00      [17]  637 	call	_text_hex
+   030D F1            [10]  638 	pop	af
+   030E 33            [ 6]  639 	inc	sp
+   030F DD E1         [14]  640 	pop	ix
+   0311 C9            [10]  641 	ret
+                            642 ;widgets.c:134: T_Checkbox *new_checkbox(unsigned char x, unsigned char y) {
+                            643 ;	---------------------------------
+                            644 ; Function new_checkbox
+                            645 ; ---------------------------------
+   0312                     646 _new_checkbox::
+   0312 DD E5         [15]  647 	push	ix
+   0314 DD 21 00 00   [14]  648 	ld	ix,#0
+   0318 DD 39         [15]  649 	add	ix,sp
+                            650 ;widgets.c:135: T_Checkbox *checkbox = (T_Checkbox *) malloc(sizeof(T_Checkbox));
+   031A 21 0B 00      [10]  651 	ld	hl,#0x000B
+   031D E5            [11]  652 	push	hl
+   031E CDr00r00      [17]  653 	call	_malloc
+   0321 F1            [10]  654 	pop	af
+   0322 EB            [ 4]  655 	ex	de,hl
+                            656 ;widgets.c:137: init_widget(&(checkbox->widget), CHECKBOX);
+   0323 D5            [11]  657 	push	de
+   0324 3E 01         [ 7]  658 	ld	a,#0x01
+   0326 F5            [11]  659 	push	af
+   0327 33            [ 6]  660 	inc	sp
+   0328 D5            [11]  661 	push	de
+   0329 CDr30r01      [17]  662 	call	_init_widget
+   032C F1            [10]  663 	pop	af
+   032D 33            [ 6]  664 	inc	sp
+   032E D1            [10]  665 	pop	de
+                            666 ;widgets.c:138: checkbox->widget.layout.x = x;
+   032F 4B            [ 4]  667 	ld	c, e
+   0330 42            [ 4]  668 	ld	b, d
+   0331 03            [ 6]  669 	inc	bc
+   0332 DD 7E 04      [19]  670 	ld	a,4 (ix)
+   0335 02            [ 7]  671 	ld	(bc),a
+                            672 ;widgets.c:139: checkbox->widget.layout.y = y;
+   0336 69            [ 4]  673 	ld	l, c
+   0337 60            [ 4]  674 	ld	h, b
+   0338 23            [ 6]  675 	inc	hl
+   0339 DD 7E 05      [19]  676 	ld	a,5 (ix)
+   033C 77            [ 7]  677 	ld	(hl),a
+                            678 ;widgets.c:140: checkbox->widget.layout.w = 2;
+   033D 69            [ 4]  679 	ld	l, c
+   033E 60            [ 4]  680 	ld	h, b
+   033F 23            [ 6]  681 	inc	hl
+   0340 23            [ 6]  682 	inc	hl
+   0341 36 02         [10]  683 	ld	(hl),#0x02
+                            684 ;widgets.c:141: checkbox->widget.layout.h = 1;
+   0343 69            [ 4]  685 	ld	l,c
+   0344 60            [ 4]  686 	ld	h,b
+   0345 23            [ 6]  687 	inc	hl
+   0346 23            [ 6]  688 	inc	hl
+   0347 23            [ 6]  689 	inc	hl
+   0348 36 01         [10]  690 	ld	(hl),#0x01
+                            691 ;widgets.c:143: checkbox->checked = 0;
+   034A 21 0A 00      [10]  692 	ld	hl,#0x000A
+   034D 19            [11]  693 	add	hl,de
+   034E 36 00         [10]  694 	ld	(hl),#0x00
+                            695 ;widgets.c:145: return checkbox;
+   0350 EB            [ 4]  696 	ex	de,hl
+   0351 DD E1         [14]  697 	pop	ix
+   0353 C9            [10]  698 	ret
+                            699 ;widgets.c:148: void checkbox_setValue(T_Checkbox *checkbox, unsigned char checked) {
+                            700 ;	---------------------------------
+                            701 ; Function checkbox_setValue
+                            702 ; ---------------------------------
+   0354                     703 _checkbox_setValue::
+                            704 ;widgets.c:149: if (checkbox != NULL) {
+   0354 21 03 00      [10]  705 	ld	hl, #2+1
+   0357 39            [11]  706 	add	hl, sp
+   0358 7E            [ 7]  707 	ld	a, (hl)
+   0359 2B            [ 6]  708 	dec	hl
+   035A B6            [ 7]  709 	or	a,(hl)
+   035B C8            [11]  710 	ret	Z
+                            711 ;widgets.c:150: checkbox->checked = checked ? -1 : 0;
+   035C D1            [10]  712 	pop	de
+   035D C1            [10]  713 	pop	bc
+   035E C5            [11]  714 	push	bc
+   035F D5            [11]  715 	push	de
+   0360 21 0A 00      [10]  716 	ld	hl,#0x000A
+   0363 09            [11]  717 	add	hl,bc
+   0364 FD 21 04 00   [14]  718 	ld	iy,#4
+   0368 FD 39         [15]  719 	add	iy,sp
+   036A FD 7E 00      [19]  720 	ld	a,0 (iy)
+   036D B7            [ 4]  721 	or	a, a
+   036E 28 04         [12]  722 	jr	Z,00105$
+   0370 3E FF         [ 7]  723 	ld	a,#0xFF
+   0372 18 02         [12]  724 	jr	00106$
+   0374                     725 00105$:
+   0374 3E 00         [ 7]  726 	ld	a,#0x00
+   0376                     727 00106$:
+   0376 77            [ 7]  728 	ld	(hl),a
+                            729 ;widgets.c:151: checkbox->widget.dirty = 1;
+   0377 21 05 00      [10]  730 	ld	hl,#0x0005
+   037A 09            [11]  731 	add	hl,bc
+   037B 36 01         [10]  732 	ld	(hl),#0x01
+   037D C9            [10]  733 	ret
+                            734 ;widgets.c:155: void checkbox_changeValue(T_Checkbox *checkbox) {
+                            735 ;	---------------------------------
+                            736 ; Function checkbox_changeValue
+                            737 ; ---------------------------------
+   037E                     738 _checkbox_changeValue::
+   037E DD E5         [15]  739 	push	ix
+   0380 DD 21 00 00   [14]  740 	ld	ix,#0
+   0384 DD 39         [15]  741 	add	ix,sp
+                            742 ;widgets.c:156: if (checkbox != NULL) {
+   0386 DD 7E 05      [19]  743 	ld	a,5 (ix)
+   0389 DD B6 04      [19]  744 	or	a,4 (ix)
+   038C 28 1D         [12]  745 	jr	Z,00103$
+                            746 ;widgets.c:157: checkbox->checked = !checkbox->checked;
+   038E DD 5E 04      [19]  747 	ld	e,4 (ix)
+   0391 DD 56 05      [19]  748 	ld	d,5 (ix)
+   0394 FD 21 0A 00   [14]  749 	ld	iy,#0x000A
+   0398 FD 19         [15]  750 	add	iy, de
+   039A FD 7E 00      [19]  751 	ld	a, 0 (iy)
+   039D D6 01         [ 7]  752 	sub	a,#0x01
+   039F 3E 00         [ 7]  753 	ld	a,#0x00
+   03A1 17            [ 4]  754 	rla
+   03A2 FD 77 00      [19]  755 	ld	0 (iy), a
+                            756 ;widgets.c:158: checkbox->widget.dirty = 1;
+   03A5 21 05 00      [10]  757 	ld	hl,#0x0005
+   03A8 19            [11]  758 	add	hl,de
+   03A9 36 01         [10]  759 	ld	(hl),#0x01
+   03AB                     760 00103$:
+   03AB DD E1         [14]  761 	pop	ix
+   03AD C9            [10]  762 	ret
+                            763 ;widgets.c:162: void checkbox_redraw(T_Checkbox *checkbox) {
+                            764 ;	---------------------------------
+                            765 ; Function checkbox_redraw
+                            766 ; ---------------------------------
+   03AE                     767 _checkbox_redraw::
+   03AE DD E5         [15]  768 	push	ix
+   03B0 DD 21 00 00   [14]  769 	ld	ix,#0
+   03B4 DD 39         [15]  770 	add	ix,sp
+   03B6 F5            [11]  771 	push	af
+                            772 ;widgets.c:163: unsigned char *dst = SCRPTR(checkbox->widget.layout.x, checkbox->widget.layout.y);
+   03B7 DD 4E 04      [19]  773 	ld	c,4 (ix)
+   03BA DD 46 05      [19]  774 	ld	b,5 (ix)
+   03BD 69            [ 4]  775 	ld	l, c
+   03BE 60            [ 4]  776 	ld	h, b
+   03BF 23            [ 6]  777 	inc	hl
+   03C0 5E            [ 7]  778 	ld	e,(hl)
+   03C1 16 00         [ 7]  779 	ld	d,#0x00
+   03C3 69            [ 4]  780 	ld	l, c
+   03C4 60            [ 4]  781 	ld	h, b
+   03C5 23            [ 6]  782 	inc	hl
+   03C6 23            [ 6]  783 	inc	hl
+   03C7 6E            [ 7]  784 	ld	l,(hl)
+   03C8 26 00         [ 7]  785 	ld	h,#0x00
+   03CA 29            [11]  786 	add	hl, hl
+   03CB 29            [11]  787 	add	hl, hl
+   03CC 29            [11]  788 	add	hl, hl
+   03CD D5            [11]  789 	push	de
+   03CE 5D            [ 4]  790 	ld	e, l
+   03CF 54            [ 4]  791 	ld	d, h
+   03D0 29            [11]  792 	add	hl, hl
+   03D1 29            [11]  793 	add	hl, hl
+   03D2 19            [11]  794 	add	hl, de
+   03D3 29            [11]  795 	add	hl, hl
+   03D4 29            [11]  796 	add	hl, hl
+   03D5 29            [11]  797 	add	hl, hl
+   03D6 29            [11]  798 	add	hl, hl
+   03D7 D1            [10]  799 	pop	de
+   03D8 19            [11]  800 	add	hl,de
+   03D9 EB            [ 4]  801 	ex	de,hl
+                            802 ;widgets.c:165: if (checkbox->checked) {
+   03DA C5            [11]  803 	push	bc
+   03DB FD E1         [14]  804 	pop	iy
+   03DD FD 6E 0A      [19]  805 	ld	l,10 (iy)
+                            806 ;widgets.c:166: *dst = 0xFC; *(dst+1) = 0x3F;
+   03E0 D5            [11]  807 	push	de
+   03E1 FD E1         [14]  808 	pop	iy
+   03E3 FD 23         [10]  809 	inc	iy
+                            810 ;widgets.c:167: dst += 80;
+   03E5 7B            [ 4]  811 	ld	a,e
+   03E6 C6 50         [ 7]  812 	add	a, #0x50
+   03E8 DD 77 FE      [19]  813 	ld	-2 (ix),a
+   03EB 7A            [ 4]  814 	ld	a,d
+   03EC CE 00         [ 7]  815 	adc	a, #0x00
+   03EE DD 77 FF      [19]  816 	ld	-1 (ix),a
+                            817 ;widgets.c:165: if (checkbox->checked) {
+   03F1 7D            [ 4]  818 	ld	a,l
+   03F2 B7            [ 4]  819 	or	a, a
+   03F3 28 43         [12]  820 	jr	Z,00102$
+                            821 ;widgets.c:166: *dst = 0xFC; *(dst+1) = 0x3F;
+   03F5 3E FC         [ 7]  822 	ld	a,#0xFC
+   03F7 12            [ 7]  823 	ld	(de),a
+   03F8 FD 36 00 3F   [19]  824 	ld	0 (iy), #0x3F
+                            825 ;widgets.c:167: dst += 80;
+   03FC D1            [10]  826 	pop	de
+   03FD D5            [11]  827 	push	de
+                            828 ;widgets.c:168: *dst = 0x0C; *(dst+1) = 0x30;
+   03FE 3E 0C         [ 7]  829 	ld	a,#0x0C
+   0400 12            [ 7]  830 	ld	(de),a
+   0401 6B            [ 4]  831 	ld	l, e
+   0402 62            [ 4]  832 	ld	h, d
+   0403 23            [ 6]  833 	inc	hl
+   0404 36 30         [10]  834 	ld	(hl),#0x30
+                            835 ;widgets.c:169: dst += 80;
+   0406 21 50 00      [10]  836 	ld	hl,#0x0050
+   0409 19            [11]  837 	add	hl,de
+   040A EB            [ 4]  838 	ex	de,hl
+                            839 ;widgets.c:170: *dst = 0xCC; *(dst+1) = 0x33;
+   040B 3E CC         [ 7]  840 	ld	a,#0xCC
+   040D 12            [ 7]  841 	ld	(de),a
+   040E 6B            [ 4]  842 	ld	l, e
+   040F 62            [ 4]  843 	ld	h, d
+   0410 23            [ 6]  844 	inc	hl
+   0411 36 33         [10]  845 	ld	(hl),#0x33
+                            846 ;widgets.c:171: dst += 80;
+   0413 21 50 00      [10]  847 	ld	hl,#0x0050
+   0416 19            [11]  848 	add	hl,de
+   0417 EB            [ 4]  849 	ex	de,hl
+                            850 ;widgets.c:172: *dst = 0xCC; *(dst+1) = 0x33;
+   0418 3E CC         [ 7]  851 	ld	a,#0xCC
+   041A 12            [ 7]  852 	ld	(de),a
+   041B 6B            [ 4]  853 	ld	l, e
+   041C 62            [ 4]  854 	ld	h, d
+   041D 23            [ 6]  855 	inc	hl
+   041E 36 33         [10]  856 	ld	(hl),#0x33
+                            857 ;widgets.c:173: dst += 80;
+   0420 21 50 00      [10]  858 	ld	hl,#0x0050
+   0423 19            [11]  859 	add	hl,de
+   0424 EB            [ 4]  860 	ex	de,hl
+                            861 ;widgets.c:174: *dst = 0x0C; *(dst+1) = 0x30;
+   0425 3E 0C         [ 7]  862 	ld	a,#0x0C
+   0427 12            [ 7]  863 	ld	(de),a
+   0428 6B            [ 4]  864 	ld	l, e
+   0429 62            [ 4]  865 	ld	h, d
+   042A 23            [ 6]  866 	inc	hl
+   042B 36 30         [10]  867 	ld	(hl),#0x30
+                            868 ;widgets.c:175: dst += 80;
+   042D 21 50 00      [10]  869 	ld	hl,#0x0050
+   0430 19            [11]  870 	add	hl,de
+                            871 ;widgets.c:176: *dst = 0xFC; *(dst+1) = 0x3F;
+   0431 36 FC         [10]  872 	ld	(hl),#0xFC
+   0433 23            [ 6]  873 	inc	hl
+   0434 36 3F         [10]  874 	ld	(hl),#0x3F
+   0436 18 41         [12]  875 	jr	00103$
+   0438                     876 00102$:
+                            877 ;widgets.c:178: *dst = 0xFC; *(dst+1) = 0x3F;
+   0438 3E FC         [ 7]  878 	ld	a,#0xFC
+   043A 12            [ 7]  879 	ld	(de),a
+   043B FD 36 00 3F   [19]  880 	ld	0 (iy), #0x3F
+                            881 ;widgets.c:179: dst += 80;
+   043F D1            [10]  882 	pop	de
+   0440 D5            [11]  883 	push	de
+                            884 ;widgets.c:180: *dst = 0x0C; *(dst+1) = 0x30;
+   0441 3E 0C         [ 7]  885 	ld	a,#0x0C
+   0443 12            [ 7]  886 	ld	(de),a
+   0444 6B            [ 4]  887 	ld	l, e
+   0445 62            [ 4]  888 	ld	h, d
+   0446 23            [ 6]  889 	inc	hl
+   0447 36 30         [10]  890 	ld	(hl),#0x30
+                            891 ;widgets.c:181: dst += 80;
+   0449 21 50 00      [10]  892 	ld	hl,#0x0050
+   044C 19            [11]  893 	add	hl,de
+   044D EB            [ 4]  894 	ex	de,hl
+                            895 ;widgets.c:182: *dst = 0x0C; *(dst+1) = 0x30;
+   044E 3E 0C         [ 7]  896 	ld	a,#0x0C
+   0450 12            [ 7]  897 	ld	(de),a
+   0451 6B            [ 4]  898 	ld	l, e
+   0452 62            [ 4]  899 	ld	h, d
+   0453 23            [ 6]  900 	inc	hl
+   0454 36 30         [10]  901 	ld	(hl),#0x30
+                            902 ;widgets.c:183: dst += 80;
+   0456 21 50 00      [10]  903 	ld	hl,#0x0050
+   0459 19            [11]  904 	add	hl,de
+   045A EB            [ 4]  905 	ex	de,hl
+                            906 ;widgets.c:184: *dst = 0x0C; *(dst+1) = 0x30;
+   045B 3E 0C         [ 7]  907 	ld	a,#0x0C
+   045D 12            [ 7]  908 	ld	(de),a
+   045E 6B            [ 4]  909 	ld	l, e
+   045F 62            [ 4]  910 	ld	h, d
+   0460 23            [ 6]  911 	inc	hl
+   0461 36 30         [10]  912 	ld	(hl),#0x30
+                            913 ;widgets.c:185: dst += 80;
+   0463 21 50 00      [10]  914 	ld	hl,#0x0050
+   0466 19            [11]  915 	add	hl,de
+   0467 EB            [ 4]  916 	ex	de,hl
+                            917 ;widgets.c:186: *dst = 0x0C; *(dst+1) = 0x30;
+   0468 3E 0C         [ 7]  918 	ld	a,#0x0C
+   046A 12            [ 7]  919 	ld	(de),a
+   046B 6B            [ 4]  920 	ld	l, e
+   046C 62            [ 4]  921 	ld	h, d
+   046D 23            [ 6]  922 	inc	hl
+   046E 36 30         [10]  923 	ld	(hl),#0x30
+                            924 ;widgets.c:187: dst += 80;
+   0470 21 50 00      [10]  925 	ld	hl,#0x0050
+   0473 19            [11]  926 	add	hl,de
+                            927 ;widgets.c:188: *dst = 0xFC; *(dst+1) = 0x3F;
+   0474 36 FC         [10]  928 	ld	(hl),#0xFC
+   0476 23            [ 6]  929 	inc	hl
+   0477 36 3F         [10]  930 	ld	(hl),#0x3F
+   0479                     931 00103$:
+                            932 ;widgets.c:190: checkbox->widget.dirty = 0;
+   0479 21 05 00      [10]  933 	ld	hl,#0x0005
+   047C 09            [11]  934 	add	hl,bc
+   047D 36 00         [10]  935 	ld	(hl),#0x00
+   047F DD F9         [10]  936 	ld	sp, ix
+   0481 DD E1         [14]  937 	pop	ix
+   0483 C9            [10]  938 	ret
+                            939 ;widgets.c:193: T_Button *new_button(unsigned char x, unsigned char y, char *label) {
+                            940 ;	---------------------------------
+                            941 ; Function new_button
+                            942 ; ---------------------------------
+   0484                     943 _new_button::
+   0484 DD E5         [15]  944 	push	ix
+   0486 DD 21 00 00   [14]  945 	ld	ix,#0
+   048A DD 39         [15]  946 	add	ix,sp
+   048C 3B            [ 6]  947 	dec	sp
+                            948 ;widgets.c:194: T_Button *button = (T_Button *) malloc(sizeof(T_Button));
+   048D 21 0C 00      [10]  949 	ld	hl,#0x000C
+   0490 E5            [11]  950 	push	hl
+   0491 CDr00r00      [17]  951 	call	_malloc
+                            952 ;widgets.c:195: char len = strlen(label);
+   0494 E3            [19]  953 	ex	(sp),hl
+   0495 DD 6E 06      [19]  954 	ld	l,6 (ix)
+   0498 DD 66 07      [19]  955 	ld	h,7 (ix)
+   049B E5            [11]  956 	push	hl
+   049C CDr00r00      [17]  957 	call	_strlen
+   049F F1            [10]  958 	pop	af
+   04A0 C1            [10]  959 	pop	bc
+   04A1 DD 75 FF      [19]  960 	ld	-1 (ix),l
+                            961 ;widgets.c:197: init_widget(&(button->widget), BUTTON);
+   04A4 C5            [11]  962 	push	bc
+   04A5 3E 02         [ 7]  963 	ld	a,#0x02
+   04A7 F5            [11]  964 	push	af
+   04A8 33            [ 6]  965 	inc	sp
+   04A9 C5            [11]  966 	push	bc
+   04AA CDr30r01      [17]  967 	call	_init_widget
+   04AD F1            [10]  968 	pop	af
+   04AE 33            [ 6]  969 	inc	sp
+   04AF C1            [10]  970 	pop	bc
+                            971 ;widgets.c:198: button->widget.layout.x = x;
+   04B0 59            [ 4]  972 	ld	e, c
+   04B1 50            [ 4]  973 	ld	d, b
+   04B2 13            [ 6]  974 	inc	de
+   04B3 DD 7E 04      [19]  975 	ld	a,4 (ix)
+   04B6 12            [ 7]  976 	ld	(de),a
+                            977 ;widgets.c:199: button->widget.layout.y = y;
+   04B7 6B            [ 4]  978 	ld	l, e
+   04B8 62            [ 4]  979 	ld	h, d
+   04B9 23            [ 6]  980 	inc	hl
+   04BA DD 7E 05      [19]  981 	ld	a,5 (ix)
+   04BD 77            [ 7]  982 	ld	(hl),a
+                            983 ;widgets.c:200: button->widget.layout.w = 2 + len;
+   04BE 6B            [ 4]  984 	ld	l, e
+   04BF 62            [ 4]  985 	ld	h, d
+   04C0 23            [ 6]  986 	inc	hl
+   04C1 23            [ 6]  987 	inc	hl
+   04C2 DD 7E FF      [19]  988 	ld	a,-1 (ix)
+   04C5 C6 02         [ 7]  989 	add	a, #0x02
+   04C7 77            [ 7]  990 	ld	(hl),a
+                            991 ;widgets.c:201: button->widget.layout.h = 1;
+   04C8 EB            [ 4]  992 	ex	de,hl
+   04C9 23            [ 6]  993 	inc	hl
+   04CA 23            [ 6]  994 	inc	hl
+   04CB 23            [ 6]  995 	inc	hl
+   04CC 36 01         [10]  996 	ld	(hl),#0x01
+                            997 ;widgets.c:203: button->label = (char *)malloc(len + 1);
+   04CE 21 0A 00      [10]  998 	ld	hl,#0x000A
+   04D1 09            [11]  999 	add	hl,bc
+   04D2 DD 5E FF      [19] 1000 	ld	e,-1 (ix)
+   04D5 DD 7E FF      [19] 1001 	ld	a,-1 (ix)
+   04D8 17            [ 4] 1002 	rla
+   04D9 9F            [ 4] 1003 	sbc	a, a
+   04DA 57            [ 4] 1004 	ld	d,a
+   04DB 13            [ 6] 1005 	inc	de
+   04DC E5            [11] 1006 	push	hl
+   04DD C5            [11] 1007 	push	bc
+   04DE D5            [11] 1008 	push	de
+   04DF CDr00r00      [17] 1009 	call	_malloc
+   04E2 F1            [10] 1010 	pop	af
+   04E3 EB            [ 4] 1011 	ex	de,hl
+   04E4 C1            [10] 1012 	pop	bc
+   04E5 E1            [10] 1013 	pop	hl
+   04E6 73            [ 7] 1014 	ld	(hl),e
+   04E7 23            [ 6] 1015 	inc	hl
+   04E8 72            [ 7] 1016 	ld	(hl),d
+                           1017 ;widgets.c:204: strcpy(button->label, label);
+   04E9 C5            [11] 1018 	push	bc
+   04EA DD 6E 06      [19] 1019 	ld	l,6 (ix)
+   04ED DD 66 07      [19] 1020 	ld	h,7 (ix)
+   04F0 AF            [ 4] 1021 	xor	a, a
+   04F1                    1022 00103$:
+   04F1 BE            [ 7] 1023 	cp	a, (hl)
+   04F2 ED A0         [16] 1024 	ldi
+   04F4 20 FB         [12] 1025 	jr	NZ, 00103$
+                           1026 ;widgets.c:206: return button;
+   04F6 E1            [10] 1027 	pop	hl
+   04F7 33            [ 6] 1028 	inc	sp
+   04F8 DD E1         [14] 1029 	pop	ix
+   04FA C9            [10] 1030 	ret
+                           1031 ;widgets.c:209: void button_redraw(T_Button *button) {
+                           1032 ;	---------------------------------
+                           1033 ; Function button_redraw
+                           1034 ; ---------------------------------
+   04FB                    1035 _button_redraw::
+   04FB DD E5         [15] 1036 	push	ix
+   04FD DD 21 00 00   [14] 1037 	ld	ix,#0
+   0501 DD 39         [15] 1038 	add	ix,sp
+                           1039 ;widgets.c:210: unsigned char *dst = SCRPTR(button->widget.layout.x, button->widget.layout.y);
+   0503 DD 4E 04      [19] 1040 	ld	c,4 (ix)
+   0506 DD 46 05      [19] 1041 	ld	b,5 (ix)
+   0509 69            [ 4] 1042 	ld	l, c
+   050A 60            [ 4] 1043 	ld	h, b
+   050B 23            [ 6] 1044 	inc	hl
+   050C 5E            [ 7] 1045 	ld	e,(hl)
+   050D 16 00         [ 7] 1046 	ld	d,#0x00
+   050F 69            [ 4] 1047 	ld	l, c
+   0510 60            [ 4] 1048 	ld	h, b
+   0511 23            [ 6] 1049 	inc	hl
+   0512 23            [ 6] 1050 	inc	hl
+   0513 6E            [ 7] 1051 	ld	l,(hl)
+   0514 26 00         [ 7] 1052 	ld	h,#0x00
+   0516 29            [11] 1053 	add	hl, hl
+   0517 29            [11] 1054 	add	hl, hl
+   0518 29            [11] 1055 	add	hl, hl
+   0519 D5            [11] 1056 	push	de
+   051A 5D            [ 4] 1057 	ld	e, l
+   051B 54            [ 4] 1058 	ld	d, h
+   051C 29            [11] 1059 	add	hl, hl
+   051D 29            [11] 1060 	add	hl, hl
+   051E 19            [11] 1061 	add	hl, de
+   051F 29            [11] 1062 	add	hl, hl
+   0520 29            [11] 1063 	add	hl, hl
+   0521 29            [11] 1064 	add	hl, hl
+   0522 29            [11] 1065 	add	hl, hl
+   0523 D1            [10] 1066 	pop	de
+   0524 19            [11] 1067 	add	hl,de
+   0525 EB            [ 4] 1068 	ex	de,hl
+                           1069 ;widgets.c:211: char *p = button->label;
+   0526 C5            [11] 1070 	push	bc
+   0527 FD E1         [14] 1071 	pop	iy
+   0529 FD 4E 0A      [19] 1072 	ld	c,10 (iy)
+   052C FD 46 0B      [19] 1073 	ld	b,11 (iy)
+                           1074 ;widgets.c:214: text_char(dst++, '[');
+   052F D5            [11] 1075 	push	de
+   0530 FD E1         [14] 1076 	pop	iy
+   0532 13            [ 6] 1077 	inc	de
+   0533 C5            [11] 1078 	push	bc
+   0534 D5            [11] 1079 	push	de
+   0535 3E 5B         [ 7] 1080 	ld	a,#0x5B
+   0537 F5            [11] 1081 	push	af
+   0538 33            [ 6] 1082 	inc	sp
+   0539 FD E5         [15] 1083 	push	iy
+   053B CDr00r00      [17] 1084 	call	_text_char
+   053E F1            [10] 1085 	pop	af
+   053F 33            [ 6] 1086 	inc	sp
+   0540 D1            [10] 1087 	pop	de
+   0541 C1            [10] 1088 	pop	bc
+                           1089 ;widgets.c:215: while(c = *p++) text_char(dst++, c);
+   0542                    1090 00101$:
+   0542 0A            [ 7] 1091 	ld	a,(bc)
+   0543 03            [ 6] 1092 	inc	bc
+   0544 67            [ 4] 1093 	ld	h,a
+   0545 B7            [ 4] 1094 	or	a, a
+   0546 28 13         [12] 1095 	jr	Z,00103$
+   0548 D5            [11] 1096 	push	de
+   0549 FD E1         [14] 1097 	pop	iy
+   054B 13            [ 6] 1098 	inc	de
+   054C C5            [11] 1099 	push	bc
+   054D D5            [11] 1100 	push	de
+   054E E5            [11] 1101 	push	hl
+   054F 33            [ 6] 1102 	inc	sp
+   0550 FD E5         [15] 1103 	push	iy
+   0552 CDr00r00      [17] 1104 	call	_text_char
+   0555 F1            [10] 1105 	pop	af
+   0556 33            [ 6] 1106 	inc	sp
+   0557 D1            [10] 1107 	pop	de
+   0558 C1            [10] 1108 	pop	bc
+   0559 18 E7         [12] 1109 	jr	00101$
+   055B                    1110 00103$:
+                           1111 ;widgets.c:216: text_char(dst++, ']');
+   055B 3E 5D         [ 7] 1112 	ld	a,#0x5D
+   055D F5            [11] 1113 	push	af
+   055E 33            [ 6] 1114 	inc	sp
+   055F D5            [11] 1115 	push	de
+   0560 CDr00r00      [17] 1116 	call	_text_char
+   0563 F1            [10] 1117 	pop	af
+   0564 33            [ 6] 1118 	inc	sp
+   0565 DD E1         [14] 1119 	pop	ix
+   0567 C9            [10] 1120 	ret
+                           1121 ;widgets.c:219: void draw_label(unsigned char x, unsigned char y, char *text) {
+                           1122 ;	---------------------------------
+                           1123 ; Function draw_label
+                           1124 ; ---------------------------------
+   0568                    1125 _draw_label::
+   0568 DD E5         [15] 1126 	push	ix
+   056A DD 21 00 00   [14] 1127 	ld	ix,#0
+   056E DD 39         [15] 1128 	add	ix,sp
+                           1129 ;widgets.c:220: unsigned char *dst = SCRPTR(x, y);
+   0570 DD 5E 04      [19] 1130 	ld	e,4 (ix)
+   0573 16 00         [ 7] 1131 	ld	d,#0x00
+   0575 DD 6E 05      [19] 1132 	ld	l,5 (ix)
+   0578 26 00         [ 7] 1133 	ld	h,#0x00
+   057A 29            [11] 1134 	add	hl, hl
+   057B 29            [11] 1135 	add	hl, hl
+   057C 29            [11] 1136 	add	hl, hl
+   057D 4D            [ 4] 1137 	ld	c, l
+   057E 44            [ 4] 1138 	ld	b, h
+   057F 29            [11] 1139 	add	hl, hl
+   0580 29            [11] 1140 	add	hl, hl
+   0581 09            [11] 1141 	add	hl, bc
+   0582 29            [11] 1142 	add	hl, hl
+   0583 29            [11] 1143 	add	hl, hl
+   0584 29            [11] 1144 	add	hl, hl
+   0585 29            [11] 1145 	add	hl, hl
+   0586 19            [11] 1146 	add	hl,de
+   0587 5D            [ 4] 1147 	ld	e, l
+   0588 54            [ 4] 1148 	ld	d, h
+                           1149 ;widgets.c:221: char *p = text;
+   0589 DD 4E 06      [19] 1150 	ld	c,6 (ix)
+   058C DD 46 07      [19] 1151 	ld	b,7 (ix)
+                           1152 ;widgets.c:224: while(c = *p++) text_char(dst++, c);
+   058F                    1153 00101$:
+   058F 0A            [ 7] 1154 	ld	a,(bc)
+   0590 03            [ 6] 1155 	inc	bc
+   0591 67            [ 4] 1156 	ld	h,a
+   0592 B7            [ 4] 1157 	or	a, a
+   0593 28 13         [12] 1158 	jr	Z,00104$
+   0595 D5            [11] 1159 	push	de
+   0596 FD E1         [14] 1160 	pop	iy
+   0598 13            [ 6] 1161 	inc	de
+   0599 C5            [11] 1162 	push	bc
+   059A D5            [11] 1163 	push	de
+   059B E5            [11] 1164 	push	hl
+   059C 33            [ 6] 1165 	inc	sp
+   059D FD E5         [15] 1166 	push	iy
+   059F CDr00r00      [17] 1167 	call	_text_char
+   05A2 F1            [10] 1168 	pop	af
+   05A3 33            [ 6] 1169 	inc	sp
+   05A4 D1            [10] 1170 	pop	de
+   05A5 C1            [10] 1171 	pop	bc
+   05A6 18 E7         [12] 1172 	jr	00101$
+   05A8                    1173 00104$:
+   05A8 DD E1         [14] 1174 	pop	ix
+   05AA C9            [10] 1175 	ret
+                           1176 	.area _CODE
+                           1177 	.area _INITIALIZER
+                           1178 	.area _CABS (ABS)

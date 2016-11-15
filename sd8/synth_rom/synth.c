@@ -44,38 +44,199 @@ __sfr __at 0x32 mouse_but_reg;
 __sfr __at 0x40 FmgAddrPort;
 __sfr __at 0x41 FmgDataPort;
 
+enum {
+	W_LED,
+	W_M1,
+	W_C1,
+	W_M2,
+	W_C2,
+	W_CH_L,
+	W_CH_R,
+	W_RESET_LFO,
+	W_CONNECT,
+	W_LFO_WF,
+	W_LFO_FREQ,
+	W_LFO_MOD,
+	W_LFO_AMPLITUDE,
+
+	NB_CH_WIDGETS
+};
+
+#define NB_OP	11
+#define NB_DEV	1
+#define NB_OP_WIDGETS	(NB_DEV * NB_OP)
+#define NB_WIDGETS	(NB_CH_WIDGETS + NB_OP_WIDGETS)
+
+typedef struct {
+	unsigned char op;
+	unsigned char dev;
+} T_WData;
+
+T_Widget *widgets[NB_WIDGETS];
+
+int current_channel = 0;
+unsigned char key_config = YM_KEY_OFF;
+
 void ct1_clicked(T_Widget *widget) {
 	ym2151_setCT1(((T_Checkbox *)widget)->checked ? 1 : 0);
 }
 
-enum {
-	W_LED,
-	SPINNER1,
-	CHECKBOX1,
+void key_config_clicked(T_Widget *widget) {
+	key_config = YM_KEY_OFF;
+	key_config |= ((T_Checkbox *)widgets[W_M1])->checked ? YM_KEY_MOD1 : 0x00;
+	key_config |= ((T_Checkbox *)widgets[W_C1])->checked ? YM_KEY_CAR1 : 0x00;
+	key_config |= ((T_Checkbox *)widgets[W_M2])->checked ? YM_KEY_MOD2 : 0x00;
+	key_config |= ((T_Checkbox *)widgets[W_C2])->checked ? YM_KEY_CAR2 : 0x00;
+}
 
-	NB_WIDGETS
-};
+void channels_config_clicked(T_Widget *widget) {
+	unsigned char channels_config = 0;
 
-T_Widget *widgets[NB_WIDGETS];
+	channels_config |= ((T_Checkbox *)widgets[W_CH_L])->checked ? YM_LEFT : 0x00;
+	channels_config |= ((T_Checkbox *)widgets[W_CH_R])->checked ? YM_RIGHT : 0x00;
+	
+	ym2151_setChannels(current_channel, channels_config);
+}
+
+void reset_lfo_clicked(T_Widget *widget) {
+	ym2151_resetLFO();
+}
+
+void connection_changed(T_Widget *widget) {
+	ym2151_setConnections(current_channel, ((T_Spinner *)widget)->value);
+}
+
+void lfo_waveform_changed(T_Widget *widget) {
+	ym2151_setLFOWaveform(((T_Spinner *)widget)->value);
+}
+
+void lfo_frequency_changed(T_Widget *widget) {
+	ym2151_setLFOFrequency(((T_Spinner *)widget)->value);
+}
+
+void lfo_modulation_clicked(T_Widget *widget) {
+	ym2151_setLFOModulation(((T_Checkbox *)widget)->checked ? YM_PHASE : YM_AMPLITUDE);
+}
+
+void lfo_amplitude_changed(T_Widget *widget) {
+	ym2151_setLFOAmplitude(((T_Spinner *)widget)->value);
+}
+
+void op_value_changed(T_Widget *widget) {
+	T_WData *data = (T_WData *)(widget->user_data);
+	unsigned char value1, value2;
+
+//	printf("op data(%x): %d, %d  \r", data, data->op, data->dev);
+
+	switch(data->op) {
+		case 0:
+		case 1:
+			value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS])->value;
+			value2 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 1])->value;
+			ym2151_setDetune1PhaseMultiply(current_channel, data->dev, value1, value2); 
+			break;
+		case 2:
+			value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 2])->value;
+			ym2151_setTotalLevel(current_channel, data->dev, value1);
+			break;
+		case 3:
+		case 4:
+			value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 3])->value;
+			value2 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 4])->value;
+			ym2151_setKeyScalingAttackRate(current_channel, data->dev, value1, value2);
+			break;
+		case 5:
+		case 6:
+			value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 5])->value;
+			value2 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 6])->value;
+			ym2151_setAMSEnableDecayRate1(current_channel, data->dev, value1, value2);
+			break;
+		case 7:
+		case 8:
+			value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 7])->value;
+			value2 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 8])->value;
+			ym2151_setDetune2DecayRate2(current_channel, data->dev, value1, value2);
+			break;
+		case 9:
+		case 10:
+			value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 9])->value;
+			value2 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 10])->value;
+			ym2151_setDecayLevelReleaseRate(current_channel, data->dev, value1, value2);
+			break;
+	}
+}
 
 void init_ui() {
-	char i;
+	char i, j;
+	char op_lbl[NB_OP][6] = {"DT1:", "MUL:", "TL:", "KS:", "AR:", "AMS:", "D1R:", "DT2:", "D2R:", "D1L:", "RR:"};
+
+	memset(widgets, 0, sizeof(T_Widget *) * NB_WIDGETS);
 
 	draw_label(0, 0, "YMSoC v0.1");
 
 	draw_label(0, 2, "CT1:");
-	widgets[W_LED] = (T_Widget *)new_checkbox(5, 2);
+	widgets[W_LED] = (T_Widget *)new_checkbox(4, 2);
 	widgets[W_LED]->callback = ct1_clicked;
- 
-	draw_label(0, 4, "Value1:");
-	widgets[SPINNER1] = (T_Widget *)new_spinner(10, 4);
 
-	draw_label(0, 5, "Value2:");
-	widgets[CHECKBOX1] = (T_Widget *)new_checkbox(10, 5);
+	draw_label(7, 1, "M1C1M2C2");
+	widgets[W_M1] = (T_Widget *)new_checkbox(7, 2);
+	widgets[W_M1]->callback = key_config_clicked;
+	widgets[W_C1] = (T_Widget *)new_checkbox(9, 2);
+	widgets[W_C1]->callback = key_config_clicked;
+	widgets[W_M2] = (T_Widget *)new_checkbox(11, 2);
+	widgets[W_M2]->callback = key_config_clicked;
+	widgets[W_C2] = (T_Widget *)new_checkbox(13, 2);
+	widgets[W_C2]->callback = key_config_clicked;
+
+	draw_label(16, 2, "Channels:");
+	draw_label(25, 1, "Le");
+	draw_label(27, 1, "Ri");
+	widgets[W_CH_L] = (T_Widget *)new_checkbox(25, 2);
+	widgets[W_CH_L]->callback = channels_config_clicked;
+	widgets[W_CH_R] = (T_Widget *)new_checkbox(27, 2);
+	widgets[W_CH_R]->callback = channels_config_clicked;
+
+	draw_label(30, 2, "Connection:");
+	widgets[W_CONNECT] = (T_Widget *)new_spinner(41, 2);
+	spinner_setMax((T_Spinner *)widgets[W_CONNECT], 7);
+	widgets[W_CONNECT]->callback = connection_changed;
+  
+	// LFO
+	widgets[W_RESET_LFO] = (T_Widget *)new_button(0, 4, "Reset LFO");
+	widgets[W_RESET_LFO]->callback = reset_lfo_clicked;
+	draw_label(0, 5, "LFO Waveform:"); 
+	widgets[W_LFO_WF] = (T_Widget *)new_spinner(13, 5);
+	spinner_setMax((T_Spinner *)widgets[W_LFO_WF], 3);
+	widgets[W_LFO_WF]->callback = lfo_waveform_changed;
+	draw_label(16, 5, "Frequency:"); 
+	widgets[W_LFO_FREQ] = (T_Widget *)new_spinner(26, 5);
+	widgets[W_LFO_FREQ]->callback = lfo_frequency_changed;
+	draw_label(0, 6, "LFO Modulation (FM/PM):");
+	widgets[W_LFO_MOD] = (T_Widget *)new_checkbox(23, 6);
+	widgets[W_LFO_MOD]->callback = lfo_modulation_clicked;
+	draw_label(26, 6, "Amplitude:");
+	widgets[W_LFO_AMPLITUDE] = (T_Widget *)new_spinner(36, 6);
+	spinner_setMax((T_Spinner *)widgets[W_LFO_AMPLITUDE], 127);
+	widgets[W_LFO_AMPLITUDE]->callback = lfo_amplitude_changed;
+
+	// Operator Table
+	for (i = 0; i < NB_OP; i++) {
+		draw_label(0, 10 + i, op_lbl[i]);
+		for (j = 0; j < NB_DEV; j++) {
+			T_Widget *w = (T_Widget *)new_spinner(6 + j * 3, 10 + i);
+			T_WData *wd = (T_WData *)malloc(sizeof(T_WData));
+			wd->op = i;
+			wd->dev = YM_KEY_MOD1;
+			w->user_data = wd;
+			w->callback = op_value_changed;
+			widgets[NB_CH_WIDGETS + i * NB_DEV + j] = w;	
+		}
+	}
 
 	// Draw the UI
 	for (i = 0; i < NB_WIDGETS; i++) {
-		widget_redraw(widgets[i]);
+		if (widgets[i])
+			widget_redraw(widgets[i]);
 	}
 }
 
@@ -105,7 +266,7 @@ void left_click_event() {
 	char i;
 
 	for (i = 0; i < NB_WIDGETS; i++)
-		if (isInLayout(&(widgets[i]->layout), mouse_x, mouse_y)) {
+		if (widgets[i] && isInLayout(&(widgets[i]->layout), mouse_x, mouse_y)) {
 			widget_event(widgets[i], EVENT_LEFT_CLICK);
 			if (widgets[i]->dirty)
 				widget_redraw(widgets[i]);
@@ -116,7 +277,7 @@ void right_click_event() {
 	char i;
 
 	for (i = 0; i < NB_WIDGETS; i++)
-		if (isInLayout(&(widgets[i]->layout), mouse_x, mouse_y)) {
+		if (widgets[i] && isInLayout(&(widgets[i]->layout), mouse_x, mouse_y)) {
 			widget_event(widgets[i], EVENT_RIGHT_CLICK);
 			if (widgets[i]->dirty)
 				widget_redraw(widgets[i]);
@@ -269,6 +430,7 @@ void ei() {
 
 void main() {
 	char i;
+	char prev_keys, current_keys = 0;
 
 	init_interrupt_table();
 
@@ -288,6 +450,8 @@ void main() {
 	// Set palette
 	*(unsigned char*)0x7f20 = BG_COLOR;
 
+	ym2151_init();
+
 	// draw UI
 	init_ui();
 
@@ -296,29 +460,19 @@ void main() {
 
 	// Enter main loop
 	do {
-		char c = keys;
-		char ch = 0;
+		char mask;
 
-		if (c & 0x1) { 	// Space
-			ym2151_write(0x20, 0xC0);	// L/R
-			// Setup
-			ym2151_write(0x28 + ch, 0x00);
-			ym2151_write(0x30 + ch, 0x00);
-			ym2151_write(0x38 + ch, 0x00);
-			ym2151_write(0x40 + ch, 0x00);
-			ym2151_write(0x60 + ch, 0x00);
-			ym2151_write(0x80 + ch, 0x00);
-			ym2151_write(0xA0 + ch, 0x00);
-			ym2151_write(0xC0 + ch, 0x00);
-			ym2151_write(0xE0 + ch, 0x00);
-		}
-		if (c & 0x2) {	// S
-			ym2151_setCT1(1);
-			ym2151_write(0x08, 0x40);	// K_ON, MOD1, CH0
-
-		}
-		if (c & 0x4) {	// C
-			ym2151_write(0x08, 0x00);	// K_OFF, CH0
+		prev_keys = current_keys;
+		current_keys = keys;
+		mask = 0x1;
+		for (i = 0; i < 8; i++) {
+			if (!(prev_keys & mask) && (current_keys & mask)) { // key pressed
+				ym2151_setKeyNote(current_channel, 4, i);
+				ym2151_setKeyState(current_channel, key_config);
+			} else if ((prev_keys & mask) && !(current_keys & mask)) { // key released
+				ym2151_setKeyState(current_channel, YM_KEY_OFF);
+			}
+			mask <<= 1;
 		}
 
 	} while(1);

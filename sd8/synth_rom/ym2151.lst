@@ -1,7 +1,7 @@
                               1 ;--------------------------------------------------------
                               2 ; File Created by SDCC : free open source ANSI-C Compiler
                               3 ; Version 3.5.0 #9253 (Mar 24 2016) (Linux)
-                              4 ; This file was generated Tue Nov  8 14:11:26 2016
+                              4 ; This file was generated Thu Nov 10 13:21:35 2016
                               5 ;--------------------------------------------------------
                               6 	.module ym2151
                               7 	.optsdcc -mz80
@@ -9,402 +9,1263 @@
                               9 ;--------------------------------------------------------
                              10 ; Public variables in this module
                              11 ;--------------------------------------------------------
-                             12 	.globl _ym2151_setLFOAmplitude
-                             13 	.globl __wait_busy
-                             14 	.globl _ym2151_write
-                             15 	.globl _ym2151_read
-                             16 	.globl _ym2151_setCT1
-                             17 	.globl _ym2151_setCT2
-                             18 	.globl _ym2151_setLFOWaveform
-                             19 	.globl _ym2151_setLFOFrequency
-                             20 	.globl _ym2151_setLFOModulation
-                             21 	.globl _ym2151_resetLFO
-                             22 	.globl _ym2151_setNoiseEnable
-                             23 	.globl _ym2151_setNoiseFrequency
-                             24 	.globl _ym2151_setKeyState
-                             25 	.globl _ym2151_setChannels
-                             26 	.globl _ym2151_setConnections
-                             27 ;--------------------------------------------------------
-                             28 ; special function registers
-                             29 ;--------------------------------------------------------
-                     0040    30 _FmgAddrPort	=	0x0040
-                     0041    31 _FmgDataPort	=	0x0041
-                             32 ;--------------------------------------------------------
-                             33 ; ram data
-                             34 ;--------------------------------------------------------
-                             35 	.area _DATA
-                             36 ;--------------------------------------------------------
-                             37 ; ram data
-                             38 ;--------------------------------------------------------
-                             39 	.area _INITIALIZED
-                             40 ;--------------------------------------------------------
-                             41 ; absolute external ram data
+                             12 	.globl __wait_busy
+                             13 	.globl _nb_bits
+                             14 	.globl _dbg_print
+                             15 	.globl _text_hex
+                             16 	.globl _text_char
+                             17 	.globl _registers
+                             18 	.globl _ym2151_init
+                             19 	.globl _ym2151_write
+                             20 	.globl _ym2151_setCT1
+                             21 	.globl _ym2151_setCT2
+                             22 	.globl _ym2151_setLFOWaveform
+                             23 	.globl _ym2151_setLFOFrequency
+                             24 	.globl _ym2151_setLFOModulation
+                             25 	.globl _ym2151_setLFOAmplitude
+                             26 	.globl _ym2151_resetLFO
+                             27 	.globl _ym2151_setNoiseEnable
+                             28 	.globl _ym2151_setNoiseFrequency
+                             29 	.globl _ym2151_setKeyState
+                             30 	.globl _ym2151_setKeyNote
+                             31 	.globl _ym2151_setKeyFraction
+                             32 	.globl _ym2151_setChannels
+                             33 	.globl _ym2151_setConnections
+                             34 	.globl _ym2151_setAmplitudeModulationSensitivity
+                             35 	.globl _ym2151_setPhaseModulationSensitivity
+                             36 	.globl _ym2151_setDetune1PhaseMultiply
+                             37 	.globl _ym2151_setTotalLevel
+                             38 	.globl _ym2151_setKeyScalingAttackRate
+                             39 	.globl _ym2151_setAMSEnableDecayRate1
+                             40 	.globl _ym2151_setDetune2DecayRate2
+                             41 	.globl _ym2151_setDecayLevelReleaseRate
                              42 ;--------------------------------------------------------
-                             43 	.area _DABS (ABS)
+                             43 ; special function registers
                              44 ;--------------------------------------------------------
-                             45 ; global & static initialisations
-                             46 ;--------------------------------------------------------
-                             47 	.area _HOME
-                             48 	.area _GSINIT
-                             49 	.area _GSFINAL
-                             50 	.area _GSINIT
-                             51 ;--------------------------------------------------------
-                             52 ; Home
+                     0040    45 _FmgAddrPort	=	0x0040
+                     0041    46 _FmgDataPort	=	0x0041
+                             47 ;--------------------------------------------------------
+                             48 ; ram data
+                             49 ;--------------------------------------------------------
+                             50 	.area _DATA
+   0000                      51 _registers::
+   0000                      52 	.ds 21
                              53 ;--------------------------------------------------------
-                             54 	.area _HOME
-                             55 	.area _HOME
-                             56 ;--------------------------------------------------------
-                             57 ; code
-                             58 ;--------------------------------------------------------
-                             59 	.area _CODE
-                             60 ;ym2151.c:5: void _wait_busy() {
-                             61 ;	---------------------------------
-                             62 ; Function _wait_busy
-                             63 ; ---------------------------------
-   0000                      64 __wait_busy::
-                             65 ;ym2151.c:9: for (i = 0; (FmgAddrPort & 0x80) && (i < 100); i++);
-   0000 11 00 00      [10]   66 	ld	de,#0x0000
-   0003                      67 00104$:
-   0003 DB 40         [11]   68 	in	a,(_FmgAddrPort)
-   0005 07            [ 4]   69 	rlca
-   0006 D0            [11]   70 	ret	NC
-   0007 7B            [ 4]   71 	ld	a,e
-   0008 D6 64         [ 7]   72 	sub	a, #0x64
-   000A 7A            [ 4]   73 	ld	a,d
-   000B 17            [ 4]   74 	rla
-   000C 3F            [ 4]   75 	ccf
-   000D 1F            [ 4]   76 	rra
-   000E DE 80         [ 7]   77 	sbc	a, #0x80
-   0010 D0            [11]   78 	ret	NC
-   0011 13            [ 6]   79 	inc	de
-   0012 18 EF         [12]   80 	jr	00104$
-                             81 ;ym2151.c:12: void ym2151_write(unsigned char reg, unsigned char value) {
-                             82 ;	---------------------------------
-                             83 ; Function ym2151_write
-                             84 ; ---------------------------------
-   0014                      85 _ym2151_write::
-                             86 ;ym2151.c:14: _wait_busy();
-   0014 CDr00r00      [17]   87 	call	__wait_busy
-                             88 ;ym2151.c:16: FmgAddrPort = reg;
-   0017 21 02 00      [10]   89 	ld	hl, #2+0
-   001A 39            [11]   90 	add	hl, sp
-   001B 7E            [ 7]   91 	ld	a, (hl)
-   001C D3 40         [11]   92 	out	(_FmgAddrPort),a
-                             93 ;ym2151.c:17: FmgDataPort = value;
-   001E 21 03 00      [10]   94 	ld	hl, #3+0
-   0021 39            [11]   95 	add	hl, sp
-   0022 7E            [ 7]   96 	ld	a, (hl)
-   0023 D3 41         [11]   97 	out	(_FmgDataPort),a
-   0025 C9            [10]   98 	ret
-                             99 ;ym2151.c:20: unsigned char ym2151_read(unsigned char reg) {
-                            100 ;	---------------------------------
-                            101 ; Function ym2151_read
-                            102 ; ---------------------------------
-   0026                     103 _ym2151_read::
-                            104 ;ym2151.c:21: _wait_busy();
-   0026 CDr00r00      [17]  105 	call	__wait_busy
-                            106 ;ym2151.c:23: FmgAddrPort = reg;
-   0029 21 02 00      [10]  107 	ld	hl, #2+0
-   002C 39            [11]  108 	add	hl, sp
-   002D 7E            [ 7]  109 	ld	a, (hl)
-   002E D3 40         [11]  110 	out	(_FmgAddrPort),a
-                            111 ;ym2151.c:24: return FmgDataPort;
-   0030 DB 41         [11]  112 	in	a,(_FmgDataPort)
-   0032 6F            [ 4]  113 	ld	l,a
-   0033 C9            [10]  114 	ret
-                            115 ;ym2151.c:27: void ym2151_setCT1(unsigned char value) {
-                            116 ;	---------------------------------
-                            117 ; Function ym2151_setCT1
-                            118 ; ---------------------------------
-   0034                     119 _ym2151_setCT1::
-                            120 ;ym2151.c:28: unsigned char reg = ym2151_read(0x1B);
-   0034 3E 1B         [ 7]  121 	ld	a,#0x1B
-   0036 F5            [11]  122 	push	af
-   0037 33            [ 6]  123 	inc	sp
-   0038 CDr26r00      [17]  124 	call	_ym2151_read
-   003B 33            [ 6]  125 	inc	sp
-   003C 65            [ 4]  126 	ld	h,l
-                            127 ;ym2151.c:30: ym2151_write(0x1B, value ? reg | 0x40 : reg & 0xBF);
-   003D FD 21 02 00   [14]  128 	ld	iy,#2
-   0041 FD 39         [15]  129 	add	iy,sp
-   0043 FD 7E 00      [19]  130 	ld	a,0 (iy)
-   0046 B7            [ 4]  131 	or	a, a
-   0047 28 04         [12]  132 	jr	Z,00103$
-   0049 CB F4         [ 8]  133 	set	6, h
-   004B 18 02         [12]  134 	jr	00104$
-   004D                     135 00103$:
-   004D CB B4         [ 8]  136 	res	6, h
-   004F                     137 00104$:
-   004F E5            [11]  138 	push	hl
-   0050 33            [ 6]  139 	inc	sp
-   0051 3E 1B         [ 7]  140 	ld	a,#0x1B
-   0053 F5            [11]  141 	push	af
-   0054 33            [ 6]  142 	inc	sp
-   0055 CDr14r00      [17]  143 	call	_ym2151_write
-   0058 F1            [10]  144 	pop	af
-   0059 C9            [10]  145 	ret
-                            146 ;ym2151.c:33: void ym2151_setCT2(unsigned char value) {
-                            147 ;	---------------------------------
-                            148 ; Function ym2151_setCT2
-                            149 ; ---------------------------------
-   005A                     150 _ym2151_setCT2::
-                            151 ;ym2151.c:34: unsigned char reg = ym2151_read(0x1B);
-   005A 3E 1B         [ 7]  152 	ld	a,#0x1B
-   005C F5            [11]  153 	push	af
-   005D 33            [ 6]  154 	inc	sp
-   005E CDr26r00      [17]  155 	call	_ym2151_read
-   0061 33            [ 6]  156 	inc	sp
-   0062 65            [ 4]  157 	ld	h,l
-                            158 ;ym2151.c:36: ym2151_write(0x1B, value ? reg | 0x80 : reg & 0x7F);
-   0063 FD 21 02 00   [14]  159 	ld	iy,#2
-   0067 FD 39         [15]  160 	add	iy,sp
-   0069 FD 7E 00      [19]  161 	ld	a,0 (iy)
-   006C B7            [ 4]  162 	or	a, a
-   006D 28 04         [12]  163 	jr	Z,00103$
-   006F CB FC         [ 8]  164 	set	7, h
-   0071 18 02         [12]  165 	jr	00104$
-   0073                     166 00103$:
-   0073 CB BC         [ 8]  167 	res	7, h
-   0075                     168 00104$:
-   0075 E5            [11]  169 	push	hl
-   0076 33            [ 6]  170 	inc	sp
-   0077 3E 1B         [ 7]  171 	ld	a,#0x1B
-   0079 F5            [11]  172 	push	af
-   007A 33            [ 6]  173 	inc	sp
-   007B CDr14r00      [17]  174 	call	_ym2151_write
-   007E F1            [10]  175 	pop	af
-   007F C9            [10]  176 	ret
-                            177 ;ym2151.c:39: void ym2151_setLFOWaveform(E_YM_WAVEFORM wf) {
-                            178 ;	---------------------------------
-                            179 ; Function ym2151_setLFOWaveform
-                            180 ; ---------------------------------
-   0080                     181 _ym2151_setLFOWaveform::
-                            182 ;ym2151.c:40: unsigned char reg = ym2151_read(0x1B);
-   0080 3E 1B         [ 7]  183 	ld	a,#0x1B
-   0082 F5            [11]  184 	push	af
-   0083 33            [ 6]  185 	inc	sp
-   0084 CDr26r00      [17]  186 	call	_ym2151_read
-   0087 33            [ 6]  187 	inc	sp
-   0088 7D            [ 4]  188 	ld	a,l
-                            189 ;ym2151.c:42: ym2151_write(0x1B, (reg & 0xFC) | wf);
-   0089 E6 FC         [ 7]  190 	and	a, #0xFC
-   008B 21 02 00      [10]  191 	ld	hl, #2+0
-   008E 39            [11]  192 	add	hl, sp
-   008F B6            [ 7]  193 	or	a, (hl)
-   0090 57            [ 4]  194 	ld	d,a
-   0091 1E 1B         [ 7]  195 	ld	e,#0x1B
-   0093 D5            [11]  196 	push	de
-   0094 CDr14r00      [17]  197 	call	_ym2151_write
-   0097 F1            [10]  198 	pop	af
-   0098 C9            [10]  199 	ret
-                            200 ;ym2151.c:45: void ym2151_setLFOFrequency(unsigned char value) {
-                            201 ;	---------------------------------
-                            202 ; Function ym2151_setLFOFrequency
-                            203 ; ---------------------------------
-   0099                     204 _ym2151_setLFOFrequency::
-                            205 ;ym2151.c:46: ym2151_write(0x18, value);
-   0099 21 02 00      [10]  206 	ld	hl, #2+0
-   009C 39            [11]  207 	add	hl, sp
-   009D 56            [ 7]  208 	ld	d, (hl)
-   009E 1E 18         [ 7]  209 	ld	e,#0x18
-   00A0 D5            [11]  210 	push	de
-   00A1 CDr14r00      [17]  211 	call	_ym2151_write
-   00A4 F1            [10]  212 	pop	af
-   00A5 C9            [10]  213 	ret
-                            214 ;ym2151.c:49: void ym2151_setLFOModulation(E_YM_MODULATION mod) {
-                            215 ;	---------------------------------
-                            216 ; Function ym2151_setLFOModulation
-                            217 ; ---------------------------------
-   00A6                     218 _ym2151_setLFOModulation::
-                            219 ;ym2151.c:50: unsigned char reg = ym2151_read(0x19);
-   00A6 3E 19         [ 7]  220 	ld	a,#0x19
-   00A8 F5            [11]  221 	push	af
-   00A9 33            [ 6]  222 	inc	sp
-   00AA CDr26r00      [17]  223 	call	_ym2151_read
-   00AD 33            [ 6]  224 	inc	sp
-   00AE 7D            [ 4]  225 	ld	a,l
-                            226 ;ym2151.c:52: ym2151_write(0x19, (reg & 0x7F) | mod); 
-   00AF E6 7F         [ 7]  227 	and	a, #0x7F
-   00B1 21 02 00      [10]  228 	ld	hl, #2+0
-   00B4 39            [11]  229 	add	hl, sp
-   00B5 B6            [ 7]  230 	or	a, (hl)
-   00B6 57            [ 4]  231 	ld	d,a
-   00B7 1E 19         [ 7]  232 	ld	e,#0x19
-   00B9 D5            [11]  233 	push	de
-   00BA CDr14r00      [17]  234 	call	_ym2151_write
-   00BD F1            [10]  235 	pop	af
-   00BE C9            [10]  236 	ret
-                            237 ;ym2151.c:55: void ym2151_setLFOAmplitude(unsigned char value) {
-                            238 ;	---------------------------------
-                            239 ; Function ym2151_setLFOAmplitude
-                            240 ; ---------------------------------
-   00BF                     241 _ym2151_setLFOAmplitude::
-                            242 ;ym2151.c:56: unsigned char reg = ym2151_read(0x19);
-   00BF 3E 19         [ 7]  243 	ld	a,#0x19
-   00C1 F5            [11]  244 	push	af
-   00C2 33            [ 6]  245 	inc	sp
-   00C3 CDr26r00      [17]  246 	call	_ym2151_read
-   00C6 33            [ 6]  247 	inc	sp
-   00C7 7D            [ 4]  248 	ld	a,l
-                            249 ;ym2151.c:58: ym2151_write(0x19, (reg & 0x80) | (value & 0x7F)); 
-   00C8 E6 80         [ 7]  250 	and	a, #0x80
-   00CA 67            [ 4]  251 	ld	h,a
-   00CB FD 21 02 00   [14]  252 	ld	iy,#2
-   00CF FD 39         [15]  253 	add	iy,sp
-   00D1 FD 7E 00      [19]  254 	ld	a,0 (iy)
-   00D4 E6 7F         [ 7]  255 	and	a, #0x7F
-   00D6 B4            [ 4]  256 	or	a, h
-   00D7 57            [ 4]  257 	ld	d,a
-   00D8 1E 19         [ 7]  258 	ld	e,#0x19
-   00DA D5            [11]  259 	push	de
-   00DB CDr14r00      [17]  260 	call	_ym2151_write
-   00DE F1            [10]  261 	pop	af
-   00DF C9            [10]  262 	ret
-                            263 ;ym2151.c:61: void ym2151_resetLFO() {
-                            264 ;	---------------------------------
-                            265 ; Function ym2151_resetLFO
-                            266 ; ---------------------------------
-   00E0                     267 _ym2151_resetLFO::
-                            268 ;ym2151.c:62: unsigned char reg = ym2151_read(0x01);
-   00E0 3E 01         [ 7]  269 	ld	a,#0x01
-   00E2 F5            [11]  270 	push	af
-   00E3 33            [ 6]  271 	inc	sp
-   00E4 CDr26r00      [17]  272 	call	_ym2151_read
-   00E7 33            [ 6]  273 	inc	sp
-   00E8 7D            [ 4]  274 	ld	a,l
-                            275 ;ym2151.c:64: ym2151_write(0x01, reg ^ 0x02);
-   00E9 EE 02         [ 7]  276 	xor	a, #0x02
-   00EB 57            [ 4]  277 	ld	d,a
-   00EC 1E 01         [ 7]  278 	ld	e,#0x01
-   00EE D5            [11]  279 	push	de
-   00EF CDr14r00      [17]  280 	call	_ym2151_write
-   00F2 F1            [10]  281 	pop	af
-   00F3 C9            [10]  282 	ret
-                            283 ;ym2151.c:67: void ym2151_setNoiseEnable(unsigned char value) {
-                            284 ;	---------------------------------
-                            285 ; Function ym2151_setNoiseEnable
-                            286 ; ---------------------------------
-   00F4                     287 _ym2151_setNoiseEnable::
-                            288 ;ym2151.c:68: unsigned char reg = ym2151_read(0x0F);
-   00F4 3E 0F         [ 7]  289 	ld	a,#0x0F
-   00F6 F5            [11]  290 	push	af
-   00F7 33            [ 6]  291 	inc	sp
-   00F8 CDr26r00      [17]  292 	call	_ym2151_read
-   00FB 33            [ 6]  293 	inc	sp
-   00FC 65            [ 4]  294 	ld	h,l
-                            295 ;ym2151.c:70: ym2151_write(0x0F, value ? reg | 0x80 : reg & 0x7F); 
-   00FD FD 21 02 00   [14]  296 	ld	iy,#2
-   0101 FD 39         [15]  297 	add	iy,sp
-   0103 FD 7E 00      [19]  298 	ld	a,0 (iy)
-   0106 B7            [ 4]  299 	or	a, a
-   0107 28 04         [12]  300 	jr	Z,00103$
-   0109 CB FC         [ 8]  301 	set	7, h
-   010B 18 02         [12]  302 	jr	00104$
-   010D                     303 00103$:
-   010D CB BC         [ 8]  304 	res	7, h
-   010F                     305 00104$:
-   010F E5            [11]  306 	push	hl
-   0110 33            [ 6]  307 	inc	sp
-   0111 3E 0F         [ 7]  308 	ld	a,#0x0F
-   0113 F5            [11]  309 	push	af
-   0114 33            [ 6]  310 	inc	sp
-   0115 CDr14r00      [17]  311 	call	_ym2151_write
-   0118 F1            [10]  312 	pop	af
-   0119 C9            [10]  313 	ret
-                            314 ;ym2151.c:73: void ym2151_setNoiseFrequency(unsigned char value) {
+                             54 ; ram data
+                             55 ;--------------------------------------------------------
+                             56 	.area _INITIALIZED
+                             57 ;--------------------------------------------------------
+                             58 ; absolute external ram data
+                             59 ;--------------------------------------------------------
+                             60 	.area _DABS (ABS)
+                             61 ;--------------------------------------------------------
+                             62 ; global & static initialisations
+                             63 ;--------------------------------------------------------
+                             64 	.area _HOME
+                             65 	.area _GSINIT
+                             66 	.area _GSFINAL
+                             67 	.area _GSINIT
+                             68 ;--------------------------------------------------------
+                             69 ; Home
+                             70 ;--------------------------------------------------------
+                             71 	.area _HOME
+                             72 	.area _HOME
+                             73 ;--------------------------------------------------------
+                             74 ; code
+                             75 ;--------------------------------------------------------
+                             76 	.area _CODE
+                             77 ;ym2151.c:10: void dbg_print(unsigned char reg, unsigned char value, unsigned char i, unsigned char j) {
+                             78 ;	---------------------------------
+                             79 ; Function dbg_print
+                             80 ; ---------------------------------
+   0000                      81 _dbg_print::
+                             82 ;ym2151.c:13: text_char(dst, 'R');
+   0000 3E 52         [ 7]   83 	ld	a,#0x52
+   0002 F5            [11]   84 	push	af
+   0003 33            [ 6]   85 	inc	sp
+   0004 21 80 48      [10]   86 	ld	hl,#0x4880
+   0007 E5            [11]   87 	push	hl
+   0008 CDr00r00      [17]   88 	call	_text_char
+   000B F1            [10]   89 	pop	af
+   000C 33            [ 6]   90 	inc	sp
+                             91 ;ym2151.c:14: text_hex(dst+1, reg);
+   000D 21 02 00      [10]   92 	ld	hl, #2+0
+   0010 39            [11]   93 	add	hl, sp
+   0011 7E            [ 7]   94 	ld	a, (hl)
+   0012 F5            [11]   95 	push	af
+   0013 33            [ 6]   96 	inc	sp
+   0014 21 81 48      [10]   97 	ld	hl,#0x4881
+   0017 E5            [11]   98 	push	hl
+   0018 CDr00r00      [17]   99 	call	_text_hex
+   001B F1            [10]  100 	pop	af
+   001C 33            [ 6]  101 	inc	sp
+                            102 ;ym2151.c:15: text_char(dst+3, '=');
+   001D 3E 3D         [ 7]  103 	ld	a,#0x3D
+   001F F5            [11]  104 	push	af
+   0020 33            [ 6]  105 	inc	sp
+   0021 21 83 48      [10]  106 	ld	hl,#0x4883
+   0024 E5            [11]  107 	push	hl
+   0025 CDr00r00      [17]  108 	call	_text_char
+   0028 F1            [10]  109 	pop	af
+   0029 33            [ 6]  110 	inc	sp
+                            111 ;ym2151.c:16: text_hex(dst+4, value);
+   002A 21 03 00      [10]  112 	ld	hl, #3+0
+   002D 39            [11]  113 	add	hl, sp
+   002E 7E            [ 7]  114 	ld	a, (hl)
+   002F F5            [11]  115 	push	af
+   0030 33            [ 6]  116 	inc	sp
+   0031 21 84 48      [10]  117 	ld	hl,#0x4884
+   0034 E5            [11]  118 	push	hl
+   0035 CDr00r00      [17]  119 	call	_text_hex
+   0038 F1            [10]  120 	pop	af
+   0039 33            [ 6]  121 	inc	sp
+                            122 ;ym2151.c:18: text_hex(dst+8, i);
+   003A 21 04 00      [10]  123 	ld	hl, #4+0
+   003D 39            [11]  124 	add	hl, sp
+   003E 7E            [ 7]  125 	ld	a, (hl)
+   003F F5            [11]  126 	push	af
+   0040 33            [ 6]  127 	inc	sp
+   0041 21 88 48      [10]  128 	ld	hl,#0x4888
+   0044 E5            [11]  129 	push	hl
+   0045 CDr00r00      [17]  130 	call	_text_hex
+   0048 F1            [10]  131 	pop	af
+   0049 33            [ 6]  132 	inc	sp
+                            133 ;ym2151.c:19: text_hex(dst+11, j);
+   004A 21 05 00      [10]  134 	ld	hl, #5+0
+   004D 39            [11]  135 	add	hl, sp
+   004E 7E            [ 7]  136 	ld	a, (hl)
+   004F F5            [11]  137 	push	af
+   0050 33            [ 6]  138 	inc	sp
+   0051 21 8B 48      [10]  139 	ld	hl,#0x488B
+   0054 E5            [11]  140 	push	hl
+   0055 CDr00r00      [17]  141 	call	_text_hex
+   0058 F1            [10]  142 	pop	af
+   0059 33            [ 6]  143 	inc	sp
+   005A C9            [10]  144 	ret
+                            145 ;ym2151.c:22: unsigned char nb_bits(unsigned char quartet) {
+                            146 ;	---------------------------------
+                            147 ; Function nb_bits
+                            148 ; ---------------------------------
+   005B                     149 _nb_bits::
+   005B 21 F0 FF      [10]  150 	ld	hl,#-16
+   005E 39            [11]  151 	add	hl,sp
+   005F F9            [ 6]  152 	ld	sp,hl
+                            153 ;ym2151.c:23: unsigned char nb[16] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4};
+   0060 21 00 00      [10]  154 	ld	hl,#0x0000
+   0063 39            [11]  155 	add	hl,sp
+   0064 EB            [ 4]  156 	ex	de,hl
+   0065 AF            [ 4]  157 	xor	a, a
+   0066 12            [ 7]  158 	ld	(de),a
+   0067 6B            [ 4]  159 	ld	l, e
+   0068 62            [ 4]  160 	ld	h, d
+   0069 23            [ 6]  161 	inc	hl
+   006A 36 01         [10]  162 	ld	(hl),#0x01
+   006C 6B            [ 4]  163 	ld	l, e
+   006D 62            [ 4]  164 	ld	h, d
+   006E 23            [ 6]  165 	inc	hl
+   006F 23            [ 6]  166 	inc	hl
+   0070 36 01         [10]  167 	ld	(hl),#0x01
+   0072 6B            [ 4]  168 	ld	l, e
+   0073 62            [ 4]  169 	ld	h, d
+   0074 23            [ 6]  170 	inc	hl
+   0075 23            [ 6]  171 	inc	hl
+   0076 23            [ 6]  172 	inc	hl
+   0077 36 02         [10]  173 	ld	(hl),#0x02
+   0079 21 04 00      [10]  174 	ld	hl,#0x0004
+   007C 19            [11]  175 	add	hl,de
+   007D 36 01         [10]  176 	ld	(hl),#0x01
+   007F 21 05 00      [10]  177 	ld	hl,#0x0005
+   0082 19            [11]  178 	add	hl,de
+   0083 36 02         [10]  179 	ld	(hl),#0x02
+   0085 21 06 00      [10]  180 	ld	hl,#0x0006
+   0088 19            [11]  181 	add	hl,de
+   0089 36 02         [10]  182 	ld	(hl),#0x02
+   008B 21 07 00      [10]  183 	ld	hl,#0x0007
+   008E 19            [11]  184 	add	hl,de
+   008F 36 03         [10]  185 	ld	(hl),#0x03
+   0091 21 08 00      [10]  186 	ld	hl,#0x0008
+   0094 19            [11]  187 	add	hl,de
+   0095 36 01         [10]  188 	ld	(hl),#0x01
+   0097 21 09 00      [10]  189 	ld	hl,#0x0009
+   009A 19            [11]  190 	add	hl,de
+   009B 36 02         [10]  191 	ld	(hl),#0x02
+   009D 21 0A 00      [10]  192 	ld	hl,#0x000A
+   00A0 19            [11]  193 	add	hl,de
+   00A1 36 02         [10]  194 	ld	(hl),#0x02
+   00A3 21 0B 00      [10]  195 	ld	hl,#0x000B
+   00A6 19            [11]  196 	add	hl,de
+   00A7 36 03         [10]  197 	ld	(hl),#0x03
+   00A9 21 0C 00      [10]  198 	ld	hl,#0x000C
+   00AC 19            [11]  199 	add	hl,de
+   00AD 36 02         [10]  200 	ld	(hl),#0x02
+   00AF 21 0D 00      [10]  201 	ld	hl,#0x000D
+   00B2 19            [11]  202 	add	hl,de
+   00B3 36 03         [10]  203 	ld	(hl),#0x03
+   00B5 21 0E 00      [10]  204 	ld	hl,#0x000E
+   00B8 19            [11]  205 	add	hl,de
+   00B9 36 03         [10]  206 	ld	(hl),#0x03
+   00BB 21 0F 00      [10]  207 	ld	hl,#0x000F
+   00BE 19            [11]  208 	add	hl,de
+   00BF 36 04         [10]  209 	ld	(hl),#0x04
+                            210 ;ym2151.c:25: return nb[quartet & 0x0f];
+   00C1 21 12 00      [10]  211 	ld	hl, #18+0
+   00C4 39            [11]  212 	add	hl, sp
+   00C5 7E            [ 7]  213 	ld	a, (hl)
+   00C6 E6 0F         [ 7]  214 	and	a, #0x0F
+   00C8 6F            [ 4]  215 	ld	l, a
+   00C9 26 00         [ 7]  216 	ld	h,#0x00
+   00CB 19            [11]  217 	add	hl,de
+   00CC 6E            [ 7]  218 	ld	l,(hl)
+   00CD FD 21 10 00   [14]  219 	ld	iy,#16
+   00D1 FD 39         [15]  220 	add	iy,sp
+   00D3 FD F9         [10]  221 	ld	sp,iy
+   00D5 C9            [10]  222 	ret
+                            223 ;ym2151.c:28: unsigned char _wait_busy() {
+                            224 ;	---------------------------------
+                            225 ; Function _wait_busy
+                            226 ; ---------------------------------
+   00D6                     227 __wait_busy::
+                            228 ;ym2151.c:32: for (i = 0; (FmgDataPort & 0x80) && (i < 100); i++);
+   00D6 16 00         [ 7]  229 	ld	d,#0x00
+   00D8                     230 00104$:
+   00D8 DB 41         [11]  231 	in	a,(_FmgDataPort)
+   00DA 07            [ 4]  232 	rlca
+   00DB 30 08         [12]  233 	jr	NC,00101$
+   00DD 7A            [ 4]  234 	ld	a,d
+   00DE D6 64         [ 7]  235 	sub	a, #0x64
+   00E0 30 03         [12]  236 	jr	NC,00101$
+   00E2 14            [ 4]  237 	inc	d
+   00E3 18 F3         [12]  238 	jr	00104$
+   00E5                     239 00101$:
+                            240 ;ym2151.c:34: return i;
+   00E5 6A            [ 4]  241 	ld	l,d
+   00E6 C9            [10]  242 	ret
+                            243 ;ym2151.c:37: void ym2151_init() {
+                            244 ;	---------------------------------
+                            245 ; Function ym2151_init
+                            246 ; ---------------------------------
+   00E7                     247 _ym2151_init::
+                            248 ;ym2151.c:40: memset(&registers, 0, sizeof(struct s_ym2151_registers));
+   00E7 21r00r00      [10]  249 	ld	hl,#_registers
+   00EA 06 15         [ 7]  250 	ld	b, #0x15
+   00EC                     251 00111$:
+   00EC 36 00         [10]  252 	ld	(hl), #0x00
+   00EE 23            [ 6]  253 	inc	hl
+   00EF 10 FB         [13]  254 	djnz	00111$
+                            255 ;ym2151.c:42: ym2151_write(0x01, registers._0x01_);
+   00F1 3Ar00r00      [13]  256 	ld	a, (#_registers + 0)
+   00F4 57            [ 4]  257 	ld	d,a
+   00F5 1E 01         [ 7]  258 	ld	e,#0x01
+   00F7 D5            [11]  259 	push	de
+   00F8 CDr45r01      [17]  260 	call	_ym2151_write
+   00FB F1            [10]  261 	pop	af
+                            262 ;ym2151.c:43: ym2151_write(0x0F, registers._0x0F_);
+   00FC 3Ar01r00      [13]  263 	ld	a, (#_registers + 1)
+   00FF 57            [ 4]  264 	ld	d,a
+   0100 1E 0F         [ 7]  265 	ld	e,#0x0F
+   0102 D5            [11]  266 	push	de
+   0103 CDr45r01      [17]  267 	call	_ym2151_write
+   0106 F1            [10]  268 	pop	af
+                            269 ;ym2151.c:44: ym2151_write(0x18, registers._0x18_);
+   0107 3Ar02r00      [13]  270 	ld	a, (#_registers + 2)
+   010A 57            [ 4]  271 	ld	d,a
+   010B 1E 18         [ 7]  272 	ld	e,#0x18
+   010D D5            [11]  273 	push	de
+   010E CDr45r01      [17]  274 	call	_ym2151_write
+   0111 F1            [10]  275 	pop	af
+                            276 ;ym2151.c:45: ym2151_write(0x19, registers._0x19_);
+   0112 3Ar03r00      [13]  277 	ld	a, (#_registers + 3)
+   0115 57            [ 4]  278 	ld	d,a
+   0116 1E 19         [ 7]  279 	ld	e,#0x19
+   0118 D5            [11]  280 	push	de
+   0119 CDr45r01      [17]  281 	call	_ym2151_write
+   011C F1            [10]  282 	pop	af
+                            283 ;ym2151.c:46: ym2151_write(0x1B, registers._0x1B_);
+   011D 3Ar04r00      [13]  284 	ld	a, (#_registers + 4)
+   0120 57            [ 4]  285 	ld	d,a
+   0121 1E 1B         [ 7]  286 	ld	e,#0x1B
+   0123 D5            [11]  287 	push	de
+   0124 CDr45r01      [17]  288 	call	_ym2151_write
+   0127 F1            [10]  289 	pop	af
+                            290 ;ym2151.c:48: for (i = 0; i < 8; i++) 
+   0128 1E 00         [ 7]  291 	ld	e,#0x00
+   012A                     292 00102$:
+                            293 ;ym2151.c:49: ym2151_write(0x20 + i, registers._0x20_[i]);
+   012A 21r05r00      [10]  294 	ld	hl,#(_registers + 0x0005)
+   012D 16 00         [ 7]  295 	ld	d,#0x00
+   012F 19            [11]  296 	add	hl, de
+   0130 66            [ 7]  297 	ld	h,(hl)
+   0131 7B            [ 4]  298 	ld	a,e
+   0132 C6 20         [ 7]  299 	add	a, #0x20
+   0134 D5            [11]  300 	push	de
+   0135 E5            [11]  301 	push	hl
+   0136 33            [ 6]  302 	inc	sp
+   0137 F5            [11]  303 	push	af
+   0138 33            [ 6]  304 	inc	sp
+   0139 CDr45r01      [17]  305 	call	_ym2151_write
+   013C F1            [10]  306 	pop	af
+   013D D1            [10]  307 	pop	de
+                            308 ;ym2151.c:48: for (i = 0; i < 8; i++) 
+   013E 1C            [ 4]  309 	inc	e
+   013F 7B            [ 4]  310 	ld	a,e
+   0140 D6 08         [ 7]  311 	sub	a, #0x08
+   0142 38 E6         [12]  312 	jr	C,00102$
+   0144 C9            [10]  313 	ret
+                            314 ;ym2151.c:52: void ym2151_write(unsigned char reg, unsigned char value) {
                             315 ;	---------------------------------
-                            316 ; Function ym2151_setNoiseFrequency
+                            316 ; Function ym2151_write
                             317 ; ---------------------------------
-   011A                     318 _ym2151_setNoiseFrequency::
-                            319 ;ym2151.c:74: unsigned char reg = ym2151_read(0x0F);
-   011A 3E 0F         [ 7]  320 	ld	a,#0x0F
-   011C F5            [11]  321 	push	af
-   011D 33            [ 6]  322 	inc	sp
-   011E CDr26r00      [17]  323 	call	_ym2151_read
-   0121 33            [ 6]  324 	inc	sp
-   0122 7D            [ 4]  325 	ld	a,l
-                            326 ;ym2151.c:76: ym2151_write(0x0F, (reg & 0xE0) | (value & 0x1F)); 
-   0123 E6 E0         [ 7]  327 	and	a, #0xE0
-   0125 67            [ 4]  328 	ld	h,a
-   0126 FD 21 02 00   [14]  329 	ld	iy,#2
-   012A FD 39         [15]  330 	add	iy,sp
-   012C FD 7E 00      [19]  331 	ld	a,0 (iy)
-   012F E6 1F         [ 7]  332 	and	a, #0x1F
-   0131 B4            [ 4]  333 	or	a, h
-   0132 57            [ 4]  334 	ld	d,a
-   0133 1E 0F         [ 7]  335 	ld	e,#0x0F
-   0135 D5            [11]  336 	push	de
-   0136 CDr14r00      [17]  337 	call	_ym2151_write
-   0139 F1            [10]  338 	pop	af
-   013A C9            [10]  339 	ret
-                            340 ;ym2151.c:79: void ym2151_setKeyState(unsigned char channel, E_YM_KEY key) {
-                            341 ;	---------------------------------
-                            342 ; Function ym2151_setKeyState
-                            343 ; ---------------------------------
-   013B                     344 _ym2151_setKeyState::
-                            345 ;ym2151.c:80: ym2151_write(0x08, key | (channel & 0x07));
-   013B 21 02 00      [10]  346 	ld	hl, #2+0
-   013E 39            [11]  347 	add	hl, sp
-   013F 7E            [ 7]  348 	ld	a, (hl)
-   0140 E6 07         [ 7]  349 	and	a, #0x07
-   0142 21 03 00      [10]  350 	ld	hl, #3+0
-   0145 39            [11]  351 	add	hl, sp
-   0146 B6            [ 7]  352 	or	a, (hl)
-   0147 57            [ 4]  353 	ld	d,a
-   0148 1E 08         [ 7]  354 	ld	e,#0x08
-   014A D5            [11]  355 	push	de
-   014B CDr14r00      [17]  356 	call	_ym2151_write
-   014E F1            [10]  357 	pop	af
-   014F C9            [10]  358 	ret
-                            359 ;ym2151.c:83: void ym2151_setChannels(E_YM_CHANNELS channels) {
-                            360 ;	---------------------------------
-                            361 ; Function ym2151_setChannels
-                            362 ; ---------------------------------
-   0150                     363 _ym2151_setChannels::
-                            364 ;ym2151.c:84: unsigned char reg = ym2151_read(0x20);
-   0150 3E 20         [ 7]  365 	ld	a,#0x20
-   0152 F5            [11]  366 	push	af
-   0153 33            [ 6]  367 	inc	sp
-   0154 CDr26r00      [17]  368 	call	_ym2151_read
-   0157 33            [ 6]  369 	inc	sp
-   0158 7D            [ 4]  370 	ld	a,l
-                            371 ;ym2151.c:86: ym2151_write(0x20, (reg & 0x3F) | channels);
-   0159 E6 3F         [ 7]  372 	and	a, #0x3F
-   015B 21 02 00      [10]  373 	ld	hl, #2+0
-   015E 39            [11]  374 	add	hl, sp
-   015F B6            [ 7]  375 	or	a, (hl)
-   0160 57            [ 4]  376 	ld	d,a
-   0161 1E 20         [ 7]  377 	ld	e,#0x20
-   0163 D5            [11]  378 	push	de
-   0164 CDr14r00      [17]  379 	call	_ym2151_write
-   0167 F1            [10]  380 	pop	af
-   0168 C9            [10]  381 	ret
-                            382 ;ym2151.c:89: void ym2151_setConnections(unsigned char connect) {
-                            383 ;	---------------------------------
-                            384 ; Function ym2151_setConnections
-                            385 ; ---------------------------------
-   0169                     386 _ym2151_setConnections::
-                            387 ;ym2151.c:90: unsigned char reg = ym2151_read(0x20);
-   0169 3E 20         [ 7]  388 	ld	a,#0x20
-   016B F5            [11]  389 	push	af
-   016C 33            [ 6]  390 	inc	sp
-   016D CDr26r00      [17]  391 	call	_ym2151_read
-   0170 33            [ 6]  392 	inc	sp
-   0171 7D            [ 4]  393 	ld	a,l
-                            394 ;ym2151.c:92: ym2151_write(0x20, (reg & 0xF8) | (connect & 0x07));
-   0172 E6 F8         [ 7]  395 	and	a, #0xF8
-   0174 67            [ 4]  396 	ld	h,a
-   0175 FD 21 02 00   [14]  397 	ld	iy,#2
-   0179 FD 39         [15]  398 	add	iy,sp
-   017B FD 7E 00      [19]  399 	ld	a,0 (iy)
-   017E E6 07         [ 7]  400 	and	a, #0x07
-   0180 B4            [ 4]  401 	or	a, h
-   0181 57            [ 4]  402 	ld	d,a
-   0182 1E 20         [ 7]  403 	ld	e,#0x20
-   0184 D5            [11]  404 	push	de
-   0185 CDr14r00      [17]  405 	call	_ym2151_write
-   0188 F1            [10]  406 	pop	af
-   0189 C9            [10]  407 	ret
-                            408 	.area _CODE
-                            409 	.area _INITIALIZER
-                            410 	.area _CABS (ABS)
+   0145                     318 _ym2151_write::
+                            319 ;ym2151.c:56: i = _wait_busy();
+   0145 CDrD6r00      [17]  320 	call	__wait_busy
+   0148 55            [ 4]  321 	ld	d,l
+                            322 ;ym2151.c:57: FmgAddrPort = reg;
+   0149 21 02 00      [10]  323 	ld	hl, #2+0
+   014C 39            [11]  324 	add	hl, sp
+   014D 7E            [ 7]  325 	ld	a, (hl)
+   014E D3 40         [11]  326 	out	(_FmgAddrPort),a
+                            327 ;ym2151.c:58: FmgDataPort = value;
+   0150 21 03 00      [10]  328 	ld	hl, #3+0
+   0153 39            [11]  329 	add	hl, sp
+   0154 7E            [ 7]  330 	ld	a, (hl)
+   0155 D3 41         [11]  331 	out	(_FmgDataPort),a
+                            332 ;ym2151.c:60: j = _wait_busy();
+   0157 D5            [11]  333 	push	de
+   0158 CDrD6r00      [17]  334 	call	__wait_busy
+   015B 65            [ 4]  335 	ld	h,l
+   015C D1            [10]  336 	pop	de
+                            337 ;ym2151.c:61: dbg_print(reg, value, i, j);
+   015D E5            [11]  338 	push	hl
+   015E 33            [ 6]  339 	inc	sp
+   015F D5            [11]  340 	push	de
+   0160 33            [ 6]  341 	inc	sp
+   0161 21 05 00      [10]  342 	ld	hl, #5+0
+   0164 39            [11]  343 	add	hl, sp
+   0165 7E            [ 7]  344 	ld	a, (hl)
+   0166 F5            [11]  345 	push	af
+   0167 33            [ 6]  346 	inc	sp
+   0168 21 05 00      [10]  347 	ld	hl, #5+0
+   016B 39            [11]  348 	add	hl, sp
+   016C 7E            [ 7]  349 	ld	a, (hl)
+   016D F5            [11]  350 	push	af
+   016E 33            [ 6]  351 	inc	sp
+   016F CDr00r00      [17]  352 	call	_dbg_print
+   0172 F1            [10]  353 	pop	af
+   0173 F1            [10]  354 	pop	af
+   0174 C9            [10]  355 	ret
+                            356 ;ym2151.c:65: void ym2151_setCT1(unsigned char value) {
+                            357 ;	---------------------------------
+                            358 ; Function ym2151_setCT1
+                            359 ; ---------------------------------
+   0175                     360 _ym2151_setCT1::
+                            361 ;ym2151.c:66: registers._0x1B_ = value ? registers._0x1B_ | 0x40 : registers._0x1B_ & 0xBF;
+   0175 21r04r00      [10]  362 	ld	hl,#_registers+4
+   0178 56            [ 7]  363 	ld	d,(hl)
+   0179 FD 21 02 00   [14]  364 	ld	iy,#2
+   017D FD 39         [15]  365 	add	iy,sp
+   017F FD 7E 00      [19]  366 	ld	a,0 (iy)
+   0182 B7            [ 4]  367 	or	a, a
+   0183 28 04         [12]  368 	jr	Z,00103$
+   0185 CB F2         [ 8]  369 	set	6, d
+   0187 18 02         [12]  370 	jr	00104$
+   0189                     371 00103$:
+   0189 CB B2         [ 8]  372 	res	6, d
+   018B                     373 00104$:
+   018B 72            [ 7]  374 	ld	(hl),d
+                            375 ;ym2151.c:68: ym2151_write(0x1B, registers._0x1B_);
+   018C 1E 1B         [ 7]  376 	ld	e, #0x1B
+   018E D5            [11]  377 	push	de
+   018F CDr45r01      [17]  378 	call	_ym2151_write
+   0192 F1            [10]  379 	pop	af
+   0193 C9            [10]  380 	ret
+                            381 ;ym2151.c:71: void ym2151_setCT2(unsigned char value) {
+                            382 ;	---------------------------------
+                            383 ; Function ym2151_setCT2
+                            384 ; ---------------------------------
+   0194                     385 _ym2151_setCT2::
+                            386 ;ym2151.c:72: registers._0x1B_ = value ? registers._0x1B_ | 0x80 : registers._0x1B_ & 0x7F;
+   0194 21r04r00      [10]  387 	ld	hl,#_registers+4
+   0197 56            [ 7]  388 	ld	d,(hl)
+   0198 FD 21 02 00   [14]  389 	ld	iy,#2
+   019C FD 39         [15]  390 	add	iy,sp
+   019E FD 7E 00      [19]  391 	ld	a,0 (iy)
+   01A1 B7            [ 4]  392 	or	a, a
+   01A2 28 04         [12]  393 	jr	Z,00103$
+   01A4 CB FA         [ 8]  394 	set	7, d
+   01A6 18 02         [12]  395 	jr	00104$
+   01A8                     396 00103$:
+   01A8 CB BA         [ 8]  397 	res	7, d
+   01AA                     398 00104$:
+   01AA 72            [ 7]  399 	ld	(hl),d
+                            400 ;ym2151.c:74: ym2151_write(0x1B, registers._0x1B_);
+   01AB 1E 1B         [ 7]  401 	ld	e, #0x1B
+   01AD D5            [11]  402 	push	de
+   01AE CDr45r01      [17]  403 	call	_ym2151_write
+   01B1 F1            [10]  404 	pop	af
+   01B2 C9            [10]  405 	ret
+                            406 ;ym2151.c:77: void ym2151_setLFOWaveform(E_YM_WAVEFORM wf) {
+                            407 ;	---------------------------------
+                            408 ; Function ym2151_setLFOWaveform
+                            409 ; ---------------------------------
+   01B3                     410 _ym2151_setLFOWaveform::
+                            411 ;ym2151.c:78: registers._0x1B_ = (registers._0x1B_ & 0xFC) | wf;
+   01B3 21r04r00      [10]  412 	ld	hl,#_registers+4
+   01B6 7E            [ 7]  413 	ld	a,(hl)
+   01B7 E6 FC         [ 7]  414 	and	a, #0xFC
+   01B9 FD 21 02 00   [14]  415 	ld	iy,#2
+   01BD FD 39         [15]  416 	add	iy,sp
+   01BF FD B6 00      [19]  417 	or	a, 0 (iy)
+   01C2 77            [ 7]  418 	ld	(hl),a
+                            419 ;ym2151.c:80: ym2151_write(0x1B, registers._0x1B_);
+   01C3 57            [ 4]  420 	ld	d,a
+   01C4 1E 1B         [ 7]  421 	ld	e,#0x1B
+   01C6 D5            [11]  422 	push	de
+   01C7 CDr45r01      [17]  423 	call	_ym2151_write
+   01CA F1            [10]  424 	pop	af
+   01CB C9            [10]  425 	ret
+                            426 ;ym2151.c:83: void ym2151_setLFOFrequency(unsigned char value) {
+                            427 ;	---------------------------------
+                            428 ; Function ym2151_setLFOFrequency
+                            429 ; ---------------------------------
+   01CC                     430 _ym2151_setLFOFrequency::
+                            431 ;ym2151.c:84: registers._0x18_ = value;
+   01CC 21r02r00      [10]  432 	ld	hl,#_registers+2
+   01CF FD 21 02 00   [14]  433 	ld	iy,#2
+   01D3 FD 39         [15]  434 	add	iy,sp
+   01D5 FD 7E 00      [19]  435 	ld	a,0 (iy)
+   01D8 77            [ 7]  436 	ld	(hl),a
+                            437 ;ym2151.c:86: ym2151_write(0x18, registers._0x18_);
+   01D9 FD 56 00      [19]  438 	ld	d, 0 (iy)
+   01DC 1E 18         [ 7]  439 	ld	e,#0x18
+   01DE D5            [11]  440 	push	de
+   01DF CDr45r01      [17]  441 	call	_ym2151_write
+   01E2 F1            [10]  442 	pop	af
+   01E3 C9            [10]  443 	ret
+                            444 ;ym2151.c:89: void ym2151_setLFOModulation(E_YM_MODULATION mod) {
+                            445 ;	---------------------------------
+                            446 ; Function ym2151_setLFOModulation
+                            447 ; ---------------------------------
+   01E4                     448 _ym2151_setLFOModulation::
+                            449 ;ym2151.c:90: registers._0x19_ = (registers._0x19_ & 0x7F) | mod;
+   01E4 21r03r00      [10]  450 	ld	hl,#_registers+3
+   01E7 7E            [ 7]  451 	ld	a,(hl)
+   01E8 E6 7F         [ 7]  452 	and	a, #0x7F
+   01EA FD 21 02 00   [14]  453 	ld	iy,#2
+   01EE FD 39         [15]  454 	add	iy,sp
+   01F0 FD B6 00      [19]  455 	or	a, 0 (iy)
+   01F3 77            [ 7]  456 	ld	(hl),a
+                            457 ;ym2151.c:92: ym2151_write(0x19, registers._0x19_); 
+   01F4 57            [ 4]  458 	ld	d,a
+   01F5 1E 19         [ 7]  459 	ld	e,#0x19
+   01F7 D5            [11]  460 	push	de
+   01F8 CDr45r01      [17]  461 	call	_ym2151_write
+   01FB F1            [10]  462 	pop	af
+   01FC C9            [10]  463 	ret
+                            464 ;ym2151.c:95: void ym2151_setLFOAmplitude(unsigned char value) {
+                            465 ;	---------------------------------
+                            466 ; Function ym2151_setLFOAmplitude
+                            467 ; ---------------------------------
+   01FD                     468 _ym2151_setLFOAmplitude::
+                            469 ;ym2151.c:96: registers._0x19_ = (registers._0x19_ & 0x80) | (value & 0x7F);
+   01FD 21r03r00      [10]  470 	ld	hl,#_registers+3
+   0200 7E            [ 7]  471 	ld	a,(hl)
+   0201 E6 80         [ 7]  472 	and	a, #0x80
+   0203 57            [ 4]  473 	ld	d,a
+   0204 FD 21 02 00   [14]  474 	ld	iy,#2
+   0208 FD 39         [15]  475 	add	iy,sp
+   020A FD 7E 00      [19]  476 	ld	a,0 (iy)
+   020D E6 7F         [ 7]  477 	and	a, #0x7F
+   020F B2            [ 4]  478 	or	a, d
+   0210 77            [ 7]  479 	ld	(hl),a
+                            480 ;ym2151.c:98: ym2151_write(0x19, registers._0x19_); 
+   0211 57            [ 4]  481 	ld	d,a
+   0212 1E 19         [ 7]  482 	ld	e,#0x19
+   0214 D5            [11]  483 	push	de
+   0215 CDr45r01      [17]  484 	call	_ym2151_write
+   0218 F1            [10]  485 	pop	af
+   0219 C9            [10]  486 	ret
+                            487 ;ym2151.c:101: void ym2151_resetLFO() {
+                            488 ;	---------------------------------
+                            489 ; Function ym2151_resetLFO
+                            490 ; ---------------------------------
+   021A                     491 _ym2151_resetLFO::
+                            492 ;ym2151.c:102: registers._0x01_ ^= 0x02;
+   021A 21r00r00      [10]  493 	ld	hl,#_registers+0
+   021D 7E            [ 7]  494 	ld	a,(hl)
+   021E EE 02         [ 7]  495 	xor	a, #0x02
+   0220 77            [ 7]  496 	ld	(hl),a
+                            497 ;ym2151.c:104: ym2151_write(0x01, registers._0x01_);
+   0221 57            [ 4]  498 	ld	d,a
+   0222 1E 01         [ 7]  499 	ld	e,#0x01
+   0224 D5            [11]  500 	push	de
+   0225 CDr45r01      [17]  501 	call	_ym2151_write
+   0228 F1            [10]  502 	pop	af
+   0229 C9            [10]  503 	ret
+                            504 ;ym2151.c:107: void ym2151_setNoiseEnable(unsigned char value) {
+                            505 ;	---------------------------------
+                            506 ; Function ym2151_setNoiseEnable
+                            507 ; ---------------------------------
+   022A                     508 _ym2151_setNoiseEnable::
+                            509 ;ym2151.c:108: registers._0x0F_ = value ? registers._0x0F_ | 0x80 : registers._0x0F_ & 0x7F; 
+   022A 21r01r00      [10]  510 	ld	hl,#_registers+1
+   022D 56            [ 7]  511 	ld	d,(hl)
+   022E FD 21 02 00   [14]  512 	ld	iy,#2
+   0232 FD 39         [15]  513 	add	iy,sp
+   0234 FD 7E 00      [19]  514 	ld	a,0 (iy)
+   0237 B7            [ 4]  515 	or	a, a
+   0238 28 04         [12]  516 	jr	Z,00103$
+   023A CB FA         [ 8]  517 	set	7, d
+   023C 18 02         [12]  518 	jr	00104$
+   023E                     519 00103$:
+   023E CB BA         [ 8]  520 	res	7, d
+   0240                     521 00104$:
+   0240 72            [ 7]  522 	ld	(hl),d
+                            523 ;ym2151.c:110: ym2151_write(0x0F, registers._0x0F_); 
+   0241 1E 0F         [ 7]  524 	ld	e, #0x0F
+   0243 D5            [11]  525 	push	de
+   0244 CDr45r01      [17]  526 	call	_ym2151_write
+   0247 F1            [10]  527 	pop	af
+   0248 C9            [10]  528 	ret
+                            529 ;ym2151.c:113: void ym2151_setNoiseFrequency(unsigned char value) {
+                            530 ;	---------------------------------
+                            531 ; Function ym2151_setNoiseFrequency
+                            532 ; ---------------------------------
+   0249                     533 _ym2151_setNoiseFrequency::
+                            534 ;ym2151.c:114: registers._0x0F_ = (registers._0x0F_ & 0xE0) | (value & 0x1F); 
+   0249 21r01r00      [10]  535 	ld	hl,#_registers+1
+   024C 7E            [ 7]  536 	ld	a,(hl)
+   024D E6 E0         [ 7]  537 	and	a, #0xE0
+   024F 57            [ 4]  538 	ld	d,a
+   0250 FD 21 02 00   [14]  539 	ld	iy,#2
+   0254 FD 39         [15]  540 	add	iy,sp
+   0256 FD 7E 00      [19]  541 	ld	a,0 (iy)
+   0259 E6 1F         [ 7]  542 	and	a, #0x1F
+   025B B2            [ 4]  543 	or	a, d
+   025C 77            [ 7]  544 	ld	(hl),a
+                            545 ;ym2151.c:116: ym2151_write(0x0F, registers._0x0F_); 
+   025D 57            [ 4]  546 	ld	d,a
+   025E 1E 0F         [ 7]  547 	ld	e,#0x0F
+   0260 D5            [11]  548 	push	de
+   0261 CDr45r01      [17]  549 	call	_ym2151_write
+   0264 F1            [10]  550 	pop	af
+   0265 C9            [10]  551 	ret
+                            552 ;ym2151.c:119: void ym2151_setKeyState(unsigned char channel, E_YM_KEY key_config) {
+                            553 ;	---------------------------------
+                            554 ; Function ym2151_setKeyState
+                            555 ; ---------------------------------
+   0266                     556 _ym2151_setKeyState::
+                            557 ;ym2151.c:120: unsigned char kon_cmd = key_config | (channel & 0x07);	
+   0266 21 02 00      [10]  558 	ld	hl, #2+0
+   0269 39            [11]  559 	add	hl, sp
+   026A 7E            [ 7]  560 	ld	a, (hl)
+   026B E6 07         [ 7]  561 	and	a, #0x07
+   026D 21 03 00      [10]  562 	ld	hl, #3+0
+   0270 39            [11]  563 	add	hl, sp
+   0271 B6            [ 7]  564 	or	a, (hl)
+                            565 ;ym2151.c:122: ym2151_write(0x08, kon_cmd);
+   0272 57            [ 4]  566 	ld	d,a
+   0273 1E 08         [ 7]  567 	ld	e,#0x08
+   0275 D5            [11]  568 	push	de
+   0276 CDr45r01      [17]  569 	call	_ym2151_write
+   0279 F1            [10]  570 	pop	af
+   027A C9            [10]  571 	ret
+                            572 ;ym2151.c:125: void ym2151_setKeyNote(unsigned char channel, unsigned char octave, unsigned char note) {
+                            573 ;	---------------------------------
+                            574 ; Function ym2151_setKeyNote
+                            575 ; ---------------------------------
+   027B                     576 _ym2151_setKeyNote::
+                            577 ;ym2151.c:126: ym2151_write(0x28 + channel, ((octave << 4) & 0x70) | (note & 0x0F));
+   027B 21 03 00      [10]  578 	ld	hl, #3+0
+   027E 39            [11]  579 	add	hl, sp
+   027F 7E            [ 7]  580 	ld	a, (hl)
+   0280 07            [ 4]  581 	rlca
+   0281 07            [ 4]  582 	rlca
+   0282 07            [ 4]  583 	rlca
+   0283 07            [ 4]  584 	rlca
+   0284 E6 F0         [ 7]  585 	and	a,#0xF0
+   0286 E6 70         [ 7]  586 	and	a, #0x70
+   0288 67            [ 4]  587 	ld	h,a
+   0289 FD 21 04 00   [14]  588 	ld	iy,#4
+   028D FD 39         [15]  589 	add	iy,sp
+   028F FD 7E 00      [19]  590 	ld	a,0 (iy)
+   0292 E6 0F         [ 7]  591 	and	a, #0x0F
+   0294 B4            [ 4]  592 	or	a, h
+   0295 57            [ 4]  593 	ld	d,a
+   0296 21 02 00      [10]  594 	ld	hl, #2+0
+   0299 39            [11]  595 	add	hl, sp
+   029A 7E            [ 7]  596 	ld	a, (hl)
+   029B C6 28         [ 7]  597 	add	a, #0x28
+   029D D5            [11]  598 	push	de
+   029E 33            [ 6]  599 	inc	sp
+   029F F5            [11]  600 	push	af
+   02A0 33            [ 6]  601 	inc	sp
+   02A1 CDr45r01      [17]  602 	call	_ym2151_write
+   02A4 F1            [10]  603 	pop	af
+   02A5 C9            [10]  604 	ret
+                            605 ;ym2151.c:129: void ym2151_setKeyFraction(unsigned char channel, unsigned char fraction) {
+                            606 ;	---------------------------------
+                            607 ; Function ym2151_setKeyFraction
+                            608 ; ---------------------------------
+   02A6                     609 _ym2151_setKeyFraction::
+                            610 ;ym2151.c:130: ym2151_write(0x30 + channel, (fraction << 2) & 0xFC);
+   02A6 21 03 00      [10]  611 	ld	hl, #3+0
+   02A9 39            [11]  612 	add	hl, sp
+   02AA 7E            [ 7]  613 	ld	a, (hl)
+   02AB 87            [ 4]  614 	add	a, a
+   02AC 87            [ 4]  615 	add	a, a
+   02AD E6 FC         [ 7]  616 	and	a, #0xFC
+   02AF 57            [ 4]  617 	ld	d,a
+   02B0 21 02 00      [10]  618 	ld	hl, #2+0
+   02B3 39            [11]  619 	add	hl, sp
+   02B4 7E            [ 7]  620 	ld	a, (hl)
+   02B5 C6 30         [ 7]  621 	add	a, #0x30
+   02B7 D5            [11]  622 	push	de
+   02B8 33            [ 6]  623 	inc	sp
+   02B9 F5            [11]  624 	push	af
+   02BA 33            [ 6]  625 	inc	sp
+   02BB CDr45r01      [17]  626 	call	_ym2151_write
+   02BE F1            [10]  627 	pop	af
+   02BF C9            [10]  628 	ret
+                            629 ;ym2151.c:133: void ym2151_setChannels(unsigned char channel, E_YM_CHANNELS channels) {
+                            630 ;	---------------------------------
+                            631 ; Function ym2151_setChannels
+                            632 ; ---------------------------------
+   02C0                     633 _ym2151_setChannels::
+                            634 ;ym2151.c:134: registers._0x20_[channel] = (registers._0x20_[channel] & 0x3F) | channels; 
+   02C0 21r05r00      [10]  635 	ld	hl,#_registers+5
+   02C3 FD 21 02 00   [14]  636 	ld	iy,#2
+   02C7 FD 39         [15]  637 	add	iy,sp
+   02C9 FD 5E 00      [19]  638 	ld	e,0 (iy)
+   02CC 4B            [ 4]  639 	ld	c,e
+   02CD 06 00         [ 7]  640 	ld	b,#0x00
+   02CF 09            [11]  641 	add	hl,bc
+   02D0 7E            [ 7]  642 	ld	a,(hl)
+   02D1 E6 3F         [ 7]  643 	and	a, #0x3F
+   02D3 FD 21 03 00   [14]  644 	ld	iy,#3
+   02D7 FD 39         [15]  645 	add	iy,sp
+   02D9 FD B6 00      [19]  646 	or	a, 0 (iy)
+   02DC 57            [ 4]  647 	ld	d,a
+   02DD 72            [ 7]  648 	ld	(hl),d
+                            649 ;ym2151.c:136: ym2151_write(0x20 + channel, registers._0x20_[channel]);
+   02DE 7B            [ 4]  650 	ld	a,e
+   02DF C6 20         [ 7]  651 	add	a, #0x20
+   02E1 D5            [11]  652 	push	de
+   02E2 33            [ 6]  653 	inc	sp
+   02E3 F5            [11]  654 	push	af
+   02E4 33            [ 6]  655 	inc	sp
+   02E5 CDr45r01      [17]  656 	call	_ym2151_write
+   02E8 F1            [10]  657 	pop	af
+   02E9 C9            [10]  658 	ret
+                            659 ;ym2151.c:139: void ym2151_setConnections(unsigned char channel, unsigned char connect) {
+                            660 ;	---------------------------------
+                            661 ; Function ym2151_setConnections
+                            662 ; ---------------------------------
+   02EA                     663 _ym2151_setConnections::
+   02EA DD E5         [15]  664 	push	ix
+   02EC DD 21 00 00   [14]  665 	ld	ix,#0
+   02F0 DD 39         [15]  666 	add	ix,sp
+                            667 ;ym2151.c:140: registers._0x20_[channel] = (registers._0x20_[channel] & 0xF8) | (connect & 0x07); 
+   02F2 21r05r00      [10]  668 	ld	hl,#_registers+5
+   02F5 DD 5E 04      [19]  669 	ld	e,4 (ix)
+   02F8 4B            [ 4]  670 	ld	c,e
+   02F9 06 00         [ 7]  671 	ld	b,#0x00
+   02FB 09            [11]  672 	add	hl,bc
+   02FC 7E            [ 7]  673 	ld	a,(hl)
+   02FD E6 F8         [ 7]  674 	and	a, #0xF8
+   02FF 57            [ 4]  675 	ld	d,a
+   0300 DD 7E 05      [19]  676 	ld	a,5 (ix)
+   0303 E6 07         [ 7]  677 	and	a, #0x07
+   0305 B2            [ 4]  678 	or	a, d
+   0306 57            [ 4]  679 	ld	d,a
+   0307 72            [ 7]  680 	ld	(hl),d
+                            681 ;ym2151.c:142: ym2151_write(0x20 + channel, registers._0x20_[channel]);
+   0308 7B            [ 4]  682 	ld	a,e
+   0309 C6 20         [ 7]  683 	add	a, #0x20
+   030B D5            [11]  684 	push	de
+   030C 33            [ 6]  685 	inc	sp
+   030D F5            [11]  686 	push	af
+   030E 33            [ 6]  687 	inc	sp
+   030F CDr45r01      [17]  688 	call	_ym2151_write
+   0312 F1            [10]  689 	pop	af
+   0313 DD E1         [14]  690 	pop	ix
+   0315 C9            [10]  691 	ret
+                            692 ;ym2151.c:145: void ym2151_setAmplitudeModulationSensitivity(unsigned char channel, unsigned char ams) {
+                            693 ;	---------------------------------
+                            694 ; Function ym2151_setAmplitudeModulationSensitivity
+                            695 ; ---------------------------------
+   0316                     696 _ym2151_setAmplitudeModulationSensitivity::
+   0316 DD E5         [15]  697 	push	ix
+   0318 DD 21 00 00   [14]  698 	ld	ix,#0
+   031C DD 39         [15]  699 	add	ix,sp
+                            700 ;ym2151.c:146: registers._0x38_[channel] = (registers._0x38_[channel] & 0xFC) | (ams & 0x03); 
+   031E 21r0Dr00      [10]  701 	ld	hl,#_registers+13
+   0321 DD 5E 04      [19]  702 	ld	e,4 (ix)
+   0324 4B            [ 4]  703 	ld	c,e
+   0325 06 00         [ 7]  704 	ld	b,#0x00
+   0327 09            [11]  705 	add	hl,bc
+   0328 7E            [ 7]  706 	ld	a,(hl)
+   0329 E6 FC         [ 7]  707 	and	a, #0xFC
+   032B 57            [ 4]  708 	ld	d,a
+   032C DD 7E 05      [19]  709 	ld	a,5 (ix)
+   032F E6 03         [ 7]  710 	and	a, #0x03
+   0331 B2            [ 4]  711 	or	a, d
+   0332 57            [ 4]  712 	ld	d,a
+   0333 72            [ 7]  713 	ld	(hl),d
+                            714 ;ym2151.c:148: ym2151_write(0x38 + channel, registers._0x38_[channel]);
+   0334 7B            [ 4]  715 	ld	a,e
+   0335 C6 38         [ 7]  716 	add	a, #0x38
+   0337 D5            [11]  717 	push	de
+   0338 33            [ 6]  718 	inc	sp
+   0339 F5            [11]  719 	push	af
+   033A 33            [ 6]  720 	inc	sp
+   033B CDr45r01      [17]  721 	call	_ym2151_write
+   033E F1            [10]  722 	pop	af
+   033F DD E1         [14]  723 	pop	ix
+   0341 C9            [10]  724 	ret
+                            725 ;ym2151.c:151: void ym2151_setPhaseModulationSensitivity(unsigned char channel, unsigned char pms) {
+                            726 ;	---------------------------------
+                            727 ; Function ym2151_setPhaseModulationSensitivity
+                            728 ; ---------------------------------
+   0342                     729 _ym2151_setPhaseModulationSensitivity::
+   0342 DD E5         [15]  730 	push	ix
+   0344 DD 21 00 00   [14]  731 	ld	ix,#0
+   0348 DD 39         [15]  732 	add	ix,sp
+                            733 ;ym2151.c:152: registers._0x38_[channel] = (registers._0x38_[channel] & 0x8F) | (pms & 0x70); 
+   034A 21r0Dr00      [10]  734 	ld	hl,#_registers+13
+   034D DD 5E 04      [19]  735 	ld	e,4 (ix)
+   0350 4B            [ 4]  736 	ld	c,e
+   0351 06 00         [ 7]  737 	ld	b,#0x00
+   0353 09            [11]  738 	add	hl,bc
+   0354 7E            [ 7]  739 	ld	a,(hl)
+   0355 E6 8F         [ 7]  740 	and	a, #0x8F
+   0357 57            [ 4]  741 	ld	d,a
+   0358 DD 7E 05      [19]  742 	ld	a,5 (ix)
+   035B E6 70         [ 7]  743 	and	a, #0x70
+   035D B2            [ 4]  744 	or	a, d
+   035E 57            [ 4]  745 	ld	d,a
+   035F 72            [ 7]  746 	ld	(hl),d
+                            747 ;ym2151.c:154: ym2151_write(0x38 + channel, registers._0x38_[channel]);
+   0360 7B            [ 4]  748 	ld	a,e
+   0361 C6 38         [ 7]  749 	add	a, #0x38
+   0363 D5            [11]  750 	push	de
+   0364 33            [ 6]  751 	inc	sp
+   0365 F5            [11]  752 	push	af
+   0366 33            [ 6]  753 	inc	sp
+   0367 CDr45r01      [17]  754 	call	_ym2151_write
+   036A F1            [10]  755 	pop	af
+   036B DD E1         [14]  756 	pop	ix
+   036D C9            [10]  757 	ret
+                            758 ;ym2151.c:157: void ym2151_setDetune1PhaseMultiply(unsigned char channel, E_YM_KEY key_config, unsigned char detune1, unsigned char phase_multiply) {
+                            759 ;	---------------------------------
+                            760 ; Function ym2151_setDetune1PhaseMultiply
+                            761 ; ---------------------------------
+   036E                     762 _ym2151_setDetune1PhaseMultiply::
+   036E DD E5         [15]  763 	push	ix
+   0370 DD 21 00 00   [14]  764 	ld	ix,#0
+   0374 DD 39         [15]  765 	add	ix,sp
+                            766 ;ym2151.c:160: ym2151_write(0x40 + channel, ((detune1 << 4) & 0x70) | (phase_multiply & 0x0F));
+   0376 DD 7E 06      [19]  767 	ld	a,6 (ix)
+   0379 07            [ 4]  768 	rlca
+   037A 07            [ 4]  769 	rlca
+   037B 07            [ 4]  770 	rlca
+   037C 07            [ 4]  771 	rlca
+   037D E6 F0         [ 7]  772 	and	a,#0xF0
+   037F 6F            [ 4]  773 	ld	l,a
+   0380 DD 7E 07      [19]  774 	ld	a,7 (ix)
+   0383 E6 0F         [ 7]  775 	and	a, #0x0F
+   0385 67            [ 4]  776 	ld	h,a
+   0386 7D            [ 4]  777 	ld	a,l
+   0387 E6 70         [ 7]  778 	and	a, #0x70
+   0389 B4            [ 4]  779 	or	a, h
+   038A 67            [ 4]  780 	ld	h,a
+                            781 ;ym2151.c:159: if (key_config & YM_KEY_MOD1) {
+   038B DD CB 05 76   [20]  782 	bit	6, 5 (ix)
+   038F 28 0F         [12]  783 	jr	Z,00102$
+                            784 ;ym2151.c:160: ym2151_write(0x40 + channel, ((detune1 << 4) & 0x70) | (phase_multiply & 0x0F));
+   0391 DD 7E 04      [19]  785 	ld	a,4 (ix)
+   0394 C6 40         [ 7]  786 	add	a, #0x40
+   0396 E5            [11]  787 	push	hl
+   0397 E5            [11]  788 	push	hl
+   0398 33            [ 6]  789 	inc	sp
+   0399 F5            [11]  790 	push	af
+   039A 33            [ 6]  791 	inc	sp
+   039B CDr45r01      [17]  792 	call	_ym2151_write
+   039E F1            [10]  793 	pop	af
+   039F E1            [10]  794 	pop	hl
+   03A0                     795 00102$:
+                            796 ;ym2151.c:162: if (key_config & YM_KEY_MOD2) {
+   03A0 DD CB 05 66   [20]  797 	bit	4, 5 (ix)
+   03A4 28 0F         [12]  798 	jr	Z,00104$
+                            799 ;ym2151.c:163: ym2151_write(0x48 + channel, ((detune1 << 4) & 0x70) | (phase_multiply & 0x0F));
+   03A6 DD 7E 04      [19]  800 	ld	a,4 (ix)
+   03A9 C6 48         [ 7]  801 	add	a, #0x48
+   03AB E5            [11]  802 	push	hl
+   03AC E5            [11]  803 	push	hl
+   03AD 33            [ 6]  804 	inc	sp
+   03AE F5            [11]  805 	push	af
+   03AF 33            [ 6]  806 	inc	sp
+   03B0 CDr45r01      [17]  807 	call	_ym2151_write
+   03B3 F1            [10]  808 	pop	af
+   03B4 E1            [10]  809 	pop	hl
+   03B5                     810 00104$:
+                            811 ;ym2151.c:165: if (key_config & YM_KEY_CAR1) {
+   03B5 DD CB 05 6E   [20]  812 	bit	5, 5 (ix)
+   03B9 28 0F         [12]  813 	jr	Z,00106$
+                            814 ;ym2151.c:166: ym2151_write(0x50 + channel, ((detune1 << 4) & 0x70) | (phase_multiply & 0x0F));
+   03BB DD 7E 04      [19]  815 	ld	a,4 (ix)
+   03BE C6 50         [ 7]  816 	add	a, #0x50
+   03C0 E5            [11]  817 	push	hl
+   03C1 E5            [11]  818 	push	hl
+   03C2 33            [ 6]  819 	inc	sp
+   03C3 F5            [11]  820 	push	af
+   03C4 33            [ 6]  821 	inc	sp
+   03C5 CDr45r01      [17]  822 	call	_ym2151_write
+   03C8 F1            [10]  823 	pop	af
+   03C9 E1            [10]  824 	pop	hl
+   03CA                     825 00106$:
+                            826 ;ym2151.c:168: if (key_config & YM_KEY_CAR2) {
+   03CA DD CB 05 5E   [20]  827 	bit	3, 5 (ix)
+   03CE 28 0D         [12]  828 	jr	Z,00109$
+                            829 ;ym2151.c:169: ym2151_write(0x58 + channel, ((detune1 << 4) & 0x70) | (phase_multiply & 0x0F));
+   03D0 DD 7E 04      [19]  830 	ld	a,4 (ix)
+   03D3 C6 58         [ 7]  831 	add	a, #0x58
+   03D5 E5            [11]  832 	push	hl
+   03D6 33            [ 6]  833 	inc	sp
+   03D7 F5            [11]  834 	push	af
+   03D8 33            [ 6]  835 	inc	sp
+   03D9 CDr45r01      [17]  836 	call	_ym2151_write
+   03DC F1            [10]  837 	pop	af
+   03DD                     838 00109$:
+   03DD DD E1         [14]  839 	pop	ix
+   03DF C9            [10]  840 	ret
+                            841 ;ym2151.c:173: void ym2151_setTotalLevel(unsigned char channel, E_YM_KEY key_config, unsigned char total_level) {
+                            842 ;	---------------------------------
+                            843 ; Function ym2151_setTotalLevel
+                            844 ; ---------------------------------
+   03E0                     845 _ym2151_setTotalLevel::
+   03E0 DD E5         [15]  846 	push	ix
+   03E2 DD 21 00 00   [14]  847 	ld	ix,#0
+   03E6 DD 39         [15]  848 	add	ix,sp
+                            849 ;ym2151.c:176: ym2151_write(0x60 + channel, total_level & 0x7F);
+   03E8 DD 66 06      [19]  850 	ld	h,6 (ix)
+   03EB CB BC         [ 8]  851 	res	7, h
+                            852 ;ym2151.c:175: if (key_config & YM_KEY_MOD1) {
+   03ED DD CB 05 76   [20]  853 	bit	6, 5 (ix)
+   03F1 28 0F         [12]  854 	jr	Z,00102$
+                            855 ;ym2151.c:176: ym2151_write(0x60 + channel, total_level & 0x7F);
+   03F3 DD 7E 04      [19]  856 	ld	a,4 (ix)
+   03F6 C6 60         [ 7]  857 	add	a, #0x60
+   03F8 E5            [11]  858 	push	hl
+   03F9 E5            [11]  859 	push	hl
+   03FA 33            [ 6]  860 	inc	sp
+   03FB F5            [11]  861 	push	af
+   03FC 33            [ 6]  862 	inc	sp
+   03FD CDr45r01      [17]  863 	call	_ym2151_write
+   0400 F1            [10]  864 	pop	af
+   0401 E1            [10]  865 	pop	hl
+   0402                     866 00102$:
+                            867 ;ym2151.c:178: if (key_config & YM_KEY_MOD2) {
+   0402 DD CB 05 66   [20]  868 	bit	4, 5 (ix)
+   0406 28 0F         [12]  869 	jr	Z,00104$
+                            870 ;ym2151.c:179: ym2151_write(0x68 + channel, total_level & 0x7F);
+   0408 DD 7E 04      [19]  871 	ld	a,4 (ix)
+   040B C6 68         [ 7]  872 	add	a, #0x68
+   040D E5            [11]  873 	push	hl
+   040E E5            [11]  874 	push	hl
+   040F 33            [ 6]  875 	inc	sp
+   0410 F5            [11]  876 	push	af
+   0411 33            [ 6]  877 	inc	sp
+   0412 CDr45r01      [17]  878 	call	_ym2151_write
+   0415 F1            [10]  879 	pop	af
+   0416 E1            [10]  880 	pop	hl
+   0417                     881 00104$:
+                            882 ;ym2151.c:181: if (key_config & YM_KEY_CAR1) {
+   0417 DD CB 05 6E   [20]  883 	bit	5, 5 (ix)
+   041B 28 0F         [12]  884 	jr	Z,00106$
+                            885 ;ym2151.c:182: ym2151_write(0x70 + channel, total_level & 0x7F);
+   041D DD 7E 04      [19]  886 	ld	a,4 (ix)
+   0420 C6 70         [ 7]  887 	add	a, #0x70
+   0422 E5            [11]  888 	push	hl
+   0423 E5            [11]  889 	push	hl
+   0424 33            [ 6]  890 	inc	sp
+   0425 F5            [11]  891 	push	af
+   0426 33            [ 6]  892 	inc	sp
+   0427 CDr45r01      [17]  893 	call	_ym2151_write
+   042A F1            [10]  894 	pop	af
+   042B E1            [10]  895 	pop	hl
+   042C                     896 00106$:
+                            897 ;ym2151.c:184: if (key_config & YM_KEY_CAR2) {
+   042C DD CB 05 5E   [20]  898 	bit	3, 5 (ix)
+   0430 28 0D         [12]  899 	jr	Z,00109$
+                            900 ;ym2151.c:185: ym2151_write(0x78 + channel, total_level & 0x7F);
+   0432 DD 7E 04      [19]  901 	ld	a,4 (ix)
+   0435 C6 78         [ 7]  902 	add	a, #0x78
+   0437 E5            [11]  903 	push	hl
+   0438 33            [ 6]  904 	inc	sp
+   0439 F5            [11]  905 	push	af
+   043A 33            [ 6]  906 	inc	sp
+   043B CDr45r01      [17]  907 	call	_ym2151_write
+   043E F1            [10]  908 	pop	af
+   043F                     909 00109$:
+   043F DD E1         [14]  910 	pop	ix
+   0441 C9            [10]  911 	ret
+                            912 ;ym2151.c:189: void ym2151_setKeyScalingAttackRate(unsigned char channel, E_YM_KEY key_config, unsigned char key_scaling, unsigned char attack_rate) {
+                            913 ;	---------------------------------
+                            914 ; Function ym2151_setKeyScalingAttackRate
+                            915 ; ---------------------------------
+   0442                     916 _ym2151_setKeyScalingAttackRate::
+   0442 DD E5         [15]  917 	push	ix
+   0444 DD 21 00 00   [14]  918 	ld	ix,#0
+   0448 DD 39         [15]  919 	add	ix,sp
+                            920 ;ym2151.c:192: ym2151_write(0x80 + channel, ((key_scaling << 6) & 0xC0) | (attack_rate & 0x1F));
+   044A DD 7E 06      [19]  921 	ld	a,6 (ix)
+   044D 0F            [ 4]  922 	rrca
+   044E 0F            [ 4]  923 	rrca
+   044F E6 C0         [ 7]  924 	and	a,#0xC0
+   0451 6F            [ 4]  925 	ld	l,a
+   0452 DD 7E 07      [19]  926 	ld	a,7 (ix)
+   0455 E6 1F         [ 7]  927 	and	a, #0x1F
+   0457 67            [ 4]  928 	ld	h,a
+   0458 7D            [ 4]  929 	ld	a,l
+   0459 E6 C0         [ 7]  930 	and	a, #0xC0
+   045B B4            [ 4]  931 	or	a, h
+   045C 67            [ 4]  932 	ld	h,a
+                            933 ;ym2151.c:191: if (key_config & YM_KEY_MOD1) {
+   045D DD CB 05 76   [20]  934 	bit	6, 5 (ix)
+   0461 28 0F         [12]  935 	jr	Z,00102$
+                            936 ;ym2151.c:192: ym2151_write(0x80 + channel, ((key_scaling << 6) & 0xC0) | (attack_rate & 0x1F));
+   0463 DD 7E 04      [19]  937 	ld	a,4 (ix)
+   0466 C6 80         [ 7]  938 	add	a, #0x80
+   0468 E5            [11]  939 	push	hl
+   0469 E5            [11]  940 	push	hl
+   046A 33            [ 6]  941 	inc	sp
+   046B F5            [11]  942 	push	af
+   046C 33            [ 6]  943 	inc	sp
+   046D CDr45r01      [17]  944 	call	_ym2151_write
+   0470 F1            [10]  945 	pop	af
+   0471 E1            [10]  946 	pop	hl
+   0472                     947 00102$:
+                            948 ;ym2151.c:194: if (key_config & YM_KEY_MOD2) {
+   0472 DD CB 05 66   [20]  949 	bit	4, 5 (ix)
+   0476 28 0F         [12]  950 	jr	Z,00104$
+                            951 ;ym2151.c:195: ym2151_write(0x88 + channel, ((key_scaling << 6) & 0xC0) | (attack_rate & 0x1F));
+   0478 DD 7E 04      [19]  952 	ld	a,4 (ix)
+   047B C6 88         [ 7]  953 	add	a, #0x88
+   047D E5            [11]  954 	push	hl
+   047E E5            [11]  955 	push	hl
+   047F 33            [ 6]  956 	inc	sp
+   0480 F5            [11]  957 	push	af
+   0481 33            [ 6]  958 	inc	sp
+   0482 CDr45r01      [17]  959 	call	_ym2151_write
+   0485 F1            [10]  960 	pop	af
+   0486 E1            [10]  961 	pop	hl
+   0487                     962 00104$:
+                            963 ;ym2151.c:197: if (key_config & YM_KEY_CAR1) {
+   0487 DD CB 05 6E   [20]  964 	bit	5, 5 (ix)
+   048B 28 0F         [12]  965 	jr	Z,00106$
+                            966 ;ym2151.c:198: ym2151_write(0x90 + channel, ((key_scaling << 6) & 0xC0) | (attack_rate & 0x1F));
+   048D DD 7E 04      [19]  967 	ld	a,4 (ix)
+   0490 C6 90         [ 7]  968 	add	a, #0x90
+   0492 E5            [11]  969 	push	hl
+   0493 E5            [11]  970 	push	hl
+   0494 33            [ 6]  971 	inc	sp
+   0495 F5            [11]  972 	push	af
+   0496 33            [ 6]  973 	inc	sp
+   0497 CDr45r01      [17]  974 	call	_ym2151_write
+   049A F1            [10]  975 	pop	af
+   049B E1            [10]  976 	pop	hl
+   049C                     977 00106$:
+                            978 ;ym2151.c:200: if (key_config & YM_KEY_CAR2) {
+   049C DD CB 05 5E   [20]  979 	bit	3, 5 (ix)
+   04A0 28 0D         [12]  980 	jr	Z,00109$
+                            981 ;ym2151.c:201: ym2151_write(0x98 + channel, ((key_scaling << 6) & 0xC0) | (attack_rate & 0x1F));
+   04A2 DD 7E 04      [19]  982 	ld	a,4 (ix)
+   04A5 C6 98         [ 7]  983 	add	a, #0x98
+   04A7 E5            [11]  984 	push	hl
+   04A8 33            [ 6]  985 	inc	sp
+   04A9 F5            [11]  986 	push	af
+   04AA 33            [ 6]  987 	inc	sp
+   04AB CDr45r01      [17]  988 	call	_ym2151_write
+   04AE F1            [10]  989 	pop	af
+   04AF                     990 00109$:
+   04AF DD E1         [14]  991 	pop	ix
+   04B1 C9            [10]  992 	ret
+                            993 ;ym2151.c:205: void ym2151_setAMSEnableDecayRate1(unsigned char channel, E_YM_KEY key_config, unsigned char ams_enable, unsigned char decay_rate1) {
+                            994 ;	---------------------------------
+                            995 ; Function ym2151_setAMSEnableDecayRate1
+                            996 ; ---------------------------------
+   04B2                     997 _ym2151_setAMSEnableDecayRate1::
+   04B2 DD E5         [15]  998 	push	ix
+   04B4 DD 21 00 00   [14]  999 	ld	ix,#0
+   04B8 DD 39         [15] 1000 	add	ix,sp
+                           1001 ;ym2151.c:208: ym2151_write(0xA0 + channel, (ams_enable ? 0x80 : 0x00) | (decay_rate1 & 0x1F));
+   04BA DD 7E 07      [19] 1002 	ld	a,7 (ix)
+   04BD E6 1F         [ 7] 1003 	and	a, #0x1F
+   04BF 6F            [ 4] 1004 	ld	l,a
+                           1005 ;ym2151.c:207: if (key_config & YM_KEY_MOD1) {
+   04C0 DD CB 05 76   [20] 1006 	bit	6, 5 (ix)
+   04C4 28 1D         [12] 1007 	jr	Z,00102$
+                           1008 ;ym2151.c:208: ym2151_write(0xA0 + channel, (ams_enable ? 0x80 : 0x00) | (decay_rate1 & 0x1F));
+   04C6 DD 7E 06      [19] 1009 	ld	a,6 (ix)
+   04C9 B7            [ 4] 1010 	or	a, a
+   04CA 28 04         [12] 1011 	jr	Z,00111$
+   04CC 3E 80         [ 7] 1012 	ld	a,#0x80
+   04CE 18 02         [12] 1013 	jr	00112$
+   04D0                    1014 00111$:
+   04D0 3E 00         [ 7] 1015 	ld	a,#0x00
+   04D2                    1016 00112$:
+   04D2 B5            [ 4] 1017 	or	a, l
+   04D3 67            [ 4] 1018 	ld	h,a
+   04D4 DD 7E 04      [19] 1019 	ld	a,4 (ix)
+   04D7 C6 A0         [ 7] 1020 	add	a, #0xA0
+   04D9 E5            [11] 1021 	push	hl
+   04DA E5            [11] 1022 	push	hl
+   04DB 33            [ 6] 1023 	inc	sp
+   04DC F5            [11] 1024 	push	af
+   04DD 33            [ 6] 1025 	inc	sp
+   04DE CDr45r01      [17] 1026 	call	_ym2151_write
+   04E1 F1            [10] 1027 	pop	af
+   04E2 E1            [10] 1028 	pop	hl
+   04E3                    1029 00102$:
+                           1030 ;ym2151.c:210: if (key_config & YM_KEY_MOD2) {
+   04E3 DD CB 05 66   [20] 1031 	bit	4, 5 (ix)
+   04E7 28 1D         [12] 1032 	jr	Z,00104$
+                           1033 ;ym2151.c:211: ym2151_write(0xA8 + channel, (ams_enable ? 0x80 : 0x00) | (decay_rate1 & 0x1F));
+   04E9 DD 7E 06      [19] 1034 	ld	a,6 (ix)
+   04EC B7            [ 4] 1035 	or	a, a
+   04ED 28 04         [12] 1036 	jr	Z,00113$
+   04EF 3E 80         [ 7] 1037 	ld	a,#0x80
+   04F1 18 02         [12] 1038 	jr	00114$
+   04F3                    1039 00113$:
+   04F3 3E 00         [ 7] 1040 	ld	a,#0x00
+   04F5                    1041 00114$:
+   04F5 B5            [ 4] 1042 	or	a, l
+   04F6 67            [ 4] 1043 	ld	h,a
+   04F7 DD 7E 04      [19] 1044 	ld	a,4 (ix)
+   04FA C6 A8         [ 7] 1045 	add	a, #0xA8
+   04FC E5            [11] 1046 	push	hl
+   04FD E5            [11] 1047 	push	hl
+   04FE 33            [ 6] 1048 	inc	sp
+   04FF F5            [11] 1049 	push	af
+   0500 33            [ 6] 1050 	inc	sp
+   0501 CDr45r01      [17] 1051 	call	_ym2151_write
+   0504 F1            [10] 1052 	pop	af
+   0505 E1            [10] 1053 	pop	hl
+   0506                    1054 00104$:
+                           1055 ;ym2151.c:213: if (key_config & YM_KEY_CAR1) {
+   0506 DD CB 05 6E   [20] 1056 	bit	5, 5 (ix)
+   050A 28 1D         [12] 1057 	jr	Z,00106$
+                           1058 ;ym2151.c:214: ym2151_write(0xB0 + channel, (ams_enable ? 0x80 : 0x00) | (decay_rate1 & 0x1F));
+   050C DD 7E 06      [19] 1059 	ld	a,6 (ix)
+   050F B7            [ 4] 1060 	or	a, a
+   0510 28 04         [12] 1061 	jr	Z,00115$
+   0512 3E 80         [ 7] 1062 	ld	a,#0x80
+   0514 18 02         [12] 1063 	jr	00116$
+   0516                    1064 00115$:
+   0516 3E 00         [ 7] 1065 	ld	a,#0x00
+   0518                    1066 00116$:
+   0518 B5            [ 4] 1067 	or	a, l
+   0519 67            [ 4] 1068 	ld	h,a
+   051A DD 7E 04      [19] 1069 	ld	a,4 (ix)
+   051D C6 B0         [ 7] 1070 	add	a, #0xB0
+   051F E5            [11] 1071 	push	hl
+   0520 E5            [11] 1072 	push	hl
+   0521 33            [ 6] 1073 	inc	sp
+   0522 F5            [11] 1074 	push	af
+   0523 33            [ 6] 1075 	inc	sp
+   0524 CDr45r01      [17] 1076 	call	_ym2151_write
+   0527 F1            [10] 1077 	pop	af
+   0528 E1            [10] 1078 	pop	hl
+   0529                    1079 00106$:
+                           1080 ;ym2151.c:216: if (key_config & YM_KEY_CAR2) {
+   0529 DD CB 05 5E   [20] 1081 	bit	3, 5 (ix)
+   052D 28 1B         [12] 1082 	jr	Z,00109$
+                           1083 ;ym2151.c:217: ym2151_write(0xB8 + channel, (ams_enable ? 0x80 : 0x00) | (decay_rate1 & 0x1F));
+   052F DD 7E 06      [19] 1084 	ld	a,6 (ix)
+   0532 B7            [ 4] 1085 	or	a, a
+   0533 28 04         [12] 1086 	jr	Z,00117$
+   0535 3E 80         [ 7] 1087 	ld	a,#0x80
+   0537 18 02         [12] 1088 	jr	00118$
+   0539                    1089 00117$:
+   0539 3E 00         [ 7] 1090 	ld	a,#0x00
+   053B                    1091 00118$:
+   053B B5            [ 4] 1092 	or	a, l
+   053C 67            [ 4] 1093 	ld	h,a
+   053D DD 7E 04      [19] 1094 	ld	a,4 (ix)
+   0540 C6 B8         [ 7] 1095 	add	a, #0xB8
+   0542 E5            [11] 1096 	push	hl
+   0543 33            [ 6] 1097 	inc	sp
+   0544 F5            [11] 1098 	push	af
+   0545 33            [ 6] 1099 	inc	sp
+   0546 CDr45r01      [17] 1100 	call	_ym2151_write
+   0549 F1            [10] 1101 	pop	af
+   054A                    1102 00109$:
+   054A DD E1         [14] 1103 	pop	ix
+   054C C9            [10] 1104 	ret
+                           1105 ;ym2151.c:221: void ym2151_setDetune2DecayRate2(unsigned char channel, E_YM_KEY key_config, unsigned char detune2, unsigned char decay_rate2) {
+                           1106 ;	---------------------------------
+                           1107 ; Function ym2151_setDetune2DecayRate2
+                           1108 ; ---------------------------------
+   054D                    1109 _ym2151_setDetune2DecayRate2::
+   054D DD E5         [15] 1110 	push	ix
+   054F DD 21 00 00   [14] 1111 	ld	ix,#0
+   0553 DD 39         [15] 1112 	add	ix,sp
+                           1113 ;ym2151.c:224: ym2151_write(0xC0 + channel, ((detune2 << 6) & 0xC0) | (decay_rate2 & 0x0F));
+   0555 DD 7E 06      [19] 1114 	ld	a,6 (ix)
+   0558 0F            [ 4] 1115 	rrca
+   0559 0F            [ 4] 1116 	rrca
+   055A E6 C0         [ 7] 1117 	and	a,#0xC0
+   055C 6F            [ 4] 1118 	ld	l,a
+   055D DD 7E 07      [19] 1119 	ld	a,7 (ix)
+   0560 E6 0F         [ 7] 1120 	and	a, #0x0F
+   0562 67            [ 4] 1121 	ld	h,a
+   0563 7D            [ 4] 1122 	ld	a,l
+   0564 E6 C0         [ 7] 1123 	and	a, #0xC0
+   0566 B4            [ 4] 1124 	or	a, h
+   0567 67            [ 4] 1125 	ld	h,a
+                           1126 ;ym2151.c:223: if (key_config & YM_KEY_MOD1) {
+   0568 DD CB 05 76   [20] 1127 	bit	6, 5 (ix)
+   056C 28 0F         [12] 1128 	jr	Z,00102$
+                           1129 ;ym2151.c:224: ym2151_write(0xC0 + channel, ((detune2 << 6) & 0xC0) | (decay_rate2 & 0x0F));
+   056E DD 7E 04      [19] 1130 	ld	a,4 (ix)
+   0571 C6 C0         [ 7] 1131 	add	a, #0xC0
+   0573 E5            [11] 1132 	push	hl
+   0574 E5            [11] 1133 	push	hl
+   0575 33            [ 6] 1134 	inc	sp
+   0576 F5            [11] 1135 	push	af
+   0577 33            [ 6] 1136 	inc	sp
+   0578 CDr45r01      [17] 1137 	call	_ym2151_write
+   057B F1            [10] 1138 	pop	af
+   057C E1            [10] 1139 	pop	hl
+   057D                    1140 00102$:
+                           1141 ;ym2151.c:226: if (key_config & YM_KEY_MOD2) {
+   057D DD CB 05 66   [20] 1142 	bit	4, 5 (ix)
+   0581 28 0F         [12] 1143 	jr	Z,00104$
+                           1144 ;ym2151.c:227: ym2151_write(0xC8 + channel, ((detune2 << 6) & 0xC0) | (decay_rate2 & 0x0F)); 
+   0583 DD 7E 04      [19] 1145 	ld	a,4 (ix)
+   0586 C6 C8         [ 7] 1146 	add	a, #0xC8
+   0588 E5            [11] 1147 	push	hl
+   0589 E5            [11] 1148 	push	hl
+   058A 33            [ 6] 1149 	inc	sp
+   058B F5            [11] 1150 	push	af
+   058C 33            [ 6] 1151 	inc	sp
+   058D CDr45r01      [17] 1152 	call	_ym2151_write
+   0590 F1            [10] 1153 	pop	af
+   0591 E1            [10] 1154 	pop	hl
+   0592                    1155 00104$:
+                           1156 ;ym2151.c:229: if (key_config & YM_KEY_CAR1) {
+   0592 DD CB 05 6E   [20] 1157 	bit	5, 5 (ix)
+   0596 28 0F         [12] 1158 	jr	Z,00106$
+                           1159 ;ym2151.c:230: ym2151_write(0xD0 + channel, ((detune2 << 6) & 0xC0) | (decay_rate2 & 0x0F));
+   0598 DD 7E 04      [19] 1160 	ld	a,4 (ix)
+   059B C6 D0         [ 7] 1161 	add	a, #0xD0
+   059D E5            [11] 1162 	push	hl
+   059E E5            [11] 1163 	push	hl
+   059F 33            [ 6] 1164 	inc	sp
+   05A0 F5            [11] 1165 	push	af
+   05A1 33            [ 6] 1166 	inc	sp
+   05A2 CDr45r01      [17] 1167 	call	_ym2151_write
+   05A5 F1            [10] 1168 	pop	af
+   05A6 E1            [10] 1169 	pop	hl
+   05A7                    1170 00106$:
+                           1171 ;ym2151.c:232: if (key_config & YM_KEY_CAR2) {
+   05A7 DD CB 05 5E   [20] 1172 	bit	3, 5 (ix)
+   05AB 28 0D         [12] 1173 	jr	Z,00109$
+                           1174 ;ym2151.c:233: ym2151_write(0xD8 + channel, ((detune2 << 6) & 0xC0) | (decay_rate2 & 0x0F));
+   05AD DD 7E 04      [19] 1175 	ld	a,4 (ix)
+   05B0 C6 D8         [ 7] 1176 	add	a, #0xD8
+   05B2 E5            [11] 1177 	push	hl
+   05B3 33            [ 6] 1178 	inc	sp
+   05B4 F5            [11] 1179 	push	af
+   05B5 33            [ 6] 1180 	inc	sp
+   05B6 CDr45r01      [17] 1181 	call	_ym2151_write
+   05B9 F1            [10] 1182 	pop	af
+   05BA                    1183 00109$:
+   05BA DD E1         [14] 1184 	pop	ix
+   05BC C9            [10] 1185 	ret
+                           1186 ;ym2151.c:237: void ym2151_setDecayLevelReleaseRate(unsigned char channel, E_YM_KEY key_config, unsigned char decay_level, unsigned char release_rate) {
+                           1187 ;	---------------------------------
+                           1188 ; Function ym2151_setDecayLevelReleaseRate
+                           1189 ; ---------------------------------
+   05BD                    1190 _ym2151_setDecayLevelReleaseRate::
+   05BD DD E5         [15] 1191 	push	ix
+   05BF DD 21 00 00   [14] 1192 	ld	ix,#0
+   05C3 DD 39         [15] 1193 	add	ix,sp
+                           1194 ;ym2151.c:240: ym2151_write(0xE0 + channel, ((decay_level << 4) & 0xF0) | (release_rate & 0x0F));
+   05C5 DD 7E 06      [19] 1195 	ld	a,6 (ix)
+   05C8 07            [ 4] 1196 	rlca
+   05C9 07            [ 4] 1197 	rlca
+   05CA 07            [ 4] 1198 	rlca
+   05CB 07            [ 4] 1199 	rlca
+   05CC E6 F0         [ 7] 1200 	and	a,#0xF0
+   05CE 6F            [ 4] 1201 	ld	l,a
+   05CF DD 7E 07      [19] 1202 	ld	a,7 (ix)
+   05D2 E6 0F         [ 7] 1203 	and	a, #0x0F
+   05D4 67            [ 4] 1204 	ld	h,a
+   05D5 7D            [ 4] 1205 	ld	a,l
+   05D6 E6 F0         [ 7] 1206 	and	a, #0xF0
+   05D8 B4            [ 4] 1207 	or	a, h
+   05D9 67            [ 4] 1208 	ld	h,a
+                           1209 ;ym2151.c:239: if (key_config & YM_KEY_MOD1) {
+   05DA DD CB 05 76   [20] 1210 	bit	6, 5 (ix)
+   05DE 28 0F         [12] 1211 	jr	Z,00102$
+                           1212 ;ym2151.c:240: ym2151_write(0xE0 + channel, ((decay_level << 4) & 0xF0) | (release_rate & 0x0F));
+   05E0 DD 7E 04      [19] 1213 	ld	a,4 (ix)
+   05E3 C6 E0         [ 7] 1214 	add	a, #0xE0
+   05E5 E5            [11] 1215 	push	hl
+   05E6 E5            [11] 1216 	push	hl
+   05E7 33            [ 6] 1217 	inc	sp
+   05E8 F5            [11] 1218 	push	af
+   05E9 33            [ 6] 1219 	inc	sp
+   05EA CDr45r01      [17] 1220 	call	_ym2151_write
+   05ED F1            [10] 1221 	pop	af
+   05EE E1            [10] 1222 	pop	hl
+   05EF                    1223 00102$:
+                           1224 ;ym2151.c:242: if (key_config & YM_KEY_MOD2) {
+   05EF DD CB 05 66   [20] 1225 	bit	4, 5 (ix)
+   05F3 28 0F         [12] 1226 	jr	Z,00104$
+                           1227 ;ym2151.c:243: ym2151_write(0xE8 + channel, ((decay_level << 4) & 0xF0) | (release_rate & 0x0F));
+   05F5 DD 7E 04      [19] 1228 	ld	a,4 (ix)
+   05F8 C6 E8         [ 7] 1229 	add	a, #0xE8
+   05FA E5            [11] 1230 	push	hl
+   05FB E5            [11] 1231 	push	hl
+   05FC 33            [ 6] 1232 	inc	sp
+   05FD F5            [11] 1233 	push	af
+   05FE 33            [ 6] 1234 	inc	sp
+   05FF CDr45r01      [17] 1235 	call	_ym2151_write
+   0602 F1            [10] 1236 	pop	af
+   0603 E1            [10] 1237 	pop	hl
+   0604                    1238 00104$:
+                           1239 ;ym2151.c:245: if (key_config & YM_KEY_CAR1) {
+   0604 DD CB 05 6E   [20] 1240 	bit	5, 5 (ix)
+   0608 28 0F         [12] 1241 	jr	Z,00106$
+                           1242 ;ym2151.c:246: ym2151_write(0xF0 + channel, ((decay_level << 4) & 0xF0) | (release_rate & 0x0F));
+   060A DD 7E 04      [19] 1243 	ld	a,4 (ix)
+   060D C6 F0         [ 7] 1244 	add	a, #0xF0
+   060F E5            [11] 1245 	push	hl
+   0610 E5            [11] 1246 	push	hl
+   0611 33            [ 6] 1247 	inc	sp
+   0612 F5            [11] 1248 	push	af
+   0613 33            [ 6] 1249 	inc	sp
+   0614 CDr45r01      [17] 1250 	call	_ym2151_write
+   0617 F1            [10] 1251 	pop	af
+   0618 E1            [10] 1252 	pop	hl
+   0619                    1253 00106$:
+                           1254 ;ym2151.c:248: if (key_config & YM_KEY_CAR2) {
+   0619 DD CB 05 5E   [20] 1255 	bit	3, 5 (ix)
+   061D 28 0D         [12] 1256 	jr	Z,00109$
+                           1257 ;ym2151.c:249: ym2151_write(0xF8 + channel, ((decay_level << 4) & 0xF0) | (release_rate & 0x0F));
+   061F DD 7E 04      [19] 1258 	ld	a,4 (ix)
+   0622 C6 F8         [ 7] 1259 	add	a, #0xF8
+   0624 E5            [11] 1260 	push	hl
+   0625 33            [ 6] 1261 	inc	sp
+   0626 F5            [11] 1262 	push	af
+   0627 33            [ 6] 1263 	inc	sp
+   0628 CDr45r01      [17] 1264 	call	_ym2151_write
+   062B F1            [10] 1265 	pop	af
+   062C                    1266 00109$:
+   062C DD E1         [14] 1267 	pop	ix
+   062E C9            [10] 1268 	ret
+                           1269 	.area _CODE
+                           1270 	.area _INITIALIZER
+                           1271 	.area _CABS (ABS)

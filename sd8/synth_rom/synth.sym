@@ -11,59 +11,98 @@ Symbol Table
     _FmgDataPort                                                =  0041 
     _PsgAddrPort                                                =  0010 
     _PsgDataPort                                                =  0011 
-  0 ___str_0                                                       0098 R
-  0 ___str_1                                                       00A3 R
-  0 ___str_2                                                       00A8 R
-  0 ___str_3                                                       00B0 R
-  7 __xinit__cur_x                                                 0007 R
-  7 __xinit__cur_y                                                 0008 R
-  7 __xinit__mouse_buttons                                         0004 R
-  7 __xinit__mouse_x                                               0000 R
-  7 __xinit__mouse_y                                               0002 R
-  7 __xinit__tick50Hz                                              0005 R
-  0 _clock50KHz                                                    02FB GR
-  0 _cls                                                           03B9 GR
+  0 ___str_11                                                      08E3 R
+  0 ___str_12                                                      08EE R
+  0 ___str_13                                                      08F3 R
+  0 ___str_14                                                      08FC R
+  0 ___str_15                                                      0906 R
+  0 ___str_16                                                      0909 R
+  0 ___str_17                                                      090C R
+  0 ___str_18                                                      0918 R
+  0 ___str_19                                                      0922 R
+  0 ___str_20                                                      0930 R
+  0 ___str_21                                                      093B R
+  0 ___str_22                                                      0953 R
+  7 __xinit__cur_x                                                 000A R
+  7 __xinit__cur_y                                                 000B R
+  7 __xinit__current_channel                                       0000 R
+  7 __xinit__key_config                                            0002 R
+  7 __xinit__mouse_buttons                                         0007 R
+  7 __xinit__mouse_x                                               0003 R
+  7 __xinit__mouse_y                                               0005 R
+  7 __xinit__tick50Hz                                              0008 R
+  0 _channels_config_clicked                                       007F GR
+  0 _clock50KHz                                                    0BA9 GR
+  0 _cls                                                           0C67 GR
+  0 _connection_changed                                            00B7 GR
   0 _ct1_clicked                                                   0000 GR
-  2 _cur_x                                                         0007 GR
-  2 _cur_y                                                         0008 GR
+  2 _cur_x                                                         000A GR
+  2 _cur_y                                                         000B GR
+  2 _current_channel                                               0000 GR
     _cursor_data                                                   **** GX
     _cursor_mask                                                   **** GX
     _draw_label                                                    **** GX
-  0 _ei                                                            03FD GR
-  0 _init_interrupt_table                                          03E6 GR
-  0 _init_ui                                                       0019 GR
+  0 _ei                                                            0CAB GR
+  0 _init_interrupt_table                                          0C94 GR
+  0 _init_ui                                                       0254 GR
     _isInLayout                                                    **** GX
+  2 _key_config                                                    0002 GR
+  0 _key_config_clicked                                            0019 GR
     _keys                                                       =  0020 
-  0 _left_click_event                                              014C GR
-  0 _main                                                          0401 GR
+  0 _left_click_event                                              09F2 GR
+  0 _lfo_amplitude_changed                                         0106 GR
+  0 _lfo_frequency_changed                                         00DD GR
+  0 _lfo_modulation_clicked                                        00ED GR
+  0 _lfo_waveform_changed                                          00CD GR
+  0 _main                                                          0CAF GR
+    _malloc                                                        **** GX
     _mouse_but_reg                                              =  0032 
-  2 _mouse_buttons                                                 0004 GR
-  2 _mouse_x                                                       0000 GR
-    _mouse_x_reg                                                =  0030 
-  2 _mouse_y                                                       0002 GR
-    _mouse_y_reg                                                =  0031 
-  0 _move_mouse                                                    00B8 GR
-    _new_checkbox                                                  **** GX
-    _new_spinner                                                   **** GX
-  0 _putchar                                                       031D GR
-  0 _refresh_mouse_buttons                                         0225 GR
-  1 _refresh_mouse_buttons_click_timer_1_85                        0007 R
-  1 _refresh_mouse_buttons_initial_click_1_85                      0008 R
-  1 _refresh_mouse_buttons_prev_buttons_1_85                       0006 R
-  0 _right_click_event                                             01B8 GR
-    _text_char                                                     **** GX
-  2 _tick50Hz                                                      0005 GR
-  0 _vbl                                                           02E9 GR
-    _widget_event                                                  **** GX
-    _widget_redraw                                                 **** GX
-  1 _widgets                                                       0000 GR
-    _ym2151_setCT1                                                 **** GX
+  2 _mouse_buttons                                                 0007 GR
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
 Hexadecimal [16-Bits]
 
 Symbol Table
 
-    _ym2151_write                                                  **** GX
+  2 _mouse_x                                                       0003 GR
+    _mouse_x_reg                                                =  0030 
+  2 _mouse_y                                                       0005 GR
+    _mouse_y_reg                                                =  0031 
+  0 _move_mouse                                                    095E GR
+    _new_button                                                    **** GX
+    _new_checkbox                                                  **** GX
+    _new_spinner                                                   **** GX
+  0 _op_value_changed                                              0116 GR
+  0 _putchar                                                       0BCB GR
+  0 _refresh_mouse_buttons                                         0AD3 GR
+  1 _refresh_mouse_buttons_click_timer_1_120                       0031 R
+  1 _refresh_mouse_buttons_initial_click_1_120                     0032 R
+  1 _refresh_mouse_buttons_prev_buttons_1_120                      0030 R
+  0 _reset_lfo_clicked                                             00B4 GR
+  0 _right_click_event                                             0A62 GR
+    _spinner_setMax                                                **** GX
+    _text_char                                                     **** GX
+  2 _tick50Hz                                                      0008 GR
+  0 _vbl                                                           0B97 GR
+    _widget_event                                                  **** GX
+    _widget_redraw                                                 **** GX
+  1 _widgets                                                       0000 GR
+    _ym2151_init                                                   **** GX
+    _ym2151_resetLFO                                               **** GX
+    _ym2151_setAMSEnableDecayRate1                                 **** GX
+    _ym2151_setCT1                                                 **** GX
+    _ym2151_setChannels                                            **** GX
+    _ym2151_setConnections                                         **** GX
+    _ym2151_setDecayLevelReleaseRate                               **** GX
+    _ym2151_setDetune1PhaseMultiply                                **** GX
+    _ym2151_setDetune2DecayRate2                                   **** GX
+    _ym2151_setKeyNote                                             **** GX
+    _ym2151_setKeyScalingAttackRate                                **** GX
+    _ym2151_setKeyState                                            **** GX
+    _ym2151_setLFOAmplitude                                        **** GX
+    _ym2151_setLFOFrequency                                        **** GX
+    _ym2151_setLFOModulation                                       **** GX
+    _ym2151_setLFOWaveform                                         **** GX
+    _ym2151_setTotalLevel                                          **** GX
 
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 3.
@@ -71,13 +110,13 @@ Hexadecimal [16-Bits]
 
 Area Table
 
-   0 _CODE                                      size  4D1   flags    0
-   1 _DATA                                      size    9   flags    0
-   2 _INITIALIZED                               size    9   flags    0
+   0 _CODE                                      size  D7A   flags    0
+   1 _DATA                                      size   33   flags    0
+   2 _INITIALIZED                               size    C   flags    0
    3 _DABS                                      size    0   flags    8
    4 _HOME                                      size    0   flags    0
    5 _GSINIT                                    size    0   flags    0
    6 _GSFINAL                                   size    0   flags    0
-   7 _INITIALIZER                               size    9   flags    0
+   7 _INITIALIZER                               size    C   flags    0
    8 _CABS                                      size    0   flags    8
 

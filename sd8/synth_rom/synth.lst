@@ -1,7 +1,7 @@
                               1 ;--------------------------------------------------------
                               2 ; File Created by SDCC : free open source ANSI-C Compiler
                               3 ; Version 3.5.0 #9253 (Mar 24 2016) (Linux)
-                              4 ; This file was generated Tue Nov  8 14:23:14 2016
+                              4 ; This file was generated Thu Nov 10 16:50:37 2016
                               5 ;--------------------------------------------------------
                               6 	.module synth
                               7 	.optsdcc -mz80
@@ -20,974 +20,2384 @@
                              20 	.globl _left_click_event
                              21 	.globl _move_mouse
                              22 	.globl _init_ui
-                             23 	.globl _ct1_clicked
-                             24 	.globl _text_char
-                             25 	.globl _draw_label
-                             26 	.globl _new_checkbox
-                             27 	.globl _new_spinner
-                             28 	.globl _widget_event
-                             29 	.globl _widget_redraw
-                             30 	.globl _isInLayout
-                             31 	.globl _ym2151_setCT1
-                             32 	.globl _ym2151_write
-                             33 	.globl _cur_y
-                             34 	.globl _cur_x
-                             35 	.globl _tick50Hz
-                             36 	.globl _mouse_buttons
-                             37 	.globl _mouse_y
-                             38 	.globl _mouse_x
-                             39 	.globl _widgets
-                             40 	.globl _putchar
-                             41 ;--------------------------------------------------------
-                             42 ; special function registers
-                             43 ;--------------------------------------------------------
-                     0010    44 _PsgAddrPort	=	0x0010
-                     0011    45 _PsgDataPort	=	0x0011
-                     0020    46 _keys	=	0x0020
-                     0030    47 _mouse_x_reg	=	0x0030
-                     0031    48 _mouse_y_reg	=	0x0031
-                     0032    49 _mouse_but_reg	=	0x0032
-                     0040    50 _FmgAddrPort	=	0x0040
-                     0041    51 _FmgDataPort	=	0x0041
-                             52 ;--------------------------------------------------------
-                             53 ; ram data
-                             54 ;--------------------------------------------------------
-                             55 	.area _DATA
-   0000                      56 _widgets::
-   0000                      57 	.ds 6
-   0006                      58 _refresh_mouse_buttons_prev_buttons_1_85:
-   0006                      59 	.ds 1
-   0007                      60 _refresh_mouse_buttons_click_timer_1_85:
-   0007                      61 	.ds 1
-   0008                      62 _refresh_mouse_buttons_initial_click_1_85:
-   0008                      63 	.ds 1
-                             64 ;--------------------------------------------------------
-                             65 ; ram data
-                             66 ;--------------------------------------------------------
-                             67 	.area _INITIALIZED
-   0000                      68 _mouse_x::
-   0000                      69 	.ds 2
-   0002                      70 _mouse_y::
-   0002                      71 	.ds 2
-   0004                      72 _mouse_buttons::
-   0004                      73 	.ds 1
-   0005                      74 _tick50Hz::
-   0005                      75 	.ds 2
-   0007                      76 _cur_x::
-   0007                      77 	.ds 1
-   0008                      78 _cur_y::
-   0008                      79 	.ds 1
-                             80 ;--------------------------------------------------------
-                             81 ; absolute external ram data
-                             82 ;--------------------------------------------------------
-                             83 	.area _DABS (ABS)
-                             84 ;--------------------------------------------------------
-                             85 ; global & static initialisations
-                             86 ;--------------------------------------------------------
-                             87 	.area _HOME
-                             88 	.area _GSINIT
-                             89 	.area _GSFINAL
-                             90 	.area _GSINIT
-                             91 ;--------------------------------------------------------
-                             92 ; Home
+                             23 	.globl _op_value_changed
+                             24 	.globl _lfo_amplitude_changed
+                             25 	.globl _lfo_modulation_clicked
+                             26 	.globl _lfo_frequency_changed
+                             27 	.globl _lfo_waveform_changed
+                             28 	.globl _connection_changed
+                             29 	.globl _reset_lfo_clicked
+                             30 	.globl _channels_config_clicked
+                             31 	.globl _key_config_clicked
+                             32 	.globl _ct1_clicked
+                             33 	.globl _text_char
+                             34 	.globl _draw_label
+                             35 	.globl _new_button
+                             36 	.globl _new_checkbox
+                             37 	.globl _spinner_setMax
+                             38 	.globl _new_spinner
+                             39 	.globl _widget_event
+                             40 	.globl _widget_redraw
+                             41 	.globl _isInLayout
+                             42 	.globl _ym2151_setDecayLevelReleaseRate
+                             43 	.globl _ym2151_setDetune2DecayRate2
+                             44 	.globl _ym2151_setAMSEnableDecayRate1
+                             45 	.globl _ym2151_setKeyScalingAttackRate
+                             46 	.globl _ym2151_setTotalLevel
+                             47 	.globl _ym2151_setDetune1PhaseMultiply
+                             48 	.globl _ym2151_setConnections
+                             49 	.globl _ym2151_setChannels
+                             50 	.globl _ym2151_setKeyNote
+                             51 	.globl _ym2151_setKeyState
+                             52 	.globl _ym2151_resetLFO
+                             53 	.globl _ym2151_setLFOAmplitude
+                             54 	.globl _ym2151_setLFOModulation
+                             55 	.globl _ym2151_setLFOFrequency
+                             56 	.globl _ym2151_setLFOWaveform
+                             57 	.globl _ym2151_setCT1
+                             58 	.globl _ym2151_init
+                             59 	.globl _malloc
+                             60 	.globl _cur_y
+                             61 	.globl _cur_x
+                             62 	.globl _tick50Hz
+                             63 	.globl _mouse_buttons
+                             64 	.globl _mouse_y
+                             65 	.globl _mouse_x
+                             66 	.globl _key_config
+                             67 	.globl _current_channel
+                             68 	.globl _widgets
+                             69 	.globl _putchar
+                             70 ;--------------------------------------------------------
+                             71 ; special function registers
+                             72 ;--------------------------------------------------------
+                     0010    73 _PsgAddrPort	=	0x0010
+                     0011    74 _PsgDataPort	=	0x0011
+                     0020    75 _keys	=	0x0020
+                     0030    76 _mouse_x_reg	=	0x0030
+                     0031    77 _mouse_y_reg	=	0x0031
+                     0032    78 _mouse_but_reg	=	0x0032
+                     0040    79 _FmgAddrPort	=	0x0040
+                     0041    80 _FmgDataPort	=	0x0041
+                             81 ;--------------------------------------------------------
+                             82 ; ram data
+                             83 ;--------------------------------------------------------
+                             84 	.area _DATA
+   0000                      85 _widgets::
+   0000                      86 	.ds 48
+   0030                      87 _refresh_mouse_buttons_prev_buttons_1_120:
+   0030                      88 	.ds 1
+   0031                      89 _refresh_mouse_buttons_click_timer_1_120:
+   0031                      90 	.ds 1
+   0032                      91 _refresh_mouse_buttons_initial_click_1_120:
+   0032                      92 	.ds 1
                              93 ;--------------------------------------------------------
-                             94 	.area _HOME
-                             95 	.area _HOME
-                             96 ;--------------------------------------------------------
-                             97 ; code
-                             98 ;--------------------------------------------------------
-                             99 	.area _CODE
-                            100 ;synth.c:47: void ct1_clicked(T_Widget *widget) {
-                            101 ;	---------------------------------
-                            102 ; Function ct1_clicked
-                            103 ; ---------------------------------
-   0000                     104 _ct1_clicked::
-                            105 ;synth.c:48: ym2151_setCT1(((T_Checkbox *)widget)->checked ? 1 : 0);
-   0000 C1            [10]  106 	pop	bc
-   0001 E1            [10]  107 	pop	hl
-   0002 E5            [11]  108 	push	hl
-   0003 C5            [11]  109 	push	bc
-   0004 11 08 00      [10]  110 	ld	de, #0x0008
-   0007 19            [11]  111 	add	hl, de
-   0008 7E            [ 7]  112 	ld	a,(hl)
-   0009 B7            [ 4]  113 	or	a, a
-   000A 28 04         [12]  114 	jr	Z,00103$
-   000C 26 01         [ 7]  115 	ld	h,#0x01
-   000E 18 02         [12]  116 	jr	00104$
-   0010                     117 00103$:
-   0010 26 00         [ 7]  118 	ld	h,#0x00
-   0012                     119 00104$:
-   0012 E5            [11]  120 	push	hl
-   0013 33            [ 6]  121 	inc	sp
-   0014 CDr00r00      [17]  122 	call	_ym2151_setCT1
-   0017 33            [ 6]  123 	inc	sp
-   0018 C9            [10]  124 	ret
-                            125 ;synth.c:61: void init_ui() {
-                            126 ;	---------------------------------
-                            127 ; Function init_ui
-                            128 ; ---------------------------------
-   0019                     129 _init_ui::
-                            130 ;synth.c:64: draw_label(0, 0, "YMSoC v0.1");
-   0019 21r98r00      [10]  131 	ld	hl,#___str_0
-   001C E5            [11]  132 	push	hl
-   001D 21 00 00      [10]  133 	ld	hl,#0x0000
-   0020 E5            [11]  134 	push	hl
-   0021 CDr00r00      [17]  135 	call	_draw_label
-   0024 F1            [10]  136 	pop	af
-                            137 ;synth.c:66: draw_label(0, 2, "CT1:");
-   0025 21rA3r00      [10]  138 	ld	hl, #___str_1
-   0028 E3            [19]  139 	ex	(sp),hl
-   0029 21 00 02      [10]  140 	ld	hl,#0x0200
-   002C E5            [11]  141 	push	hl
-   002D CDr00r00      [17]  142 	call	_draw_label
-   0030 F1            [10]  143 	pop	af
-                            144 ;synth.c:67: widgets[W_LED] = (T_Widget *)new_checkbox(5, 2);
-   0031 21 05 02      [10]  145 	ld	hl, #0x0205
-   0034 E3            [19]  146 	ex	(sp),hl
-   0035 CDr00r00      [17]  147 	call	_new_checkbox
-   0038 F1            [10]  148 	pop	af
-   0039 EB            [ 4]  149 	ex	de,hl
-   003A ED 53r00r00   [20]  150 	ld	(_widgets), de
-                            151 ;synth.c:68: widgets[W_LED]->callback = ct1_clicked;
-   003E 21 06 00      [10]  152 	ld	hl,#0x0006
-   0041 19            [11]  153 	add	hl,de
-   0042 36r00         [10]  154 	ld	(hl),#<(_ct1_clicked)
-   0044 23            [ 6]  155 	inc	hl
-   0045 36s00         [10]  156 	ld	(hl),#>(_ct1_clicked)
-                            157 ;synth.c:70: draw_label(0, 4, "Value1:");
-   0047 21rA8r00      [10]  158 	ld	hl,#___str_2
-   004A E5            [11]  159 	push	hl
-   004B 21 00 04      [10]  160 	ld	hl,#0x0400
-   004E E5            [11]  161 	push	hl
-   004F CDr00r00      [17]  162 	call	_draw_label
-   0052 F1            [10]  163 	pop	af
-                            164 ;synth.c:71: widgets[SPINNER1] = (T_Widget *)new_spinner(10, 4);
-   0053 21 0A 04      [10]  165 	ld	hl, #0x040A
-   0056 E3            [19]  166 	ex	(sp),hl
-   0057 CDr00r00      [17]  167 	call	_new_spinner
-   005A F1            [10]  168 	pop	af
-   005B EB            [ 4]  169 	ex	de,hl
-   005C ED 53r02r00   [20]  170 	ld	((_widgets + 0x0002)), de
-                            171 ;synth.c:73: draw_label(0, 5, "Value2:");
-   0060 21rB0r00      [10]  172 	ld	hl,#___str_3
-   0063 E5            [11]  173 	push	hl
-   0064 21 00 05      [10]  174 	ld	hl,#0x0500
-   0067 E5            [11]  175 	push	hl
-   0068 CDr00r00      [17]  176 	call	_draw_label
-   006B F1            [10]  177 	pop	af
-                            178 ;synth.c:74: widgets[CHECKBOX1] = (T_Widget *)new_checkbox(10, 5);
-   006C 21 0A 05      [10]  179 	ld	hl, #0x050A
-   006F E3            [19]  180 	ex	(sp),hl
-   0070 CDr00r00      [17]  181 	call	_new_checkbox
-   0073 F1            [10]  182 	pop	af
-   0074 EB            [ 4]  183 	ex	de,hl
-   0075 ED 53r04r00   [20]  184 	ld	((_widgets + 0x0004)), de
-                            185 ;synth.c:77: for (i = 0; i < NB_WIDGETS; i++) {
-   0079 16 00         [ 7]  186 	ld	d,#0x00
-   007B                     187 00102$:
-                            188 ;synth.c:78: widget_redraw(widgets[i]);
-   007B 7A            [ 4]  189 	ld	a,d
-   007C 6F            [ 4]  190 	ld	l,a
-   007D 17            [ 4]  191 	rla
-   007E 9F            [ 4]  192 	sbc	a, a
-   007F 67            [ 4]  193 	ld	h,a
-   0080 29            [11]  194 	add	hl, hl
-   0081 01r00r00      [10]  195 	ld	bc,#_widgets
-   0084 09            [11]  196 	add	hl,bc
-   0085 4E            [ 7]  197 	ld	c,(hl)
-   0086 23            [ 6]  198 	inc	hl
-   0087 46            [ 7]  199 	ld	b,(hl)
-   0088 D5            [11]  200 	push	de
-   0089 C5            [11]  201 	push	bc
-   008A CDr00r00      [17]  202 	call	_widget_redraw
-   008D F1            [10]  203 	pop	af
-   008E D1            [10]  204 	pop	de
-                            205 ;synth.c:77: for (i = 0; i < NB_WIDGETS; i++) {
-   008F 14            [ 4]  206 	inc	d
-   0090 7A            [ 4]  207 	ld	a,d
-   0091 EE 80         [ 7]  208 	xor	a, #0x80
-   0093 D6 83         [ 7]  209 	sub	a, #0x83
-   0095 38 E4         [12]  210 	jr	C,00102$
-   0097 C9            [10]  211 	ret
-   0098                     212 ___str_0:
-   0098 59 4D 53 6F 43 20   213 	.ascii "YMSoC v0.1"
+                             94 ; ram data
+                             95 ;--------------------------------------------------------
+                             96 	.area _INITIALIZED
+   0000                      97 _current_channel::
+   0000                      98 	.ds 2
+   0002                      99 _key_config::
+   0002                     100 	.ds 1
+   0003                     101 _mouse_x::
+   0003                     102 	.ds 2
+   0005                     103 _mouse_y::
+   0005                     104 	.ds 2
+   0007                     105 _mouse_buttons::
+   0007                     106 	.ds 1
+   0008                     107 _tick50Hz::
+   0008                     108 	.ds 2
+   000A                     109 _cur_x::
+   000A                     110 	.ds 1
+   000B                     111 _cur_y::
+   000B                     112 	.ds 1
+                            113 ;--------------------------------------------------------
+                            114 ; absolute external ram data
+                            115 ;--------------------------------------------------------
+                            116 	.area _DABS (ABS)
+                            117 ;--------------------------------------------------------
+                            118 ; global & static initialisations
+                            119 ;--------------------------------------------------------
+                            120 	.area _HOME
+                            121 	.area _GSINIT
+                            122 	.area _GSFINAL
+                            123 	.area _GSINIT
+                            124 ;--------------------------------------------------------
+                            125 ; Home
+                            126 ;--------------------------------------------------------
+                            127 	.area _HOME
+                            128 	.area _HOME
+                            129 ;--------------------------------------------------------
+                            130 ; code
+                            131 ;--------------------------------------------------------
+                            132 	.area _CODE
+                            133 ;synth.c:80: void ct1_clicked(T_Widget *widget) {
+                            134 ;	---------------------------------
+                            135 ; Function ct1_clicked
+                            136 ; ---------------------------------
+   0000                     137 _ct1_clicked::
+                            138 ;synth.c:81: ym2151_setCT1(((T_Checkbox *)widget)->checked ? 1 : 0);
+   0000 C1            [10]  139 	pop	bc
+   0001 E1            [10]  140 	pop	hl
+   0002 E5            [11]  141 	push	hl
+   0003 C5            [11]  142 	push	bc
+   0004 11 0A 00      [10]  143 	ld	de, #0x000A
+   0007 19            [11]  144 	add	hl, de
+   0008 7E            [ 7]  145 	ld	a,(hl)
+   0009 B7            [ 4]  146 	or	a, a
+   000A 28 04         [12]  147 	jr	Z,00103$
+   000C 26 01         [ 7]  148 	ld	h,#0x01
+   000E 18 02         [12]  149 	jr	00104$
+   0010                     150 00103$:
+   0010 26 00         [ 7]  151 	ld	h,#0x00
+   0012                     152 00104$:
+   0012 E5            [11]  153 	push	hl
+   0013 33            [ 6]  154 	inc	sp
+   0014 CDr00r00      [17]  155 	call	_ym2151_setCT1
+   0017 33            [ 6]  156 	inc	sp
+   0018 C9            [10]  157 	ret
+                            158 ;synth.c:84: void key_config_clicked(T_Widget *widget) {
+                            159 ;	---------------------------------
+                            160 ; Function key_config_clicked
+                            161 ; ---------------------------------
+   0019                     162 _key_config_clicked::
+   0019 DD E5         [15]  163 	push	ix
+                            164 ;synth.c:85: key_config = YM_KEY_OFF;
+   001B 21r02r00      [10]  165 	ld	hl,#_key_config + 0
+   001E 36 00         [10]  166 	ld	(hl), #0x00
+                            167 ;synth.c:86: key_config |= ((T_Checkbox *)widgets[W_M1])->checked ? YM_KEY_MOD1 : 0x00;
+   0020 2Ar02r00      [16]  168 	ld	hl, (#_widgets + 2)
+   0023 11 0A 00      [10]  169 	ld	de, #0x000A
+   0026 19            [11]  170 	add	hl, de
+   0027 7E            [ 7]  171 	ld	a,(hl)
+   0028 B7            [ 4]  172 	or	a, a
+   0029 28 04         [12]  173 	jr	Z,00103$
+   002B 3E 40         [ 7]  174 	ld	a,#0x40
+   002D 18 02         [12]  175 	jr	00104$
+   002F                     176 00103$:
+   002F 3E 00         [ 7]  177 	ld	a,#0x00
+   0031                     178 00104$:
+   0031 32r02r00      [13]  179 	ld	(#_key_config + 0),a
+                            180 ;synth.c:87: key_config |= ((T_Checkbox *)widgets[W_C1])->checked ? YM_KEY_CAR1 : 0x00;
+   0034 2Ar04r00      [16]  181 	ld	hl, (#_widgets + 4)
+   0037 11 0A 00      [10]  182 	ld	de, #0x000A
+   003A 19            [11]  183 	add	hl, de
+   003B 7E            [ 7]  184 	ld	a,(hl)
+   003C B7            [ 4]  185 	or	a, a
+   003D 28 04         [12]  186 	jr	Z,00105$
+   003F 3E 20         [ 7]  187 	ld	a,#0x20
+   0041 18 02         [12]  188 	jr	00106$
+   0043                     189 00105$:
+   0043 3E 00         [ 7]  190 	ld	a,#0x00
+   0045                     191 00106$:
+   0045 21r02r00      [10]  192 	ld	hl,#_key_config + 0
+   0048 B6            [ 7]  193 	or	a,(hl)
+   0049 32r02r00      [13]  194 	ld	(#_key_config + 0),a
+                            195 ;synth.c:88: key_config |= ((T_Checkbox *)widgets[W_M2])->checked ? YM_KEY_MOD2 : 0x00;
+   004C 2Ar06r00      [16]  196 	ld	hl, (#_widgets + 6)
+   004F 11 0A 00      [10]  197 	ld	de, #0x000A
+   0052 19            [11]  198 	add	hl, de
+   0053 7E            [ 7]  199 	ld	a,(hl)
+   0054 B7            [ 4]  200 	or	a, a
+   0055 28 04         [12]  201 	jr	Z,00107$
+   0057 3E 10         [ 7]  202 	ld	a,#0x10
+   0059 18 02         [12]  203 	jr	00108$
+   005B                     204 00107$:
+   005B 3E 00         [ 7]  205 	ld	a,#0x00
+   005D                     206 00108$:
+   005D 21r02r00      [10]  207 	ld	hl,#_key_config + 0
+   0060 B6            [ 7]  208 	or	a,(hl)
+   0061 32r02r00      [13]  209 	ld	(#_key_config + 0),a
+                            210 ;synth.c:89: key_config |= ((T_Checkbox *)widgets[W_C2])->checked ? YM_KEY_CAR2 : 0x00;
+   0064 2Ar08r00      [16]  211 	ld	hl, (#_widgets + 8)
+   0067 11 0A 00      [10]  212 	ld	de, #0x000A
+   006A 19            [11]  213 	add	hl, de
+   006B 7E            [ 7]  214 	ld	a,(hl)
+   006C B7            [ 4]  215 	or	a, a
+   006D 28 04         [12]  216 	jr	Z,00109$
+   006F 3E 08         [ 7]  217 	ld	a,#0x08
+   0071 18 02         [12]  218 	jr	00110$
+   0073                     219 00109$:
+   0073 3E 00         [ 7]  220 	ld	a,#0x00
+   0075                     221 00110$:
+   0075 21r02r00      [10]  222 	ld	hl,#_key_config + 0
+   0078 B6            [ 7]  223 	or	a,(hl)
+   0079 32r02r00      [13]  224 	ld	(#_key_config + 0),a
+   007C DD E1         [14]  225 	pop	ix
+   007E C9            [10]  226 	ret
+                            227 ;synth.c:92: void channels_config_clicked(T_Widget *widget) {
+                            228 ;	---------------------------------
+                            229 ; Function channels_config_clicked
+                            230 ; ---------------------------------
+   007F                     231 _channels_config_clicked::
+   007F DD E5         [15]  232 	push	ix
+                            233 ;synth.c:95: channels_config |= ((T_Checkbox *)widgets[W_CH_L])->checked ? YM_LEFT : 0x00;
+   0081 2Ar0Ar00      [16]  234 	ld	hl, (#_widgets + 10)
+   0084 11 0A 00      [10]  235 	ld	de, #0x000A
+   0087 19            [11]  236 	add	hl, de
+   0088 7E            [ 7]  237 	ld	a,(hl)
+   0089 B7            [ 4]  238 	or	a, a
+   008A 28 04         [12]  239 	jr	Z,00103$
+   008C 16 40         [ 7]  240 	ld	d,#0x40
+   008E 18 02         [12]  241 	jr	00104$
+   0090                     242 00103$:
+   0090 16 00         [ 7]  243 	ld	d,#0x00
+   0092                     244 00104$:
+                            245 ;synth.c:96: channels_config |= ((T_Checkbox *)widgets[W_CH_R])->checked ? YM_RIGHT : 0x00;
+   0092 2Ar0Cr00      [16]  246 	ld	hl, (#_widgets + 12)
+   0095 01 0A 00      [10]  247 	ld	bc, #0x000A
+   0098 09            [11]  248 	add	hl, bc
+   0099 7E            [ 7]  249 	ld	a,(hl)
+   009A B7            [ 4]  250 	or	a, a
+   009B 28 04         [12]  251 	jr	Z,00105$
+   009D 3E 80         [ 7]  252 	ld	a,#0x80
+   009F 18 02         [12]  253 	jr	00106$
+   00A1                     254 00105$:
+   00A1 3E 00         [ 7]  255 	ld	a,#0x00
+   00A3                     256 00106$:
+   00A3 B2            [ 4]  257 	or	a, d
+   00A4 57            [ 4]  258 	ld	d,a
+                            259 ;synth.c:98: ym2151_setChannels(current_channel, channels_config);
+   00A5 21r00r00      [10]  260 	ld	hl,#_current_channel + 0
+   00A8 46            [ 7]  261 	ld	b, (hl)
+   00A9 D5            [11]  262 	push	de
+   00AA 33            [ 6]  263 	inc	sp
+   00AB C5            [11]  264 	push	bc
+   00AC 33            [ 6]  265 	inc	sp
+   00AD CDr00r00      [17]  266 	call	_ym2151_setChannels
+   00B0 F1            [10]  267 	pop	af
+   00B1 DD E1         [14]  268 	pop	ix
+   00B3 C9            [10]  269 	ret
+                            270 ;synth.c:101: void reset_lfo_clicked(T_Widget *widget) {
+                            271 ;	---------------------------------
+                            272 ; Function reset_lfo_clicked
+                            273 ; ---------------------------------
+   00B4                     274 _reset_lfo_clicked::
+                            275 ;synth.c:102: ym2151_resetLFO();
+   00B4 C3r00r00      [10]  276 	jp	_ym2151_resetLFO
+                            277 ;synth.c:105: void connection_changed(T_Widget *widget) {
+                            278 ;	---------------------------------
+                            279 ; Function connection_changed
+                            280 ; ---------------------------------
+   00B7                     281 _connection_changed::
+                            282 ;synth.c:106: ym2151_setConnections(current_channel, ((T_Spinner *)widget)->value);
+   00B7 C1            [10]  283 	pop	bc
+   00B8 E1            [10]  284 	pop	hl
+   00B9 E5            [11]  285 	push	hl
+   00BA C5            [11]  286 	push	bc
+   00BB 11 0C 00      [10]  287 	ld	de, #0x000C
+   00BE 19            [11]  288 	add	hl, de
+   00BF 56            [ 7]  289 	ld	d,(hl)
+   00C0 21r00r00      [10]  290 	ld	hl,#_current_channel + 0
+   00C3 46            [ 7]  291 	ld	b, (hl)
+   00C4 D5            [11]  292 	push	de
+   00C5 33            [ 6]  293 	inc	sp
+   00C6 C5            [11]  294 	push	bc
+   00C7 33            [ 6]  295 	inc	sp
+   00C8 CDr00r00      [17]  296 	call	_ym2151_setConnections
+   00CB F1            [10]  297 	pop	af
+   00CC C9            [10]  298 	ret
+                            299 ;synth.c:109: void lfo_waveform_changed(T_Widget *widget) {
+                            300 ;	---------------------------------
+                            301 ; Function lfo_waveform_changed
+                            302 ; ---------------------------------
+   00CD                     303 _lfo_waveform_changed::
+                            304 ;synth.c:110: ym2151_setLFOWaveform(((T_Spinner *)widget)->value);
+   00CD C1            [10]  305 	pop	bc
+   00CE E1            [10]  306 	pop	hl
+   00CF E5            [11]  307 	push	hl
+   00D0 C5            [11]  308 	push	bc
+   00D1 11 0C 00      [10]  309 	ld	de, #0x000C
+   00D4 19            [11]  310 	add	hl, de
+   00D5 66            [ 7]  311 	ld	h,(hl)
+   00D6 E5            [11]  312 	push	hl
+   00D7 33            [ 6]  313 	inc	sp
+   00D8 CDr00r00      [17]  314 	call	_ym2151_setLFOWaveform
+   00DB 33            [ 6]  315 	inc	sp
+   00DC C9            [10]  316 	ret
+                            317 ;synth.c:113: void lfo_frequency_changed(T_Widget *widget) {
+                            318 ;	---------------------------------
+                            319 ; Function lfo_frequency_changed
+                            320 ; ---------------------------------
+   00DD                     321 _lfo_frequency_changed::
+                            322 ;synth.c:114: ym2151_setLFOFrequency(((T_Spinner *)widget)->value);
+   00DD C1            [10]  323 	pop	bc
+   00DE E1            [10]  324 	pop	hl
+   00DF E5            [11]  325 	push	hl
+   00E0 C5            [11]  326 	push	bc
+   00E1 11 0C 00      [10]  327 	ld	de, #0x000C
+   00E4 19            [11]  328 	add	hl, de
+   00E5 66            [ 7]  329 	ld	h,(hl)
+   00E6 E5            [11]  330 	push	hl
+   00E7 33            [ 6]  331 	inc	sp
+   00E8 CDr00r00      [17]  332 	call	_ym2151_setLFOFrequency
+   00EB 33            [ 6]  333 	inc	sp
+   00EC C9            [10]  334 	ret
+                            335 ;synth.c:117: void lfo_modulation_clicked(T_Widget *widget) {
+                            336 ;	---------------------------------
+                            337 ; Function lfo_modulation_clicked
+                            338 ; ---------------------------------
+   00ED                     339 _lfo_modulation_clicked::
+                            340 ;synth.c:118: ym2151_setLFOModulation(((T_Checkbox *)widget)->checked ? YM_PHASE : YM_AMPLITUDE);
+   00ED C1            [10]  341 	pop	bc
+   00EE E1            [10]  342 	pop	hl
+   00EF E5            [11]  343 	push	hl
+   00F0 C5            [11]  344 	push	bc
+   00F1 11 0A 00      [10]  345 	ld	de, #0x000A
+   00F4 19            [11]  346 	add	hl, de
+   00F5 7E            [ 7]  347 	ld	a,(hl)
+   00F6 B7            [ 4]  348 	or	a, a
+   00F7 28 04         [12]  349 	jr	Z,00103$
+   00F9 26 80         [ 7]  350 	ld	h,#0x80
+   00FB 18 02         [12]  351 	jr	00104$
+   00FD                     352 00103$:
+   00FD 26 00         [ 7]  353 	ld	h,#0x00
+   00FF                     354 00104$:
+   00FF E5            [11]  355 	push	hl
+   0100 33            [ 6]  356 	inc	sp
+   0101 CDr00r00      [17]  357 	call	_ym2151_setLFOModulation
+   0104 33            [ 6]  358 	inc	sp
+   0105 C9            [10]  359 	ret
+                            360 ;synth.c:121: void lfo_amplitude_changed(T_Widget *widget) {
+                            361 ;	---------------------------------
+                            362 ; Function lfo_amplitude_changed
+                            363 ; ---------------------------------
+   0106                     364 _lfo_amplitude_changed::
+                            365 ;synth.c:122: ym2151_setLFOAmplitude(((T_Spinner *)widget)->value);
+   0106 C1            [10]  366 	pop	bc
+   0107 E1            [10]  367 	pop	hl
+   0108 E5            [11]  368 	push	hl
+   0109 C5            [11]  369 	push	bc
+   010A 11 0C 00      [10]  370 	ld	de, #0x000C
+   010D 19            [11]  371 	add	hl, de
+   010E 66            [ 7]  372 	ld	h,(hl)
+   010F E5            [11]  373 	push	hl
+   0110 33            [ 6]  374 	inc	sp
+   0111 CDr00r00      [17]  375 	call	_ym2151_setLFOAmplitude
+   0114 33            [ 6]  376 	inc	sp
+   0115 C9            [10]  377 	ret
+                            378 ;synth.c:125: void op_value_changed(T_Widget *widget) {
+                            379 ;	---------------------------------
+                            380 ; Function op_value_changed
+                            381 ; ---------------------------------
+   0116                     382 _op_value_changed::
+   0116 DD E5         [15]  383 	push	ix
+   0118 DD 21 00 00   [14]  384 	ld	ix,#0
+   011C DD 39         [15]  385 	add	ix,sp
+                            386 ;synth.c:126: T_WData *data = (T_WData *)(widget->user_data);
+   011E DD 6E 04      [19]  387 	ld	l,4 (ix)
+   0121 DD 66 05      [19]  388 	ld	h,5 (ix)
+   0124 11 08 00      [10]  389 	ld	de, #0x0008
+   0127 19            [11]  390 	add	hl, de
+   0128 4E            [ 7]  391 	ld	c,(hl)
+   0129 23            [ 6]  392 	inc	hl
+   012A 46            [ 7]  393 	ld	b,(hl)
+                            394 ;synth.c:131: switch(data->op) {
+   012B 0A            [ 7]  395 	ld	a,(bc)
+   012C 5F            [ 4]  396 	ld	e,a
+   012D 3E 0A         [ 7]  397 	ld	a,#0x0A
+   012F 93            [ 4]  398 	sub	a, e
+   0130 DAr51r02      [10]  399 	jp	C,00113$
+   0133 16 00         [ 7]  400 	ld	d,#0x00
+   0135 21r3Cr01      [10]  401 	ld	hl,#00119$
+   0138 19            [11]  402 	add	hl,de
+   0139 19            [11]  403 	add	hl,de
+   013A 19            [11]  404 	add	hl,de
+   013B E9            [ 4]  405 	jp	(hl)
+   013C                     406 00119$:
+   013C C3r5Dr01      [10]  407 	jp	00101$
+   013F C3r5Dr01      [10]  408 	jp	00102$
+   0142 C3r89r01      [10]  409 	jp	00103$
+   0145 C3rA6r01      [10]  410 	jp	00104$
+   0148 C3rA6r01      [10]  411 	jp	00105$
+   014B C3rD2r01      [10]  412 	jp	00106$
+   014E C3rD2r01      [10]  413 	jp	00107$
+   0151 C3rFDr01      [10]  414 	jp	00108$
+   0154 C3rFDr01      [10]  415 	jp	00109$
+   0157 C3r28r02      [10]  416 	jp	00110$
+   015A C3r28r02      [10]  417 	jp	00111$
+                            418 ;synth.c:132: case 0:
+   015D                     419 00101$:
+                            420 ;synth.c:133: case 1:
+   015D                     421 00102$:
+                            422 ;synth.c:134: value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS])->value;
+   015D 2Ar1Ar00      [16]  423 	ld	hl, (#_widgets + 26)
+   0160 11 0C 00      [10]  424 	ld	de, #0x000C
+   0163 19            [11]  425 	add	hl, de
+   0164 56            [ 7]  426 	ld	d,(hl)
+                            427 ;synth.c:135: value2 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 1])->value;
+   0165 2Ar1Cr00      [16]  428 	ld	hl, (#_widgets + 28)
+   0168 C5            [11]  429 	push	bc
+   0169 01 0C 00      [10]  430 	ld	bc, #0x000C
+   016C 09            [11]  431 	add	hl, bc
+   016D C1            [10]  432 	pop	bc
+   016E 5E            [ 7]  433 	ld	e,(hl)
+                            434 ;synth.c:136: ym2151_setDetune1PhaseMultiply(current_channel, data->dev, value1, value2); 
+   016F 69            [ 4]  435 	ld	l, c
+   0170 60            [ 4]  436 	ld	h, b
+   0171 23            [ 6]  437 	inc	hl
+   0172 4E            [ 7]  438 	ld	c,(hl)
+   0173 21r00r00      [10]  439 	ld	hl,#_current_channel + 0
+   0176 46            [ 7]  440 	ld	b, (hl)
+   0177 7B            [ 4]  441 	ld	a,e
+   0178 F5            [11]  442 	push	af
+   0179 33            [ 6]  443 	inc	sp
+   017A D5            [11]  444 	push	de
+   017B 33            [ 6]  445 	inc	sp
+   017C 79            [ 4]  446 	ld	a,c
+   017D F5            [11]  447 	push	af
+   017E 33            [ 6]  448 	inc	sp
+   017F C5            [11]  449 	push	bc
+   0180 33            [ 6]  450 	inc	sp
+   0181 CDr00r00      [17]  451 	call	_ym2151_setDetune1PhaseMultiply
+   0184 F1            [10]  452 	pop	af
+   0185 F1            [10]  453 	pop	af
+                            454 ;synth.c:137: break;
+   0186 C3r51r02      [10]  455 	jp	00113$
+                            456 ;synth.c:138: case 2:
+   0189                     457 00103$:
+                            458 ;synth.c:139: value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 2])->value;
+   0189 2Ar1Er00      [16]  459 	ld	hl, (#(_widgets + 0x001e) + 0)
+   018C 11 0C 00      [10]  460 	ld	de, #0x000C
+   018F 19            [11]  461 	add	hl, de
+   0190 56            [ 7]  462 	ld	d,(hl)
+                            463 ;synth.c:140: ym2151_setTotalLevel(current_channel, data->dev, value1);
+   0191 69            [ 4]  464 	ld	l, c
+   0192 60            [ 4]  465 	ld	h, b
+   0193 23            [ 6]  466 	inc	hl
+   0194 46            [ 7]  467 	ld	b,(hl)
+   0195 3Ar00r00      [13]  468 	ld	a,(#_current_channel + 0)
+   0198 D5            [11]  469 	push	de
+   0199 33            [ 6]  470 	inc	sp
+   019A C5            [11]  471 	push	bc
+   019B 33            [ 6]  472 	inc	sp
+   019C F5            [11]  473 	push	af
+   019D 33            [ 6]  474 	inc	sp
+   019E CDr00r00      [17]  475 	call	_ym2151_setTotalLevel
+   01A1 F1            [10]  476 	pop	af
+   01A2 33            [ 6]  477 	inc	sp
+                            478 ;synth.c:141: break;
+   01A3 C3r51r02      [10]  479 	jp	00113$
+                            480 ;synth.c:142: case 3:
+   01A6                     481 00104$:
+                            482 ;synth.c:143: case 4:
+   01A6                     483 00105$:
+                            484 ;synth.c:144: value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 3])->value;
+   01A6 2Ar20r00      [16]  485 	ld	hl, (#_widgets + 32)
+   01A9 11 0C 00      [10]  486 	ld	de, #0x000C
+   01AC 19            [11]  487 	add	hl, de
+   01AD 56            [ 7]  488 	ld	d,(hl)
+                            489 ;synth.c:145: value2 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 4])->value;
+   01AE 2Ar22r00      [16]  490 	ld	hl, (#_widgets + 34)
+   01B1 C5            [11]  491 	push	bc
+   01B2 01 0C 00      [10]  492 	ld	bc, #0x000C
+   01B5 09            [11]  493 	add	hl, bc
+   01B6 C1            [10]  494 	pop	bc
+   01B7 5E            [ 7]  495 	ld	e,(hl)
+                            496 ;synth.c:146: ym2151_setKeyScalingAttackRate(current_channel, data->dev, value1, value2);
+   01B8 69            [ 4]  497 	ld	l, c
+   01B9 60            [ 4]  498 	ld	h, b
+   01BA 23            [ 6]  499 	inc	hl
+   01BB 4E            [ 7]  500 	ld	c,(hl)
+   01BC 21r00r00      [10]  501 	ld	hl,#_current_channel + 0
+   01BF 46            [ 7]  502 	ld	b, (hl)
+   01C0 7B            [ 4]  503 	ld	a,e
+   01C1 F5            [11]  504 	push	af
+   01C2 33            [ 6]  505 	inc	sp
+   01C3 D5            [11]  506 	push	de
+   01C4 33            [ 6]  507 	inc	sp
+   01C5 79            [ 4]  508 	ld	a,c
+   01C6 F5            [11]  509 	push	af
+   01C7 33            [ 6]  510 	inc	sp
+   01C8 C5            [11]  511 	push	bc
+   01C9 33            [ 6]  512 	inc	sp
+   01CA CDr00r00      [17]  513 	call	_ym2151_setKeyScalingAttackRate
+   01CD F1            [10]  514 	pop	af
+   01CE F1            [10]  515 	pop	af
+                            516 ;synth.c:147: break;
+   01CF C3r51r02      [10]  517 	jp	00113$
+                            518 ;synth.c:148: case 5:
+   01D2                     519 00106$:
+                            520 ;synth.c:149: case 6:
+   01D2                     521 00107$:
+                            522 ;synth.c:150: value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 5])->value;
+   01D2 2Ar24r00      [16]  523 	ld	hl, (#_widgets + 36)
+   01D5 11 0C 00      [10]  524 	ld	de, #0x000C
+   01D8 19            [11]  525 	add	hl, de
+   01D9 56            [ 7]  526 	ld	d,(hl)
+                            527 ;synth.c:151: value2 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 6])->value;
+   01DA 2Ar26r00      [16]  528 	ld	hl, (#_widgets + 38)
+   01DD C5            [11]  529 	push	bc
+   01DE 01 0C 00      [10]  530 	ld	bc, #0x000C
+   01E1 09            [11]  531 	add	hl, bc
+   01E2 C1            [10]  532 	pop	bc
+   01E3 5E            [ 7]  533 	ld	e,(hl)
+                            534 ;synth.c:152: ym2151_setAMSEnableDecayRate1(current_channel, data->dev, value1, value2);
+   01E4 69            [ 4]  535 	ld	l, c
+   01E5 60            [ 4]  536 	ld	h, b
+   01E6 23            [ 6]  537 	inc	hl
+   01E7 4E            [ 7]  538 	ld	c,(hl)
+   01E8 21r00r00      [10]  539 	ld	hl,#_current_channel + 0
+   01EB 46            [ 7]  540 	ld	b, (hl)
+   01EC 7B            [ 4]  541 	ld	a,e
+   01ED F5            [11]  542 	push	af
+   01EE 33            [ 6]  543 	inc	sp
+   01EF D5            [11]  544 	push	de
+   01F0 33            [ 6]  545 	inc	sp
+   01F1 79            [ 4]  546 	ld	a,c
+   01F2 F5            [11]  547 	push	af
+   01F3 33            [ 6]  548 	inc	sp
+   01F4 C5            [11]  549 	push	bc
+   01F5 33            [ 6]  550 	inc	sp
+   01F6 CDr00r00      [17]  551 	call	_ym2151_setAMSEnableDecayRate1
+   01F9 F1            [10]  552 	pop	af
+   01FA F1            [10]  553 	pop	af
+                            554 ;synth.c:153: break;
+   01FB 18 54         [12]  555 	jr	00113$
+                            556 ;synth.c:154: case 7:
+   01FD                     557 00108$:
+                            558 ;synth.c:155: case 8:
+   01FD                     559 00109$:
+                            560 ;synth.c:156: value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 7])->value;
+   01FD 2Ar28r00      [16]  561 	ld	hl, (#_widgets + 40)
+   0200 11 0C 00      [10]  562 	ld	de, #0x000C
+   0203 19            [11]  563 	add	hl, de
+   0204 56            [ 7]  564 	ld	d,(hl)
+                            565 ;synth.c:157: value2 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 8])->value;
+   0205 2Ar2Ar00      [16]  566 	ld	hl, (#_widgets + 42)
+   0208 C5            [11]  567 	push	bc
+   0209 01 0C 00      [10]  568 	ld	bc, #0x000C
+   020C 09            [11]  569 	add	hl, bc
+   020D C1            [10]  570 	pop	bc
+   020E 5E            [ 7]  571 	ld	e,(hl)
+                            572 ;synth.c:158: ym2151_setDetune2DecayRate2(current_channel, data->dev, value1, value2);
+   020F 69            [ 4]  573 	ld	l, c
+   0210 60            [ 4]  574 	ld	h, b
+   0211 23            [ 6]  575 	inc	hl
+   0212 4E            [ 7]  576 	ld	c,(hl)
+   0213 21r00r00      [10]  577 	ld	hl,#_current_channel + 0
+   0216 46            [ 7]  578 	ld	b, (hl)
+   0217 7B            [ 4]  579 	ld	a,e
+   0218 F5            [11]  580 	push	af
+   0219 33            [ 6]  581 	inc	sp
+   021A D5            [11]  582 	push	de
+   021B 33            [ 6]  583 	inc	sp
+   021C 79            [ 4]  584 	ld	a,c
+   021D F5            [11]  585 	push	af
+   021E 33            [ 6]  586 	inc	sp
+   021F C5            [11]  587 	push	bc
+   0220 33            [ 6]  588 	inc	sp
+   0221 CDr00r00      [17]  589 	call	_ym2151_setDetune2DecayRate2
+   0224 F1            [10]  590 	pop	af
+   0225 F1            [10]  591 	pop	af
+                            592 ;synth.c:159: break;
+   0226 18 29         [12]  593 	jr	00113$
+                            594 ;synth.c:160: case 9:
+   0228                     595 00110$:
+                            596 ;synth.c:161: case 10:
+   0228                     597 00111$:
+                            598 ;synth.c:162: value1 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 9])->value;
+   0228 2Ar2Cr00      [16]  599 	ld	hl, (#_widgets + 44)
+   022B 11 0C 00      [10]  600 	ld	de, #0x000C
+   022E 19            [11]  601 	add	hl, de
+   022F 56            [ 7]  602 	ld	d,(hl)
+                            603 ;synth.c:163: value2 = ((T_Spinner *)widgets[NB_CH_WIDGETS + 10])->value;
+   0230 2Ar2Er00      [16]  604 	ld	hl, (#_widgets + 46)
+   0233 C5            [11]  605 	push	bc
+   0234 01 0C 00      [10]  606 	ld	bc, #0x000C
+   0237 09            [11]  607 	add	hl, bc
+   0238 C1            [10]  608 	pop	bc
+   0239 5E            [ 7]  609 	ld	e,(hl)
+                            610 ;synth.c:164: ym2151_setDecayLevelReleaseRate(current_channel, data->dev, value1, value2);
+   023A 69            [ 4]  611 	ld	l, c
+   023B 60            [ 4]  612 	ld	h, b
+   023C 23            [ 6]  613 	inc	hl
+   023D 4E            [ 7]  614 	ld	c,(hl)
+   023E 21r00r00      [10]  615 	ld	hl,#_current_channel + 0
+   0241 46            [ 7]  616 	ld	b, (hl)
+   0242 7B            [ 4]  617 	ld	a,e
+   0243 F5            [11]  618 	push	af
+   0244 33            [ 6]  619 	inc	sp
+   0245 D5            [11]  620 	push	de
+   0246 33            [ 6]  621 	inc	sp
+   0247 79            [ 4]  622 	ld	a,c
+   0248 F5            [11]  623 	push	af
+   0249 33            [ 6]  624 	inc	sp
+   024A C5            [11]  625 	push	bc
+   024B 33            [ 6]  626 	inc	sp
+   024C CDr00r00      [17]  627 	call	_ym2151_setDecayLevelReleaseRate
+   024F F1            [10]  628 	pop	af
+   0250 F1            [10]  629 	pop	af
+                            630 ;synth.c:166: }
+   0251                     631 00113$:
+   0251 DD E1         [14]  632 	pop	ix
+   0253 C9            [10]  633 	ret
+                            634 ;synth.c:169: void init_ui() {
+                            635 ;	---------------------------------
+                            636 ; Function init_ui
+                            637 ; ---------------------------------
+   0254                     638 _init_ui::
+   0254 DD E5         [15]  639 	push	ix
+   0256 DD 21 00 00   [14]  640 	ld	ix,#0
+   025A DD 39         [15]  641 	add	ix,sp
+   025C 21 B5 FF      [10]  642 	ld	hl,#-75
+   025F 39            [11]  643 	add	hl,sp
+                            644 ;synth.c:171: char op_lbl[NB_OP][6] = {"DT1:", "MUL:", "TL:", "KS:", "AR:", "AMS:", "D1R:", "DT2:", "D2R:", "D1L:", "RR:"};
+   0260 F9            [ 6]  645 	ld	sp, hl
+   0261 23            [ 6]  646 	inc	hl
+   0262 23            [ 6]  647 	inc	hl
+   0263 36 44         [10]  648 	ld	(hl),#0x44
+   0265 21 02 00      [10]  649 	ld	hl,#0x0002
+   0268 39            [11]  650 	add	hl,sp
+   0269 5D            [ 4]  651 	ld	e,l
+   026A 54            [ 4]  652 	ld	d,h
+   026B 23            [ 6]  653 	inc	hl
+   026C 36 54         [10]  654 	ld	(hl),#0x54
+   026E 6B            [ 4]  655 	ld	l, e
+   026F 62            [ 4]  656 	ld	h, d
+   0270 23            [ 6]  657 	inc	hl
+   0271 23            [ 6]  658 	inc	hl
+   0272 36 31         [10]  659 	ld	(hl),#0x31
+   0274 6B            [ 4]  660 	ld	l, e
+   0275 62            [ 4]  661 	ld	h, d
+   0276 23            [ 6]  662 	inc	hl
+   0277 23            [ 6]  663 	inc	hl
+   0278 23            [ 6]  664 	inc	hl
+   0279 36 3A         [10]  665 	ld	(hl),#0x3A
+   027B 21 04 00      [10]  666 	ld	hl,#0x0004
+   027E 19            [11]  667 	add	hl,de
+   027F 36 00         [10]  668 	ld	(hl),#0x00
+   0281 21 05 00      [10]  669 	ld	hl,#0x0005
+   0284 19            [11]  670 	add	hl,de
+   0285 36 00         [10]  671 	ld	(hl),#0x00
+   0287 21 02 00      [10]  672 	ld	hl,#0x0002
+   028A 39            [11]  673 	add	hl,sp
+   028B DD 75 FA      [19]  674 	ld	-6 (ix),l
+   028E DD 74 FB      [19]  675 	ld	-5 (ix),h
+   0291 DD 7E FA      [19]  676 	ld	a,-6 (ix)
+   0294 C6 06         [ 7]  677 	add	a, #0x06
+   0296 6F            [ 4]  678 	ld	l,a
+   0297 DD 7E FB      [19]  679 	ld	a,-5 (ix)
+   029A CE 00         [ 7]  680 	adc	a, #0x00
+   029C 67            [ 4]  681 	ld	h,a
+   029D 36 4D         [10]  682 	ld	(hl),#0x4D
+   029F DD 7E FA      [19]  683 	ld	a,-6 (ix)
+   02A2 C6 07         [ 7]  684 	add	a, #0x07
+   02A4 6F            [ 4]  685 	ld	l,a
+   02A5 DD 7E FB      [19]  686 	ld	a,-5 (ix)
+   02A8 CE 00         [ 7]  687 	adc	a, #0x00
+   02AA 67            [ 4]  688 	ld	h,a
+   02AB 36 55         [10]  689 	ld	(hl),#0x55
+   02AD DD 7E FA      [19]  690 	ld	a,-6 (ix)
+   02B0 C6 08         [ 7]  691 	add	a, #0x08
+   02B2 6F            [ 4]  692 	ld	l,a
+   02B3 DD 7E FB      [19]  693 	ld	a,-5 (ix)
+   02B6 CE 00         [ 7]  694 	adc	a, #0x00
+   02B8 67            [ 4]  695 	ld	h,a
+   02B9 36 4C         [10]  696 	ld	(hl),#0x4C
+   02BB DD 7E FA      [19]  697 	ld	a,-6 (ix)
+   02BE C6 09         [ 7]  698 	add	a, #0x09
+   02C0 6F            [ 4]  699 	ld	l,a
+   02C1 DD 7E FB      [19]  700 	ld	a,-5 (ix)
+   02C4 CE 00         [ 7]  701 	adc	a, #0x00
+   02C6 67            [ 4]  702 	ld	h,a
+   02C7 36 3A         [10]  703 	ld	(hl),#0x3A
+   02C9 DD 7E FA      [19]  704 	ld	a,-6 (ix)
+   02CC C6 0A         [ 7]  705 	add	a, #0x0A
+   02CE 6F            [ 4]  706 	ld	l,a
+   02CF DD 7E FB      [19]  707 	ld	a,-5 (ix)
+   02D2 CE 00         [ 7]  708 	adc	a, #0x00
+   02D4 67            [ 4]  709 	ld	h,a
+   02D5 36 00         [10]  710 	ld	(hl),#0x00
+   02D7 DD 7E FA      [19]  711 	ld	a,-6 (ix)
+   02DA C6 0B         [ 7]  712 	add	a, #0x0B
+   02DC 6F            [ 4]  713 	ld	l,a
+   02DD DD 7E FB      [19]  714 	ld	a,-5 (ix)
+   02E0 CE 00         [ 7]  715 	adc	a, #0x00
+   02E2 67            [ 4]  716 	ld	h,a
+   02E3 36 00         [10]  717 	ld	(hl),#0x00
+   02E5 DD 7E FA      [19]  718 	ld	a,-6 (ix)
+   02E8 C6 0C         [ 7]  719 	add	a, #0x0C
+   02EA 6F            [ 4]  720 	ld	l,a
+   02EB DD 7E FB      [19]  721 	ld	a,-5 (ix)
+   02EE CE 00         [ 7]  722 	adc	a, #0x00
+   02F0 67            [ 4]  723 	ld	h,a
+   02F1 36 54         [10]  724 	ld	(hl),#0x54
+   02F3 DD 7E FA      [19]  725 	ld	a,-6 (ix)
+   02F6 C6 0D         [ 7]  726 	add	a, #0x0D
+   02F8 6F            [ 4]  727 	ld	l,a
+   02F9 DD 7E FB      [19]  728 	ld	a,-5 (ix)
+   02FC CE 00         [ 7]  729 	adc	a, #0x00
+   02FE 67            [ 4]  730 	ld	h,a
+   02FF 36 4C         [10]  731 	ld	(hl),#0x4C
+   0301 DD 7E FA      [19]  732 	ld	a,-6 (ix)
+   0304 C6 0E         [ 7]  733 	add	a, #0x0E
+   0306 6F            [ 4]  734 	ld	l,a
+   0307 DD 7E FB      [19]  735 	ld	a,-5 (ix)
+   030A CE 00         [ 7]  736 	adc	a, #0x00
+   030C 67            [ 4]  737 	ld	h,a
+   030D 36 3A         [10]  738 	ld	(hl),#0x3A
+   030F DD 7E FA      [19]  739 	ld	a,-6 (ix)
+   0312 C6 0F         [ 7]  740 	add	a, #0x0F
+   0314 6F            [ 4]  741 	ld	l,a
+   0315 DD 7E FB      [19]  742 	ld	a,-5 (ix)
+   0318 CE 00         [ 7]  743 	adc	a, #0x00
+   031A 67            [ 4]  744 	ld	h,a
+   031B 36 00         [10]  745 	ld	(hl),#0x00
+   031D DD 7E FA      [19]  746 	ld	a,-6 (ix)
+   0320 C6 10         [ 7]  747 	add	a, #0x10
+   0322 6F            [ 4]  748 	ld	l,a
+   0323 DD 7E FB      [19]  749 	ld	a,-5 (ix)
+   0326 CE 00         [ 7]  750 	adc	a, #0x00
+   0328 67            [ 4]  751 	ld	h,a
+   0329 36 00         [10]  752 	ld	(hl),#0x00
+   032B DD 7E FA      [19]  753 	ld	a,-6 (ix)
+   032E C6 11         [ 7]  754 	add	a, #0x11
+   0330 6F            [ 4]  755 	ld	l,a
+   0331 DD 7E FB      [19]  756 	ld	a,-5 (ix)
+   0334 CE 00         [ 7]  757 	adc	a, #0x00
+   0336 67            [ 4]  758 	ld	h,a
+   0337 36 00         [10]  759 	ld	(hl),#0x00
+   0339 DD 7E FA      [19]  760 	ld	a,-6 (ix)
+   033C C6 12         [ 7]  761 	add	a, #0x12
+   033E 6F            [ 4]  762 	ld	l,a
+   033F DD 7E FB      [19]  763 	ld	a,-5 (ix)
+   0342 CE 00         [ 7]  764 	adc	a, #0x00
+   0344 67            [ 4]  765 	ld	h,a
+   0345 36 4B         [10]  766 	ld	(hl),#0x4B
+   0347 DD 7E FA      [19]  767 	ld	a,-6 (ix)
+   034A C6 13         [ 7]  768 	add	a, #0x13
+   034C 6F            [ 4]  769 	ld	l,a
+   034D DD 7E FB      [19]  770 	ld	a,-5 (ix)
+   0350 CE 00         [ 7]  771 	adc	a, #0x00
+   0352 67            [ 4]  772 	ld	h,a
+   0353 36 53         [10]  773 	ld	(hl),#0x53
+   0355 DD 7E FA      [19]  774 	ld	a,-6 (ix)
+   0358 C6 14         [ 7]  775 	add	a, #0x14
+   035A 6F            [ 4]  776 	ld	l,a
+   035B DD 7E FB      [19]  777 	ld	a,-5 (ix)
+   035E CE 00         [ 7]  778 	adc	a, #0x00
+   0360 67            [ 4]  779 	ld	h,a
+   0361 36 3A         [10]  780 	ld	(hl),#0x3A
+   0363 DD 7E FA      [19]  781 	ld	a,-6 (ix)
+   0366 C6 15         [ 7]  782 	add	a, #0x15
+   0368 6F            [ 4]  783 	ld	l,a
+   0369 DD 7E FB      [19]  784 	ld	a,-5 (ix)
+   036C CE 00         [ 7]  785 	adc	a, #0x00
+   036E 67            [ 4]  786 	ld	h,a
+   036F 36 00         [10]  787 	ld	(hl),#0x00
+   0371 DD 7E FA      [19]  788 	ld	a,-6 (ix)
+   0374 C6 16         [ 7]  789 	add	a, #0x16
+   0376 6F            [ 4]  790 	ld	l,a
+   0377 DD 7E FB      [19]  791 	ld	a,-5 (ix)
+   037A CE 00         [ 7]  792 	adc	a, #0x00
+   037C 67            [ 4]  793 	ld	h,a
+   037D 36 00         [10]  794 	ld	(hl),#0x00
+   037F DD 7E FA      [19]  795 	ld	a,-6 (ix)
+   0382 C6 17         [ 7]  796 	add	a, #0x17
+   0384 6F            [ 4]  797 	ld	l,a
+   0385 DD 7E FB      [19]  798 	ld	a,-5 (ix)
+   0388 CE 00         [ 7]  799 	adc	a, #0x00
+   038A 67            [ 4]  800 	ld	h,a
+   038B 36 00         [10]  801 	ld	(hl),#0x00
+   038D DD 7E FA      [19]  802 	ld	a,-6 (ix)
+   0390 C6 18         [ 7]  803 	add	a, #0x18
+   0392 6F            [ 4]  804 	ld	l,a
+   0393 DD 7E FB      [19]  805 	ld	a,-5 (ix)
+   0396 CE 00         [ 7]  806 	adc	a, #0x00
+   0398 67            [ 4]  807 	ld	h,a
+   0399 36 41         [10]  808 	ld	(hl),#0x41
+   039B DD 7E FA      [19]  809 	ld	a,-6 (ix)
+   039E C6 19         [ 7]  810 	add	a, #0x19
+   03A0 6F            [ 4]  811 	ld	l,a
+   03A1 DD 7E FB      [19]  812 	ld	a,-5 (ix)
+   03A4 CE 00         [ 7]  813 	adc	a, #0x00
+   03A6 67            [ 4]  814 	ld	h,a
+   03A7 36 52         [10]  815 	ld	(hl),#0x52
+   03A9 DD 7E FA      [19]  816 	ld	a,-6 (ix)
+   03AC C6 1A         [ 7]  817 	add	a, #0x1A
+   03AE 6F            [ 4]  818 	ld	l,a
+   03AF DD 7E FB      [19]  819 	ld	a,-5 (ix)
+   03B2 CE 00         [ 7]  820 	adc	a, #0x00
+   03B4 67            [ 4]  821 	ld	h,a
+   03B5 36 3A         [10]  822 	ld	(hl),#0x3A
+   03B7 DD 7E FA      [19]  823 	ld	a,-6 (ix)
+   03BA C6 1B         [ 7]  824 	add	a, #0x1B
+   03BC 6F            [ 4]  825 	ld	l,a
+   03BD DD 7E FB      [19]  826 	ld	a,-5 (ix)
+   03C0 CE 00         [ 7]  827 	adc	a, #0x00
+   03C2 67            [ 4]  828 	ld	h,a
+   03C3 36 00         [10]  829 	ld	(hl),#0x00
+   03C5 DD 7E FA      [19]  830 	ld	a,-6 (ix)
+   03C8 C6 1C         [ 7]  831 	add	a, #0x1C
+   03CA 6F            [ 4]  832 	ld	l,a
+   03CB DD 7E FB      [19]  833 	ld	a,-5 (ix)
+   03CE CE 00         [ 7]  834 	adc	a, #0x00
+   03D0 67            [ 4]  835 	ld	h,a
+   03D1 36 00         [10]  836 	ld	(hl),#0x00
+   03D3 DD 7E FA      [19]  837 	ld	a,-6 (ix)
+   03D6 C6 1D         [ 7]  838 	add	a, #0x1D
+   03D8 6F            [ 4]  839 	ld	l,a
+   03D9 DD 7E FB      [19]  840 	ld	a,-5 (ix)
+   03DC CE 00         [ 7]  841 	adc	a, #0x00
+   03DE 67            [ 4]  842 	ld	h,a
+   03DF 36 00         [10]  843 	ld	(hl),#0x00
+   03E1 DD 7E FA      [19]  844 	ld	a,-6 (ix)
+   03E4 C6 1E         [ 7]  845 	add	a, #0x1E
+   03E6 6F            [ 4]  846 	ld	l,a
+   03E7 DD 7E FB      [19]  847 	ld	a,-5 (ix)
+   03EA CE 00         [ 7]  848 	adc	a, #0x00
+   03EC 67            [ 4]  849 	ld	h,a
+   03ED 36 41         [10]  850 	ld	(hl),#0x41
+   03EF DD 7E FA      [19]  851 	ld	a,-6 (ix)
+   03F2 C6 1F         [ 7]  852 	add	a, #0x1F
+   03F4 6F            [ 4]  853 	ld	l,a
+   03F5 DD 7E FB      [19]  854 	ld	a,-5 (ix)
+   03F8 CE 00         [ 7]  855 	adc	a, #0x00
+   03FA 67            [ 4]  856 	ld	h,a
+   03FB 36 4D         [10]  857 	ld	(hl),#0x4D
+   03FD DD 7E FA      [19]  858 	ld	a,-6 (ix)
+   0400 C6 20         [ 7]  859 	add	a, #0x20
+   0402 6F            [ 4]  860 	ld	l,a
+   0403 DD 7E FB      [19]  861 	ld	a,-5 (ix)
+   0406 CE 00         [ 7]  862 	adc	a, #0x00
+   0408 67            [ 4]  863 	ld	h,a
+   0409 36 53         [10]  864 	ld	(hl),#0x53
+   040B DD 7E FA      [19]  865 	ld	a,-6 (ix)
+   040E C6 21         [ 7]  866 	add	a, #0x21
+   0410 6F            [ 4]  867 	ld	l,a
+   0411 DD 7E FB      [19]  868 	ld	a,-5 (ix)
+   0414 CE 00         [ 7]  869 	adc	a, #0x00
+   0416 67            [ 4]  870 	ld	h,a
+   0417 36 3A         [10]  871 	ld	(hl),#0x3A
+   0419 DD 7E FA      [19]  872 	ld	a,-6 (ix)
+   041C C6 22         [ 7]  873 	add	a, #0x22
+   041E 6F            [ 4]  874 	ld	l,a
+   041F DD 7E FB      [19]  875 	ld	a,-5 (ix)
+   0422 CE 00         [ 7]  876 	adc	a, #0x00
+   0424 67            [ 4]  877 	ld	h,a
+   0425 36 00         [10]  878 	ld	(hl),#0x00
+   0427 DD 7E FA      [19]  879 	ld	a,-6 (ix)
+   042A C6 23         [ 7]  880 	add	a, #0x23
+   042C 6F            [ 4]  881 	ld	l,a
+   042D DD 7E FB      [19]  882 	ld	a,-5 (ix)
+   0430 CE 00         [ 7]  883 	adc	a, #0x00
+   0432 67            [ 4]  884 	ld	h,a
+   0433 36 00         [10]  885 	ld	(hl),#0x00
+   0435 DD 7E FA      [19]  886 	ld	a,-6 (ix)
+   0438 C6 24         [ 7]  887 	add	a, #0x24
+   043A 6F            [ 4]  888 	ld	l,a
+   043B DD 7E FB      [19]  889 	ld	a,-5 (ix)
+   043E CE 00         [ 7]  890 	adc	a, #0x00
+   0440 67            [ 4]  891 	ld	h,a
+   0441 36 44         [10]  892 	ld	(hl),#0x44
+   0443 DD 7E FA      [19]  893 	ld	a,-6 (ix)
+   0446 C6 25         [ 7]  894 	add	a, #0x25
+   0448 6F            [ 4]  895 	ld	l,a
+   0449 DD 7E FB      [19]  896 	ld	a,-5 (ix)
+   044C CE 00         [ 7]  897 	adc	a, #0x00
+   044E 67            [ 4]  898 	ld	h,a
+   044F 36 31         [10]  899 	ld	(hl),#0x31
+   0451 DD 7E FA      [19]  900 	ld	a,-6 (ix)
+   0454 C6 26         [ 7]  901 	add	a, #0x26
+   0456 6F            [ 4]  902 	ld	l,a
+   0457 DD 7E FB      [19]  903 	ld	a,-5 (ix)
+   045A CE 00         [ 7]  904 	adc	a, #0x00
+   045C 67            [ 4]  905 	ld	h,a
+   045D 36 52         [10]  906 	ld	(hl),#0x52
+   045F DD 7E FA      [19]  907 	ld	a,-6 (ix)
+   0462 C6 27         [ 7]  908 	add	a, #0x27
+   0464 6F            [ 4]  909 	ld	l,a
+   0465 DD 7E FB      [19]  910 	ld	a,-5 (ix)
+   0468 CE 00         [ 7]  911 	adc	a, #0x00
+   046A 67            [ 4]  912 	ld	h,a
+   046B 36 3A         [10]  913 	ld	(hl),#0x3A
+   046D DD 7E FA      [19]  914 	ld	a,-6 (ix)
+   0470 C6 28         [ 7]  915 	add	a, #0x28
+   0472 6F            [ 4]  916 	ld	l,a
+   0473 DD 7E FB      [19]  917 	ld	a,-5 (ix)
+   0476 CE 00         [ 7]  918 	adc	a, #0x00
+   0478 67            [ 4]  919 	ld	h,a
+   0479 36 00         [10]  920 	ld	(hl),#0x00
+   047B DD 7E FA      [19]  921 	ld	a,-6 (ix)
+   047E C6 29         [ 7]  922 	add	a, #0x29
+   0480 6F            [ 4]  923 	ld	l,a
+   0481 DD 7E FB      [19]  924 	ld	a,-5 (ix)
+   0484 CE 00         [ 7]  925 	adc	a, #0x00
+   0486 67            [ 4]  926 	ld	h,a
+   0487 36 00         [10]  927 	ld	(hl),#0x00
+   0489 DD 7E FA      [19]  928 	ld	a,-6 (ix)
+   048C C6 2A         [ 7]  929 	add	a, #0x2A
+   048E 6F            [ 4]  930 	ld	l,a
+   048F DD 7E FB      [19]  931 	ld	a,-5 (ix)
+   0492 CE 00         [ 7]  932 	adc	a, #0x00
+   0494 67            [ 4]  933 	ld	h,a
+   0495 36 44         [10]  934 	ld	(hl),#0x44
+   0497 DD 7E FA      [19]  935 	ld	a,-6 (ix)
+   049A C6 2B         [ 7]  936 	add	a, #0x2B
+   049C 6F            [ 4]  937 	ld	l,a
+   049D DD 7E FB      [19]  938 	ld	a,-5 (ix)
+   04A0 CE 00         [ 7]  939 	adc	a, #0x00
+   04A2 67            [ 4]  940 	ld	h,a
+   04A3 36 54         [10]  941 	ld	(hl),#0x54
+   04A5 DD 7E FA      [19]  942 	ld	a,-6 (ix)
+   04A8 C6 2C         [ 7]  943 	add	a, #0x2C
+   04AA 6F            [ 4]  944 	ld	l,a
+   04AB DD 7E FB      [19]  945 	ld	a,-5 (ix)
+   04AE CE 00         [ 7]  946 	adc	a, #0x00
+   04B0 67            [ 4]  947 	ld	h,a
+   04B1 36 32         [10]  948 	ld	(hl),#0x32
+   04B3 DD 7E FA      [19]  949 	ld	a,-6 (ix)
+   04B6 C6 2D         [ 7]  950 	add	a, #0x2D
+   04B8 6F            [ 4]  951 	ld	l,a
+   04B9 DD 7E FB      [19]  952 	ld	a,-5 (ix)
+   04BC CE 00         [ 7]  953 	adc	a, #0x00
+   04BE 67            [ 4]  954 	ld	h,a
+   04BF 36 3A         [10]  955 	ld	(hl),#0x3A
+   04C1 DD 7E FA      [19]  956 	ld	a,-6 (ix)
+   04C4 C6 2E         [ 7]  957 	add	a, #0x2E
+   04C6 6F            [ 4]  958 	ld	l,a
+   04C7 DD 7E FB      [19]  959 	ld	a,-5 (ix)
+   04CA CE 00         [ 7]  960 	adc	a, #0x00
+   04CC 67            [ 4]  961 	ld	h,a
+   04CD 36 00         [10]  962 	ld	(hl),#0x00
+   04CF DD 7E FA      [19]  963 	ld	a,-6 (ix)
+   04D2 C6 2F         [ 7]  964 	add	a, #0x2F
+   04D4 6F            [ 4]  965 	ld	l,a
+   04D5 DD 7E FB      [19]  966 	ld	a,-5 (ix)
+   04D8 CE 00         [ 7]  967 	adc	a, #0x00
+   04DA 67            [ 4]  968 	ld	h,a
+   04DB 36 00         [10]  969 	ld	(hl),#0x00
+   04DD DD 7E FA      [19]  970 	ld	a,-6 (ix)
+   04E0 C6 30         [ 7]  971 	add	a, #0x30
+   04E2 6F            [ 4]  972 	ld	l,a
+   04E3 DD 7E FB      [19]  973 	ld	a,-5 (ix)
+   04E6 CE 00         [ 7]  974 	adc	a, #0x00
+   04E8 67            [ 4]  975 	ld	h,a
+   04E9 36 44         [10]  976 	ld	(hl),#0x44
+   04EB DD 7E FA      [19]  977 	ld	a,-6 (ix)
+   04EE C6 31         [ 7]  978 	add	a, #0x31
+   04F0 6F            [ 4]  979 	ld	l,a
+   04F1 DD 7E FB      [19]  980 	ld	a,-5 (ix)
+   04F4 CE 00         [ 7]  981 	adc	a, #0x00
+   04F6 67            [ 4]  982 	ld	h,a
+   04F7 36 32         [10]  983 	ld	(hl),#0x32
+   04F9 DD 7E FA      [19]  984 	ld	a,-6 (ix)
+   04FC C6 32         [ 7]  985 	add	a, #0x32
+   04FE 6F            [ 4]  986 	ld	l,a
+   04FF DD 7E FB      [19]  987 	ld	a,-5 (ix)
+   0502 CE 00         [ 7]  988 	adc	a, #0x00
+   0504 67            [ 4]  989 	ld	h,a
+   0505 36 52         [10]  990 	ld	(hl),#0x52
+   0507 DD 7E FA      [19]  991 	ld	a,-6 (ix)
+   050A C6 33         [ 7]  992 	add	a, #0x33
+   050C 6F            [ 4]  993 	ld	l,a
+   050D DD 7E FB      [19]  994 	ld	a,-5 (ix)
+   0510 CE 00         [ 7]  995 	adc	a, #0x00
+   0512 67            [ 4]  996 	ld	h,a
+   0513 36 3A         [10]  997 	ld	(hl),#0x3A
+   0515 DD 7E FA      [19]  998 	ld	a,-6 (ix)
+   0518 C6 34         [ 7]  999 	add	a, #0x34
+   051A 6F            [ 4] 1000 	ld	l,a
+   051B DD 7E FB      [19] 1001 	ld	a,-5 (ix)
+   051E CE 00         [ 7] 1002 	adc	a, #0x00
+   0520 67            [ 4] 1003 	ld	h,a
+   0521 36 00         [10] 1004 	ld	(hl),#0x00
+   0523 DD 7E FA      [19] 1005 	ld	a,-6 (ix)
+   0526 C6 35         [ 7] 1006 	add	a, #0x35
+   0528 6F            [ 4] 1007 	ld	l,a
+   0529 DD 7E FB      [19] 1008 	ld	a,-5 (ix)
+   052C CE 00         [ 7] 1009 	adc	a, #0x00
+   052E 67            [ 4] 1010 	ld	h,a
+   052F 36 00         [10] 1011 	ld	(hl),#0x00
+   0531 DD 7E FA      [19] 1012 	ld	a,-6 (ix)
+   0534 C6 36         [ 7] 1013 	add	a, #0x36
+   0536 6F            [ 4] 1014 	ld	l,a
+   0537 DD 7E FB      [19] 1015 	ld	a,-5 (ix)
+   053A CE 00         [ 7] 1016 	adc	a, #0x00
+   053C 67            [ 4] 1017 	ld	h,a
+   053D 36 44         [10] 1018 	ld	(hl),#0x44
+   053F DD 7E FA      [19] 1019 	ld	a,-6 (ix)
+   0542 C6 37         [ 7] 1020 	add	a, #0x37
+   0544 6F            [ 4] 1021 	ld	l,a
+   0545 DD 7E FB      [19] 1022 	ld	a,-5 (ix)
+   0548 CE 00         [ 7] 1023 	adc	a, #0x00
+   054A 67            [ 4] 1024 	ld	h,a
+   054B 36 31         [10] 1025 	ld	(hl),#0x31
+   054D DD 7E FA      [19] 1026 	ld	a,-6 (ix)
+   0550 C6 38         [ 7] 1027 	add	a, #0x38
+   0552 6F            [ 4] 1028 	ld	l,a
+   0553 DD 7E FB      [19] 1029 	ld	a,-5 (ix)
+   0556 CE 00         [ 7] 1030 	adc	a, #0x00
+   0558 67            [ 4] 1031 	ld	h,a
+   0559 36 4C         [10] 1032 	ld	(hl),#0x4C
+   055B DD 7E FA      [19] 1033 	ld	a,-6 (ix)
+   055E C6 39         [ 7] 1034 	add	a, #0x39
+   0560 6F            [ 4] 1035 	ld	l,a
+   0561 DD 7E FB      [19] 1036 	ld	a,-5 (ix)
+   0564 CE 00         [ 7] 1037 	adc	a, #0x00
+   0566 67            [ 4] 1038 	ld	h,a
+   0567 36 3A         [10] 1039 	ld	(hl),#0x3A
+   0569 DD 7E FA      [19] 1040 	ld	a,-6 (ix)
+   056C C6 3A         [ 7] 1041 	add	a, #0x3A
+   056E 6F            [ 4] 1042 	ld	l,a
+   056F DD 7E FB      [19] 1043 	ld	a,-5 (ix)
+   0572 CE 00         [ 7] 1044 	adc	a, #0x00
+   0574 67            [ 4] 1045 	ld	h,a
+   0575 36 00         [10] 1046 	ld	(hl),#0x00
+   0577 DD 7E FA      [19] 1047 	ld	a,-6 (ix)
+   057A C6 3B         [ 7] 1048 	add	a, #0x3B
+   057C 6F            [ 4] 1049 	ld	l,a
+   057D DD 7E FB      [19] 1050 	ld	a,-5 (ix)
+   0580 CE 00         [ 7] 1051 	adc	a, #0x00
+   0582 67            [ 4] 1052 	ld	h,a
+   0583 36 00         [10] 1053 	ld	(hl),#0x00
+   0585 DD 7E FA      [19] 1054 	ld	a,-6 (ix)
+   0588 C6 3C         [ 7] 1055 	add	a, #0x3C
+   058A 6F            [ 4] 1056 	ld	l,a
+   058B DD 7E FB      [19] 1057 	ld	a,-5 (ix)
+   058E CE 00         [ 7] 1058 	adc	a, #0x00
+   0590 67            [ 4] 1059 	ld	h,a
+   0591 36 52         [10] 1060 	ld	(hl),#0x52
+   0593 DD 7E FA      [19] 1061 	ld	a,-6 (ix)
+   0596 C6 3D         [ 7] 1062 	add	a, #0x3D
+   0598 6F            [ 4] 1063 	ld	l,a
+   0599 DD 7E FB      [19] 1064 	ld	a,-5 (ix)
+   059C CE 00         [ 7] 1065 	adc	a, #0x00
+   059E 67            [ 4] 1066 	ld	h,a
+   059F 36 52         [10] 1067 	ld	(hl),#0x52
+   05A1 DD 7E FA      [19] 1068 	ld	a,-6 (ix)
+   05A4 C6 3E         [ 7] 1069 	add	a, #0x3E
+   05A6 6F            [ 4] 1070 	ld	l,a
+   05A7 DD 7E FB      [19] 1071 	ld	a,-5 (ix)
+   05AA CE 00         [ 7] 1072 	adc	a, #0x00
+   05AC 67            [ 4] 1073 	ld	h,a
+   05AD 36 3A         [10] 1074 	ld	(hl),#0x3A
+   05AF DD 7E FA      [19] 1075 	ld	a,-6 (ix)
+   05B2 C6 3F         [ 7] 1076 	add	a, #0x3F
+   05B4 6F            [ 4] 1077 	ld	l,a
+   05B5 DD 7E FB      [19] 1078 	ld	a,-5 (ix)
+   05B8 CE 00         [ 7] 1079 	adc	a, #0x00
+   05BA 67            [ 4] 1080 	ld	h,a
+   05BB 36 00         [10] 1081 	ld	(hl),#0x00
+   05BD DD 7E FA      [19] 1082 	ld	a,-6 (ix)
+   05C0 C6 40         [ 7] 1083 	add	a, #0x40
+   05C2 6F            [ 4] 1084 	ld	l,a
+   05C3 DD 7E FB      [19] 1085 	ld	a,-5 (ix)
+   05C6 CE 00         [ 7] 1086 	adc	a, #0x00
+   05C8 67            [ 4] 1087 	ld	h,a
+   05C9 36 00         [10] 1088 	ld	(hl),#0x00
+   05CB DD 7E FA      [19] 1089 	ld	a,-6 (ix)
+   05CE C6 41         [ 7] 1090 	add	a, #0x41
+   05D0 6F            [ 4] 1091 	ld	l,a
+   05D1 DD 7E FB      [19] 1092 	ld	a,-5 (ix)
+   05D4 CE 00         [ 7] 1093 	adc	a, #0x00
+   05D6 67            [ 4] 1094 	ld	h,a
+   05D7 36 00         [10] 1095 	ld	(hl),#0x00
+                           1096 ;synth.c:173: memset(widgets, 0, sizeof(T_Widget *) * NB_WIDGETS);
+   05D9 21r00r00      [10] 1097 	ld	hl,#_widgets
+   05DC 06 30         [ 7] 1098 	ld	b, #0x30
+   05DE                    1099 00141$:
+   05DE 36 00         [10] 1100 	ld	(hl), #0x00
+   05E0 23            [ 6] 1101 	inc	hl
+   05E1 10 FB         [13] 1102 	djnz	00141$
+                           1103 ;synth.c:175: draw_label(0, 0, "YMSoC v0.1");
+   05E3 21rE3r08      [10] 1104 	ld	hl,#___str_11
+   05E6 E5            [11] 1105 	push	hl
+   05E7 21 00 00      [10] 1106 	ld	hl,#0x0000
+   05EA E5            [11] 1107 	push	hl
+   05EB CDr00r00      [17] 1108 	call	_draw_label
+   05EE F1            [10] 1109 	pop	af
+                           1110 ;synth.c:177: draw_label(0, 2, "CT1:");
+   05EF 21rEEr08      [10] 1111 	ld	hl, #___str_12
+   05F2 E3            [19] 1112 	ex	(sp),hl
+   05F3 21 00 02      [10] 1113 	ld	hl,#0x0200
+   05F6 E5            [11] 1114 	push	hl
+   05F7 CDr00r00      [17] 1115 	call	_draw_label
+   05FA F1            [10] 1116 	pop	af
+                           1117 ;synth.c:178: widgets[W_LED] = (T_Widget *)new_checkbox(4, 2);
+   05FB 21 04 02      [10] 1118 	ld	hl, #0x0204
+   05FE E3            [19] 1119 	ex	(sp),hl
+   05FF CDr00r00      [17] 1120 	call	_new_checkbox
+   0602 F1            [10] 1121 	pop	af
+   0603 EB            [ 4] 1122 	ex	de,hl
+   0604 ED 53r00r00   [20] 1123 	ld	(_widgets), de
+                           1124 ;synth.c:179: widgets[W_LED]->callback = ct1_clicked;
+   0608 21 06 00      [10] 1125 	ld	hl,#0x0006
+   060B 19            [11] 1126 	add	hl,de
+   060C 36r00         [10] 1127 	ld	(hl),#<(_ct1_clicked)
+   060E 23            [ 6] 1128 	inc	hl
+   060F 36s00         [10] 1129 	ld	(hl),#>(_ct1_clicked)
+                           1130 ;synth.c:181: draw_label(7, 1, "M1C1M2C2");
+   0611 21rF3r08      [10] 1131 	ld	hl,#___str_13
+   0614 E5            [11] 1132 	push	hl
+   0615 21 07 01      [10] 1133 	ld	hl,#0x0107
+   0618 E5            [11] 1134 	push	hl
+   0619 CDr00r00      [17] 1135 	call	_draw_label
+   061C F1            [10] 1136 	pop	af
+                           1137 ;synth.c:182: widgets[W_M1] = (T_Widget *)new_checkbox(7, 2);
+   061D 21 07 02      [10] 1138 	ld	hl, #0x0207
+   0620 E3            [19] 1139 	ex	(sp),hl
+   0621 CDr00r00      [17] 1140 	call	_new_checkbox
+   0624 F1            [10] 1141 	pop	af
+   0625 EB            [ 4] 1142 	ex	de,hl
+   0626 ED 53r02r00   [20] 1143 	ld	((_widgets + 0x0002)), de
+                           1144 ;synth.c:183: widgets[W_M1]->callback = key_config_clicked;
+   062A 21 06 00      [10] 1145 	ld	hl,#0x0006
+   062D 19            [11] 1146 	add	hl,de
+   062E 36r19         [10] 1147 	ld	(hl),#<(_key_config_clicked)
+   0630 23            [ 6] 1148 	inc	hl
+   0631 36s00         [10] 1149 	ld	(hl),#>(_key_config_clicked)
+                           1150 ;synth.c:184: widgets[W_C1] = (T_Widget *)new_checkbox(9, 2);
+   0633 21 09 02      [10] 1151 	ld	hl,#0x0209
+   0636 E5            [11] 1152 	push	hl
+   0637 CDr00r00      [17] 1153 	call	_new_checkbox
+   063A F1            [10] 1154 	pop	af
+   063B EB            [ 4] 1155 	ex	de,hl
+   063C ED 53r04r00   [20] 1156 	ld	((_widgets + 0x0004)), de
+                           1157 ;synth.c:185: widgets[W_C1]->callback = key_config_clicked;
+   0640 21 06 00      [10] 1158 	ld	hl,#0x0006
+   0643 19            [11] 1159 	add	hl,de
+   0644 36r19         [10] 1160 	ld	(hl),#<(_key_config_clicked)
+   0646 23            [ 6] 1161 	inc	hl
+   0647 36s00         [10] 1162 	ld	(hl),#>(_key_config_clicked)
+                           1163 ;synth.c:186: widgets[W_M2] = (T_Widget *)new_checkbox(11, 2);
+   0649 21 0B 02      [10] 1164 	ld	hl,#0x020B
+   064C E5            [11] 1165 	push	hl
+   064D CDr00r00      [17] 1166 	call	_new_checkbox
+   0650 F1            [10] 1167 	pop	af
+   0651 EB            [ 4] 1168 	ex	de,hl
+   0652 ED 53r06r00   [20] 1169 	ld	((_widgets + 0x0006)), de
+                           1170 ;synth.c:187: widgets[W_M2]->callback = key_config_clicked;
+   0656 21 06 00      [10] 1171 	ld	hl,#0x0006
+   0659 19            [11] 1172 	add	hl,de
+   065A 36r19         [10] 1173 	ld	(hl),#<(_key_config_clicked)
+   065C 23            [ 6] 1174 	inc	hl
+   065D 36s00         [10] 1175 	ld	(hl),#>(_key_config_clicked)
+                           1176 ;synth.c:188: widgets[W_C2] = (T_Widget *)new_checkbox(13, 2);
+   065F 21 0D 02      [10] 1177 	ld	hl,#0x020D
+   0662 E5            [11] 1178 	push	hl
+   0663 CDr00r00      [17] 1179 	call	_new_checkbox
+   0666 F1            [10] 1180 	pop	af
+   0667 EB            [ 4] 1181 	ex	de,hl
+   0668 ED 53r08r00   [20] 1182 	ld	((_widgets + 0x0008)), de
+                           1183 ;synth.c:189: widgets[W_C2]->callback = key_config_clicked;
+   066C 21 06 00      [10] 1184 	ld	hl,#0x0006
+   066F 19            [11] 1185 	add	hl,de
+   0670 36r19         [10] 1186 	ld	(hl),#<(_key_config_clicked)
+   0672 23            [ 6] 1187 	inc	hl
+   0673 36s00         [10] 1188 	ld	(hl),#>(_key_config_clicked)
+                           1189 ;synth.c:191: draw_label(16, 2, "Channels:");
+   0675 21rFCr08      [10] 1190 	ld	hl,#___str_14
+   0678 E5            [11] 1191 	push	hl
+   0679 21 10 02      [10] 1192 	ld	hl,#0x0210
+   067C E5            [11] 1193 	push	hl
+   067D CDr00r00      [17] 1194 	call	_draw_label
+   0680 F1            [10] 1195 	pop	af
+                           1196 ;synth.c:192: draw_label(25, 1, "Le");
+   0681 21r06r09      [10] 1197 	ld	hl, #___str_15
+   0684 E3            [19] 1198 	ex	(sp),hl
+   0685 21 19 01      [10] 1199 	ld	hl,#0x0119
+   0688 E5            [11] 1200 	push	hl
+   0689 CDr00r00      [17] 1201 	call	_draw_label
+   068C F1            [10] 1202 	pop	af
+                           1203 ;synth.c:193: draw_label(27, 1, "Ri");
+   068D 21r09r09      [10] 1204 	ld	hl, #___str_16
+   0690 E3            [19] 1205 	ex	(sp),hl
+   0691 21 1B 01      [10] 1206 	ld	hl,#0x011B
+   0694 E5            [11] 1207 	push	hl
+   0695 CDr00r00      [17] 1208 	call	_draw_label
+   0698 F1            [10] 1209 	pop	af
+                           1210 ;synth.c:194: widgets[W_CH_L] = (T_Widget *)new_checkbox(25, 2);
+   0699 21 19 02      [10] 1211 	ld	hl, #0x0219
+   069C E3            [19] 1212 	ex	(sp),hl
+   069D CDr00r00      [17] 1213 	call	_new_checkbox
+   06A0 F1            [10] 1214 	pop	af
+   06A1 EB            [ 4] 1215 	ex	de,hl
+   06A2 ED 53r0Ar00   [20] 1216 	ld	((_widgets + 0x000a)), de
+                           1217 ;synth.c:195: widgets[W_CH_L]->callback = channels_config_clicked;
+   06A6 21 06 00      [10] 1218 	ld	hl,#0x0006
+   06A9 19            [11] 1219 	add	hl,de
+   06AA 36r7F         [10] 1220 	ld	(hl),#<(_channels_config_clicked)
+   06AC 23            [ 6] 1221 	inc	hl
+   06AD 36s00         [10] 1222 	ld	(hl),#>(_channels_config_clicked)
+                           1223 ;synth.c:196: widgets[W_CH_R] = (T_Widget *)new_checkbox(27, 2);
+   06AF 21 1B 02      [10] 1224 	ld	hl,#0x021B
+   06B2 E5            [11] 1225 	push	hl
+   06B3 CDr00r00      [17] 1226 	call	_new_checkbox
+   06B6 F1            [10] 1227 	pop	af
+   06B7 EB            [ 4] 1228 	ex	de,hl
+   06B8 ED 53r0Cr00   [20] 1229 	ld	((_widgets + 0x000c)), de
+                           1230 ;synth.c:197: widgets[W_CH_R]->callback = channels_config_clicked;
+   06BC 21 06 00      [10] 1231 	ld	hl,#0x0006
+   06BF 19            [11] 1232 	add	hl,de
+   06C0 36r7F         [10] 1233 	ld	(hl),#<(_channels_config_clicked)
+   06C2 23            [ 6] 1234 	inc	hl
+   06C3 36s00         [10] 1235 	ld	(hl),#>(_channels_config_clicked)
+                           1236 ;synth.c:199: draw_label(30, 2, "Connection:");
+   06C5 21r0Cr09      [10] 1237 	ld	hl,#___str_17
+   06C8 E5            [11] 1238 	push	hl
+   06C9 21 1E 02      [10] 1239 	ld	hl,#0x021E
+   06CC E5            [11] 1240 	push	hl
+   06CD CDr00r00      [17] 1241 	call	_draw_label
+   06D0 F1            [10] 1242 	pop	af
+                           1243 ;synth.c:200: widgets[W_CONNECT] = (T_Widget *)new_spinner(41, 2);
+   06D1 21 29 02      [10] 1244 	ld	hl, #0x0229
+   06D4 E3            [19] 1245 	ex	(sp),hl
+   06D5 CDr00r00      [17] 1246 	call	_new_spinner
+   06D8 F1            [10] 1247 	pop	af
+   06D9 EB            [ 4] 1248 	ex	de,hl
+   06DA ED 53r10r00   [20] 1249 	ld	((_widgets + 0x0010)), de
+                           1250 ;synth.c:201: spinner_setMax((T_Spinner *)widgets[W_CONNECT], 7);
+   06DE 3E 07         [ 7] 1251 	ld	a,#0x07
+   06E0 F5            [11] 1252 	push	af
+   06E1 33            [ 6] 1253 	inc	sp
+   06E2 D5            [11] 1254 	push	de
+   06E3 CDr00r00      [17] 1255 	call	_spinner_setMax
+   06E6 F1            [10] 1256 	pop	af
+   06E7 33            [ 6] 1257 	inc	sp
+                           1258 ;synth.c:202: widgets[W_CONNECT]->callback = connection_changed;
+   06E8 21r10r00      [10] 1259 	ld	hl, #(_widgets + 0x0010) + 0
+   06EB 7E            [ 7] 1260 	ld	a,(hl)
+   06EC DD 77 FC      [19] 1261 	ld	-4 (ix),a
+   06EF 23            [ 6] 1262 	inc	hl
+   06F0 7E            [ 7] 1263 	ld	a,(hl)
+   06F1 DD 77 FD      [19] 1264 	ld	-3 (ix),a
+   06F4 DD 7E FC      [19] 1265 	ld	a,-4 (ix)
+   06F7 C6 06         [ 7] 1266 	add	a, #0x06
+   06F9 DD 77 FC      [19] 1267 	ld	-4 (ix),a
+   06FC DD 7E FD      [19] 1268 	ld	a,-3 (ix)
+   06FF CE 00         [ 7] 1269 	adc	a, #0x00
+   0701 DD 77 FD      [19] 1270 	ld	-3 (ix),a
+   0704 DD 6E FC      [19] 1271 	ld	l,-4 (ix)
+   0707 DD 66 FD      [19] 1272 	ld	h,-3 (ix)
+   070A 36rB7         [10] 1273 	ld	(hl),#<(_connection_changed)
+   070C 23            [ 6] 1274 	inc	hl
+   070D 36s00         [10] 1275 	ld	(hl),#>(_connection_changed)
+                           1276 ;synth.c:205: widgets[W_RESET_LFO] = (T_Widget *)new_button(0, 4, "Reset LFO");
+   070F 21r18r09      [10] 1277 	ld	hl,#___str_18
+   0712 E5            [11] 1278 	push	hl
+   0713 21 00 04      [10] 1279 	ld	hl,#0x0400
+   0716 E5            [11] 1280 	push	hl
+   0717 CDr00r00      [17] 1281 	call	_new_button
+   071A F1            [10] 1282 	pop	af
+   071B F1            [10] 1283 	pop	af
+   071C EB            [ 4] 1284 	ex	de,hl
+   071D ED 53r0Er00   [20] 1285 	ld	((_widgets + 0x000e)), de
+                           1286 ;synth.c:206: widgets[W_RESET_LFO]->callback = reset_lfo_clicked;
+   0721 21 06 00      [10] 1287 	ld	hl,#0x0006
+   0724 19            [11] 1288 	add	hl,de
+   0725 36rB4         [10] 1289 	ld	(hl),#<(_reset_lfo_clicked)
+   0727 23            [ 6] 1290 	inc	hl
+   0728 36s00         [10] 1291 	ld	(hl),#>(_reset_lfo_clicked)
+                           1292 ;synth.c:207: draw_label(0, 5, "LFO Waveform:"); 
+   072A 21r22r09      [10] 1293 	ld	hl,#___str_19
+   072D E5            [11] 1294 	push	hl
+   072E 21 00 05      [10] 1295 	ld	hl,#0x0500
+   0731 E5            [11] 1296 	push	hl
+   0732 CDr00r00      [17] 1297 	call	_draw_label
+   0735 F1            [10] 1298 	pop	af
+                           1299 ;synth.c:208: widgets[W_LFO_WF] = (T_Widget *)new_spinner(13, 5);
+   0736 21 0D 05      [10] 1300 	ld	hl, #0x050D
+   0739 E3            [19] 1301 	ex	(sp),hl
+   073A CDr00r00      [17] 1302 	call	_new_spinner
+   073D F1            [10] 1303 	pop	af
+   073E EB            [ 4] 1304 	ex	de,hl
+   073F ED 53r12r00   [20] 1305 	ld	((_widgets + 0x0012)), de
+                           1306 ;synth.c:209: spinner_setMax((T_Spinner *)widgets[W_LFO_WF], 3);
+   0743 3E 03         [ 7] 1307 	ld	a,#0x03
+   0745 F5            [11] 1308 	push	af
+   0746 33            [ 6] 1309 	inc	sp
+   0747 D5            [11] 1310 	push	de
+   0748 CDr00r00      [17] 1311 	call	_spinner_setMax
+   074B F1            [10] 1312 	pop	af
+   074C 33            [ 6] 1313 	inc	sp
+                           1314 ;synth.c:210: widgets[W_LFO_WF]->callback = lfo_waveform_changed;
+   074D 21r12r00      [10] 1315 	ld	hl, #(_widgets + 0x0012) + 0
+   0750 7E            [ 7] 1316 	ld	a,(hl)
+   0751 DD 77 FC      [19] 1317 	ld	-4 (ix),a
+   0754 23            [ 6] 1318 	inc	hl
+   0755 7E            [ 7] 1319 	ld	a,(hl)
+   0756 DD 77 FD      [19] 1320 	ld	-3 (ix),a
+   0759 DD 7E FC      [19] 1321 	ld	a,-4 (ix)
+   075C C6 06         [ 7] 1322 	add	a, #0x06
+   075E DD 77 FC      [19] 1323 	ld	-4 (ix),a
+   0761 DD 7E FD      [19] 1324 	ld	a,-3 (ix)
+   0764 CE 00         [ 7] 1325 	adc	a, #0x00
+   0766 DD 77 FD      [19] 1326 	ld	-3 (ix),a
+   0769 DD 6E FC      [19] 1327 	ld	l,-4 (ix)
+   076C DD 66 FD      [19] 1328 	ld	h,-3 (ix)
+   076F 36rCD         [10] 1329 	ld	(hl),#<(_lfo_waveform_changed)
+   0771 23            [ 6] 1330 	inc	hl
+   0772 36s00         [10] 1331 	ld	(hl),#>(_lfo_waveform_changed)
+                           1332 ;synth.c:211: draw_label(16, 5, "Frequency:"); 
+   0774 21r30r09      [10] 1333 	ld	hl,#___str_20
+   0777 E5            [11] 1334 	push	hl
+   0778 21 10 05      [10] 1335 	ld	hl,#0x0510
+   077B E5            [11] 1336 	push	hl
+   077C CDr00r00      [17] 1337 	call	_draw_label
+   077F F1            [10] 1338 	pop	af
+                           1339 ;synth.c:212: widgets[W_LFO_FREQ] = (T_Widget *)new_spinner(26, 5);
+   0780 21 1A 05      [10] 1340 	ld	hl, #0x051A
+   0783 E3            [19] 1341 	ex	(sp),hl
+   0784 CDr00r00      [17] 1342 	call	_new_spinner
+   0787 F1            [10] 1343 	pop	af
+   0788 EB            [ 4] 1344 	ex	de,hl
+   0789 ED 53r14r00   [20] 1345 	ld	((_widgets + 0x0014)), de
+                           1346 ;synth.c:213: widgets[W_LFO_FREQ]->callback = lfo_frequency_changed;
+   078D 21 06 00      [10] 1347 	ld	hl,#0x0006
+   0790 19            [11] 1348 	add	hl,de
+   0791 36rDD         [10] 1349 	ld	(hl),#<(_lfo_frequency_changed)
+   0793 23            [ 6] 1350 	inc	hl
+   0794 36s00         [10] 1351 	ld	(hl),#>(_lfo_frequency_changed)
+                           1352 ;synth.c:214: draw_label(0, 6, "LFO Modulation (FM/PM):");
+   0796 21r3Br09      [10] 1353 	ld	hl,#___str_21
+   0799 E5            [11] 1354 	push	hl
+   079A 21 00 06      [10] 1355 	ld	hl,#0x0600
+   079D E5            [11] 1356 	push	hl
+   079E CDr00r00      [17] 1357 	call	_draw_label
+   07A1 F1            [10] 1358 	pop	af
+                           1359 ;synth.c:215: widgets[W_LFO_MOD] = (T_Widget *)new_checkbox(23, 6);
+   07A2 21 17 06      [10] 1360 	ld	hl, #0x0617
+   07A5 E3            [19] 1361 	ex	(sp),hl
+   07A6 CDr00r00      [17] 1362 	call	_new_checkbox
+   07A9 F1            [10] 1363 	pop	af
+   07AA EB            [ 4] 1364 	ex	de,hl
+   07AB ED 53r16r00   [20] 1365 	ld	((_widgets + 0x0016)), de
+                           1366 ;synth.c:216: widgets[W_LFO_MOD]->callback = lfo_modulation_clicked;
+   07AF 21 06 00      [10] 1367 	ld	hl,#0x0006
+   07B2 19            [11] 1368 	add	hl,de
+   07B3 36rED         [10] 1369 	ld	(hl),#<(_lfo_modulation_clicked)
+   07B5 23            [ 6] 1370 	inc	hl
+   07B6 36s00         [10] 1371 	ld	(hl),#>(_lfo_modulation_clicked)
+                           1372 ;synth.c:217: draw_label(26, 6, "Amplitude:");
+   07B8 21r53r09      [10] 1373 	ld	hl,#___str_22
+   07BB E5            [11] 1374 	push	hl
+   07BC 21 1A 06      [10] 1375 	ld	hl,#0x061A
+   07BF E5            [11] 1376 	push	hl
+   07C0 CDr00r00      [17] 1377 	call	_draw_label
+   07C3 F1            [10] 1378 	pop	af
+                           1379 ;synth.c:218: widgets[W_LFO_AMPLITUDE] = (T_Widget *)new_spinner(36, 6);
+   07C4 21 24 06      [10] 1380 	ld	hl, #0x0624
+   07C7 E3            [19] 1381 	ex	(sp),hl
+   07C8 CDr00r00      [17] 1382 	call	_new_spinner
+   07CB F1            [10] 1383 	pop	af
+   07CC EB            [ 4] 1384 	ex	de,hl
+   07CD ED 53r18r00   [20] 1385 	ld	((_widgets + 0x0018)), de
+                           1386 ;synth.c:219: spinner_setMax((T_Spinner *)widgets[W_LFO_AMPLITUDE], 127);
+   07D1 3E 7F         [ 7] 1387 	ld	a,#0x7F
+   07D3 F5            [11] 1388 	push	af
+   07D4 33            [ 6] 1389 	inc	sp
+   07D5 D5            [11] 1390 	push	de
+   07D6 CDr00r00      [17] 1391 	call	_spinner_setMax
+   07D9 F1            [10] 1392 	pop	af
+   07DA 33            [ 6] 1393 	inc	sp
+                           1394 ;synth.c:220: widgets[W_LFO_AMPLITUDE]->callback = lfo_amplitude_changed;
+   07DB 21r18r00      [10] 1395 	ld	hl, #(_widgets + 0x0018) + 0
+   07DE 7E            [ 7] 1396 	ld	a,(hl)
+   07DF DD 77 FC      [19] 1397 	ld	-4 (ix),a
+   07E2 23            [ 6] 1398 	inc	hl
+   07E3 7E            [ 7] 1399 	ld	a,(hl)
+   07E4 DD 77 FD      [19] 1400 	ld	-3 (ix),a
+   07E7 DD 7E FC      [19] 1401 	ld	a,-4 (ix)
+   07EA C6 06         [ 7] 1402 	add	a, #0x06
+   07EC DD 77 FC      [19] 1403 	ld	-4 (ix),a
+   07EF DD 7E FD      [19] 1404 	ld	a,-3 (ix)
+   07F2 CE 00         [ 7] 1405 	adc	a, #0x00
+   07F4 DD 77 FD      [19] 1406 	ld	-3 (ix),a
+   07F7 DD 6E FC      [19] 1407 	ld	l,-4 (ix)
+   07FA DD 66 FD      [19] 1408 	ld	h,-3 (ix)
+   07FD 36r06         [10] 1409 	ld	(hl),#<(_lfo_amplitude_changed)
+   07FF 23            [ 6] 1410 	inc	hl
+   0800 36s01         [10] 1411 	ld	(hl),#>(_lfo_amplitude_changed)
+                           1412 ;synth.c:223: for (i = 0; i < NB_OP; i++) {
+   0802 0E 00         [ 7] 1413 	ld	c,#0x00
+   0804 11 00 00      [10] 1414 	ld	de,#0x0000
+   0807                    1415 00108$:
+                           1416 ;synth.c:224: draw_label(0, 10 + i, op_lbl[i]);
+   0807 DD 6E FA      [19] 1417 	ld	l,-6 (ix)
+   080A DD 66 FB      [19] 1418 	ld	h,-5 (ix)
+   080D 19            [11] 1419 	add	hl,de
+   080E 79            [ 4] 1420 	ld	a,c
+   080F C6 0A         [ 7] 1421 	add	a, #0x0A
+   0811 47            [ 4] 1422 	ld	b,a
+   0812 C5            [11] 1423 	push	bc
+   0813 D5            [11] 1424 	push	de
+   0814 E5            [11] 1425 	push	hl
+   0815 C5            [11] 1426 	push	bc
+   0816 33            [ 6] 1427 	inc	sp
+   0817 AF            [ 4] 1428 	xor	a, a
+   0818 F5            [11] 1429 	push	af
+   0819 33            [ 6] 1430 	inc	sp
+   081A CDr00r00      [17] 1431 	call	_draw_label
+   081D F1            [10] 1432 	pop	af
+   081E F1            [10] 1433 	pop	af
+   081F D1            [10] 1434 	pop	de
+   0820 C1            [10] 1435 	pop	bc
+                           1436 ;synth.c:225: for (j = 0; j < NB_DEV; j++) {
+   0821 DD 70 FC      [19] 1437 	ld	-4 (ix),b
+   0824 79            [ 4] 1438 	ld	a,c
+   0825 C6 0D         [ 7] 1439 	add	a, #0x0D
+   0827 DD 77 FE      [19] 1440 	ld	-2 (ix),a
+   082A DD 36 F9 00   [19] 1441 	ld	-7 (ix),#0x00
+   082E 06 00         [ 7] 1442 	ld	b,#0x00
+   0830                    1443 00106$:
+                           1444 ;synth.c:226: T_Widget *w = (T_Widget *)new_spinner(6 + j * 3, 10 + i);
+   0830 78            [ 4] 1445 	ld	a,b
+   0831 C6 06         [ 7] 1446 	add	a, #0x06
+   0833 DD 77 FF      [19] 1447 	ld	-1 (ix),a
+   0836 C5            [11] 1448 	push	bc
+   0837 D5            [11] 1449 	push	de
+   0838 DD 66 FC      [19] 1450 	ld	h,-4 (ix)
+   083B DD 6E FF      [19] 1451 	ld	l,-1 (ix)
+   083E E5            [11] 1452 	push	hl
+   083F CDr00r00      [17] 1453 	call	_new_spinner
+   0842 F1            [10] 1454 	pop	af
+   0843 D1            [10] 1455 	pop	de
+   0844 C1            [10] 1456 	pop	bc
+   0845 33            [ 6] 1457 	inc	sp
+   0846 33            [ 6] 1458 	inc	sp
+   0847 E5            [11] 1459 	push	hl
+                           1460 ;synth.c:227: T_WData *wd = (T_WData *)malloc(sizeof(T_WData));
+   0848 C5            [11] 1461 	push	bc
+   0849 D5            [11] 1462 	push	de
+   084A 21 02 00      [10] 1463 	ld	hl,#0x0002
+   084D E5            [11] 1464 	push	hl
+   084E CDr00r00      [17] 1465 	call	_malloc
+   0851 F1            [10] 1466 	pop	af
+   0852 D1            [10] 1467 	pop	de
+   0853 C1            [10] 1468 	pop	bc
+                           1469 ;synth.c:228: wd->op = i;
+   0854 71            [ 7] 1470 	ld	(hl),c
+                           1471 ;synth.c:229: wd->dev = YM_KEY_MOD1;
+   0855 E5            [11] 1472 	push	hl
+   0856 FD E1         [14] 1473 	pop	iy
+   0858 FD 23         [10] 1474 	inc	iy
+   085A FD 36 00 40   [19] 1475 	ld	0 (iy), #0x40
+                           1476 ;synth.c:230: w->user_data = wd;
+   085E FD 21 08 00   [14] 1477 	ld	iy,#0x0008
+   0862 C5            [11] 1478 	push	bc
+   0863 DD 4E B5      [19] 1479 	ld	c,-75 (ix)
+   0866 DD 46 B6      [19] 1480 	ld	b,-74 (ix)
+   0869 FD 09         [15] 1481 	add	iy, bc
+   086B C1            [10] 1482 	pop	bc
+   086C FD 75 00      [19] 1483 	ld	0 (iy),l
+   086F FD 74 01      [19] 1484 	ld	1 (iy),h
+                           1485 ;synth.c:231: w->callback = op_value_changed;
+   0872 DD 7E B5      [19] 1486 	ld	a,-75 (ix)
+   0875 C6 06         [ 7] 1487 	add	a, #0x06
+   0877 6F            [ 4] 1488 	ld	l,a
+   0878 DD 7E B6      [19] 1489 	ld	a,-74 (ix)
+   087B CE 00         [ 7] 1490 	adc	a, #0x00
+   087D 67            [ 4] 1491 	ld	h,a
+   087E 36r16         [10] 1492 	ld	(hl),#<(_op_value_changed)
+   0880 23            [ 6] 1493 	inc	hl
+   0881 36s01         [10] 1494 	ld	(hl),#>(_op_value_changed)
+                           1495 ;synth.c:232: widgets[NB_CH_WIDGETS + i * NB_DEV + j] = w;	
+   0883 DD 7E FE      [19] 1496 	ld	a,-2 (ix)
+   0886 DD 86 F9      [19] 1497 	add	a, -7 (ix)
+   0889 6F            [ 4] 1498 	ld	l,a
+   088A 17            [ 4] 1499 	rla
+   088B 9F            [ 4] 1500 	sbc	a, a
+   088C 67            [ 4] 1501 	ld	h,a
+   088D 29            [11] 1502 	add	hl, hl
+   088E 7D            [ 4] 1503 	ld	a,l
+   088F C6r00         [ 7] 1504 	add	a, #<(_widgets)
+   0891 6F            [ 4] 1505 	ld	l,a
+   0892 7C            [ 4] 1506 	ld	a,h
+   0893 CEs00         [ 7] 1507 	adc	a, #>(_widgets)
+   0895 67            [ 4] 1508 	ld	h,a
+   0896 DD 7E B5      [19] 1509 	ld	a,-75 (ix)
+   0899 77            [ 7] 1510 	ld	(hl),a
+   089A 23            [ 6] 1511 	inc	hl
+   089B DD 7E B6      [19] 1512 	ld	a,-74 (ix)
+   089E 77            [ 7] 1513 	ld	(hl),a
+                           1514 ;synth.c:225: for (j = 0; j < NB_DEV; j++) {
+   089F 04            [ 4] 1515 	inc	b
+   08A0 04            [ 4] 1516 	inc	b
+   08A1 04            [ 4] 1517 	inc	b
+   08A2 DD 34 F9      [23] 1518 	inc	-7 (ix)
+   08A5 DD 7E F9      [19] 1519 	ld	a,-7 (ix)
+   08A8 EE 80         [ 7] 1520 	xor	a, #0x80
+   08AA D6 81         [ 7] 1521 	sub	a, #0x81
+   08AC 38 82         [12] 1522 	jr	C,00106$
+                           1523 ;synth.c:223: for (i = 0; i < NB_OP; i++) {
+   08AE 21 06 00      [10] 1524 	ld	hl,#0x0006
+   08B1 19            [11] 1525 	add	hl,de
+   08B2 EB            [ 4] 1526 	ex	de,hl
+   08B3 0C            [ 4] 1527 	inc	c
+   08B4 79            [ 4] 1528 	ld	a,c
+   08B5 EE 80         [ 7] 1529 	xor	a, #0x80
+   08B7 D6 8B         [ 7] 1530 	sub	a, #0x8B
+   08B9 DAr07r08      [10] 1531 	jp	C,00108$
+                           1532 ;synth.c:237: for (i = 0; i < NB_WIDGETS; i++) {
+   08BC 1E 00         [ 7] 1533 	ld	e,#0x00
+   08BE                    1534 00110$:
+                           1535 ;synth.c:238: if (widgets[i])
+   08BE 7B            [ 4] 1536 	ld	a,e
+   08BF 6F            [ 4] 1537 	ld	l,a
+   08C0 17            [ 4] 1538 	rla
+   08C1 9F            [ 4] 1539 	sbc	a, a
+   08C2 67            [ 4] 1540 	ld	h,a
+   08C3 29            [11] 1541 	add	hl, hl
+   08C4 01r00r00      [10] 1542 	ld	bc,#_widgets
+   08C7 09            [11] 1543 	add	hl,bc
+   08C8 4E            [ 7] 1544 	ld	c,(hl)
+   08C9 23            [ 6] 1545 	inc	hl
+   08CA 46            [ 7] 1546 	ld	b,(hl)
+   08CB 78            [ 4] 1547 	ld	a,b
+   08CC B1            [ 4] 1548 	or	a,c
+   08CD 28 07         [12] 1549 	jr	Z,00111$
+                           1550 ;synth.c:239: widget_redraw(widgets[i]);
+   08CF D5            [11] 1551 	push	de
+   08D0 C5            [11] 1552 	push	bc
+   08D1 CDr00r00      [17] 1553 	call	_widget_redraw
+   08D4 F1            [10] 1554 	pop	af
+   08D5 D1            [10] 1555 	pop	de
+   08D6                    1556 00111$:
+                           1557 ;synth.c:237: for (i = 0; i < NB_WIDGETS; i++) {
+   08D6 1C            [ 4] 1558 	inc	e
+   08D7 7B            [ 4] 1559 	ld	a,e
+   08D8 EE 80         [ 7] 1560 	xor	a, #0x80
+   08DA D6 98         [ 7] 1561 	sub	a, #0x98
+   08DC 38 E0         [12] 1562 	jr	C,00110$
+   08DE DD F9         [10] 1563 	ld	sp, ix
+   08E0 DD E1         [14] 1564 	pop	ix
+   08E2 C9            [10] 1565 	ret
+   08E3                    1566 ___str_11:
+   08E3 59 4D 53 6F 43 20  1567 	.ascii "YMSoC v0.1"
         76 30 2E 31
-   00A2 00                  214 	.db 0x00
-   00A3                     215 ___str_1:
-   00A3 43 54 31 3A         216 	.ascii "CT1:"
-   00A7 00                  217 	.db 0x00
-   00A8                     218 ___str_2:
-   00A8 56 61 6C 75 65 31   219 	.ascii "Value1:"
+   08ED 00                 1568 	.db 0x00
+   08EE                    1569 ___str_12:
+   08EE 43 54 31 3A        1570 	.ascii "CT1:"
+   08F2 00                 1571 	.db 0x00
+   08F3                    1572 ___str_13:
+   08F3 4D 31 43 31 4D 32  1573 	.ascii "M1C1M2C2"
+        43 32
+   08FB 00                 1574 	.db 0x00
+   08FC                    1575 ___str_14:
+   08FC 43 68 61 6E 6E 65  1576 	.ascii "Channels:"
+        6C 73 3A
+   0905 00                 1577 	.db 0x00
+   0906                    1578 ___str_15:
+   0906 4C 65              1579 	.ascii "Le"
+   0908 00                 1580 	.db 0x00
+   0909                    1581 ___str_16:
+   0909 52 69              1582 	.ascii "Ri"
+   090B 00                 1583 	.db 0x00
+   090C                    1584 ___str_17:
+   090C 43 6F 6E 6E 65 63  1585 	.ascii "Connection:"
+        74 69 6F 6E 3A
+   0917 00                 1586 	.db 0x00
+   0918                    1587 ___str_18:
+   0918 52 65 73 65 74 20  1588 	.ascii "Reset LFO"
+        4C 46 4F
+   0921 00                 1589 	.db 0x00
+   0922                    1590 ___str_19:
+   0922 4C 46 4F 20 57 61  1591 	.ascii "LFO Waveform:"
+        76 65 66 6F 72 6D
         3A
-   00AF 00                  220 	.db 0x00
-   00B0                     221 ___str_3:
-   00B0 56 61 6C 75 65 32   222 	.ascii "Value2:"
-        3A
-   00B7 00                  223 	.db 0x00
-                            224 ;synth.c:86: void move_mouse() {
-                            225 ;	---------------------------------
-                            226 ; Function move_mouse
-                            227 ; ---------------------------------
-   00B8                     228 _move_mouse::
-                            229 ;synth.c:89: mouse_x += (char)mouse_x_reg;
-   00B8 DB 30         [11]  230 	in	a,(_mouse_x_reg)
-   00BA 57            [ 4]  231 	ld	d,a
-   00BB 17            [ 4]  232 	rla
-   00BC 9F            [ 4]  233 	sbc	a, a
-   00BD 5F            [ 4]  234 	ld	e,a
-   00BE 21r00r00      [10]  235 	ld	hl,#_mouse_x
-   00C1 7E            [ 7]  236 	ld	a,(hl)
-   00C2 82            [ 4]  237 	add	a, d
-   00C3 77            [ 7]  238 	ld	(hl),a
-   00C4 23            [ 6]  239 	inc	hl
-   00C5 7E            [ 7]  240 	ld	a,(hl)
-   00C6 8B            [ 4]  241 	adc	a, e
-   00C7 77            [ 7]  242 	ld	(hl),a
-                            243 ;synth.c:90: mouse_y -= (char)mouse_y_reg;
-   00C8 DB 31         [11]  244 	in	a,(_mouse_y_reg)
-   00CA 57            [ 4]  245 	ld	d,a
-   00CB 17            [ 4]  246 	rla
-   00CC 9F            [ 4]  247 	sbc	a, a
-   00CD 5F            [ 4]  248 	ld	e,a
-   00CE 21r02r00      [10]  249 	ld	hl,#_mouse_y
-   00D1 7E            [ 7]  250 	ld	a,(hl)
-   00D2 92            [ 4]  251 	sub	a, d
-   00D3 77            [ 7]  252 	ld	(hl),a
-   00D4 23            [ 6]  253 	inc	hl
-   00D5 7E            [ 7]  254 	ld	a,(hl)
-   00D6 9B            [ 4]  255 	sbc	a, e
-   00D7 77            [ 7]  256 	ld	(hl),a
-                            257 ;synth.c:93: if(mouse_x < 0)   mouse_x = 0;
-   00D8 3Ar01r00      [13]  258 	ld	a,(#_mouse_x + 1)
-   00DB CB 7F         [ 8]  259 	bit	7,a
-   00DD 28 06         [12]  260 	jr	Z,00102$
-   00DF 21 00 00      [10]  261 	ld	hl,#0x0000
-   00E2 22r00r00      [16]  262 	ld	(_mouse_x),hl
-   00E5                     263 00102$:
-                            264 ;synth.c:94: if(mouse_x > 319) mouse_x = 319;
-   00E5 3E 3F         [ 7]  265 	ld	a,#0x3F
-   00E7 FD 21r00r00   [14]  266 	ld	iy,#_mouse_x
-   00EB FD BE 00      [19]  267 	cp	a, 0 (iy)
-   00EE 3E 01         [ 7]  268 	ld	a,#0x01
-   00F0 FD 21r00r00   [14]  269 	ld	iy,#_mouse_x
-   00F4 FD 9E 01      [19]  270 	sbc	a, 1 (iy)
-   00F7 E2rFCr00      [10]  271 	jp	PO, 00127$
-   00FA EE 80         [ 7]  272 	xor	a, #0x80
-   00FC                     273 00127$:
-   00FC F2r05r01      [10]  274 	jp	P,00104$
-   00FF 21 3F 01      [10]  275 	ld	hl,#0x013F
-   0102 22r00r00      [16]  276 	ld	(_mouse_x),hl
-   0105                     277 00104$:
-                            278 ;synth.c:95: if(mouse_y < 0)   mouse_y = 0;
-   0105 3Ar03r00      [13]  279 	ld	a,(#_mouse_y + 1)
-   0108 CB 7F         [ 8]  280 	bit	7,a
-   010A 28 06         [12]  281 	jr	Z,00106$
-   010C 21 00 00      [10]  282 	ld	hl,#0x0000
-   010F 22r02r00      [16]  283 	ld	(_mouse_y),hl
-   0112                     284 00106$:
-                            285 ;synth.c:96: if(mouse_y > 239)  mouse_y = 239;
-   0112 3E EF         [ 7]  286 	ld	a,#0xEF
-   0114 FD 21r02r00   [14]  287 	ld	iy,#_mouse_y
-   0118 FD BE 00      [19]  288 	cp	a, 0 (iy)
-   011B 3E 00         [ 7]  289 	ld	a,#0x00
-   011D FD 21r02r00   [14]  290 	ld	iy,#_mouse_y
-   0121 FD 9E 01      [19]  291 	sbc	a, 1 (iy)
-   0124 E2r29r01      [10]  292 	jp	PO, 00128$
-   0127 EE 80         [ 7]  293 	xor	a, #0x80
-   0129                     294 00128$:
-   0129 F2r32r01      [10]  295 	jp	P,00108$
-   012C 21 EF 00      [10]  296 	ld	hl,#0x00EF
-   012F 22r02r00      [16]  297 	ld	(_mouse_y),hl
-   0132                     298 00108$:
-                            299 ;synth.c:99: *(unsigned char*)0x7efe = mouse_x;
-   0132 3Ar00r00      [13]  300 	ld	a,(#_mouse_x + 0)
-   0135 32 FE 7E      [13]  301 	ld	(#0x7EFE),a
-                            302 ;synth.c:100: *(unsigned char*)0x7eff = (mouse_x & 0x100) >> 8;
-   0138 3Ar01r00      [13]  303 	ld	a,(#_mouse_x + 1)
-   013B E6 01         [ 7]  304 	and	a, #0x01
-   013D 57            [ 4]  305 	ld	d,a
-   013E CB 07         [ 8]  306 	rlc	a
-   0140 9F            [ 4]  307 	sbc	a, a
-   0141 21 FF 7E      [10]  308 	ld	hl,#0x7EFF
-   0144 72            [ 7]  309 	ld	(hl),d
-                            310 ;synth.c:101: *(unsigned char*)0x7f00 = mouse_y;
-   0145 3Ar02r00      [13]  311 	ld	a,(#_mouse_y + 0)
-   0148 32 00 7F      [13]  312 	ld	(#0x7F00),a
-   014B C9            [10]  313 	ret
-                            314 ;synth.c:104: void left_click_event() {
-                            315 ;	---------------------------------
-                            316 ; Function left_click_event
-                            317 ; ---------------------------------
-   014C                     318 _left_click_event::
-   014C DD E5         [15]  319 	push	ix
-   014E DD 21 00 00   [14]  320 	ld	ix,#0
-   0152 DD 39         [15]  321 	add	ix,sp
-   0154 3B            [ 6]  322 	dec	sp
-                            323 ;synth.c:107: for (i = 0; i < NB_WIDGETS; i++)
-   0155 DD 36 FF 00   [19]  324 	ld	-1 (ix),#0x00
-   0159                     325 00106$:
-                            326 ;synth.c:108: if (isInLayout(&(widgets[i]->layout), mouse_x, mouse_y)) {
-   0159 DD 6E FF      [19]  327 	ld	l,-1 (ix)
-   015C DD 7E FF      [19]  328 	ld	a,-1 (ix)
-   015F 17            [ 4]  329 	rla
-   0160 9F            [ 4]  330 	sbc	a, a
-   0161 67            [ 4]  331 	ld	h,a
-   0162 29            [11]  332 	add	hl, hl
-   0163 3Er00         [ 7]  333 	ld	a,#<(_widgets)
-   0165 85            [ 4]  334 	add	a, l
-   0166 5F            [ 4]  335 	ld	e,a
-   0167 3Es00         [ 7]  336 	ld	a,#>(_widgets)
-   0169 8C            [ 4]  337 	adc	a, h
-   016A 57            [ 4]  338 	ld	d,a
-   016B 6B            [ 4]  339 	ld	l, e
-   016C 62            [ 4]  340 	ld	h, d
-   016D 4E            [ 7]  341 	ld	c,(hl)
-   016E 23            [ 6]  342 	inc	hl
-   016F 46            [ 7]  343 	ld	b,(hl)
-   0170 03            [ 6]  344 	inc	bc
-   0171 D5            [11]  345 	push	de
-   0172 2Ar02r00      [16]  346 	ld	hl,(_mouse_y)
-   0175 E5            [11]  347 	push	hl
-   0176 2Ar00r00      [16]  348 	ld	hl,(_mouse_x)
-   0179 E5            [11]  349 	push	hl
-   017A C5            [11]  350 	push	bc
-   017B CDr00r00      [17]  351 	call	_isInLayout
-   017E F1            [10]  352 	pop	af
-   017F F1            [10]  353 	pop	af
-   0180 F1            [10]  354 	pop	af
-   0181 7D            [ 4]  355 	ld	a,l
-   0182 D1            [10]  356 	pop	de
-   0183 B7            [ 4]  357 	or	a, a
-   0184 28 22         [12]  358 	jr	Z,00107$
-                            359 ;synth.c:109: widget_event(widgets[i], EVENT_LEFT_CLICK);
-   0186 6B            [ 4]  360 	ld	l, e
-   0187 62            [ 4]  361 	ld	h, d
-   0188 4E            [ 7]  362 	ld	c,(hl)
-   0189 23            [ 6]  363 	inc	hl
-   018A 46            [ 7]  364 	ld	b,(hl)
-   018B D5            [11]  365 	push	de
-   018C AF            [ 4]  366 	xor	a, a
-   018D F5            [11]  367 	push	af
-   018E 33            [ 6]  368 	inc	sp
-   018F C5            [11]  369 	push	bc
-   0190 CDr00r00      [17]  370 	call	_widget_event
-   0193 F1            [10]  371 	pop	af
-   0194 33            [ 6]  372 	inc	sp
-                            373 ;synth.c:110: if (widgets[i]->dirty)
-   0195 E1            [10]  374 	pop	hl
-   0196 5E            [ 7]  375 	ld	e,(hl)
-   0197 23            [ 6]  376 	inc	hl
-   0198 56            [ 7]  377 	ld	d,(hl)
-   0199 6B            [ 4]  378 	ld	l, e
-   019A 62            [ 4]  379 	ld	h, d
-   019B 01 05 00      [10]  380 	ld	bc, #0x0005
-   019E 09            [11]  381 	add	hl, bc
-   019F 7E            [ 7]  382 	ld	a,(hl)
-   01A0 B7            [ 4]  383 	or	a, a
-   01A1 28 05         [12]  384 	jr	Z,00107$
-                            385 ;synth.c:111: widget_redraw(widgets[i]);
-   01A3 D5            [11]  386 	push	de
-   01A4 CDr00r00      [17]  387 	call	_widget_redraw
-   01A7 F1            [10]  388 	pop	af
-   01A8                     389 00107$:
-                            390 ;synth.c:107: for (i = 0; i < NB_WIDGETS; i++)
-   01A8 DD 34 FF      [23]  391 	inc	-1 (ix)
-   01AB DD 7E FF      [19]  392 	ld	a,-1 (ix)
-   01AE EE 80         [ 7]  393 	xor	a, #0x80
-   01B0 D6 83         [ 7]  394 	sub	a, #0x83
-   01B2 38 A5         [12]  395 	jr	C,00106$
-   01B4 33            [ 6]  396 	inc	sp
-   01B5 DD E1         [14]  397 	pop	ix
-   01B7 C9            [10]  398 	ret
-                            399 ;synth.c:115: void right_click_event() {
-                            400 ;	---------------------------------
-                            401 ; Function right_click_event
-                            402 ; ---------------------------------
-   01B8                     403 _right_click_event::
-   01B8 DD E5         [15]  404 	push	ix
-   01BA DD 21 00 00   [14]  405 	ld	ix,#0
-   01BE DD 39         [15]  406 	add	ix,sp
-   01C0 3B            [ 6]  407 	dec	sp
-                            408 ;synth.c:118: for (i = 0; i < NB_WIDGETS; i++)
-   01C1 DD 36 FF 00   [19]  409 	ld	-1 (ix),#0x00
-   01C5                     410 00106$:
-                            411 ;synth.c:119: if (isInLayout(&(widgets[i]->layout), mouse_x, mouse_y)) {
-   01C5 DD 6E FF      [19]  412 	ld	l,-1 (ix)
-   01C8 DD 7E FF      [19]  413 	ld	a,-1 (ix)
-   01CB 17            [ 4]  414 	rla
-   01CC 9F            [ 4]  415 	sbc	a, a
-   01CD 67            [ 4]  416 	ld	h,a
-   01CE 29            [11]  417 	add	hl, hl
-   01CF 3Er00         [ 7]  418 	ld	a,#<(_widgets)
-   01D1 85            [ 4]  419 	add	a, l
-   01D2 5F            [ 4]  420 	ld	e,a
-   01D3 3Es00         [ 7]  421 	ld	a,#>(_widgets)
-   01D5 8C            [ 4]  422 	adc	a, h
-   01D6 57            [ 4]  423 	ld	d,a
-   01D7 6B            [ 4]  424 	ld	l, e
-   01D8 62            [ 4]  425 	ld	h, d
-   01D9 4E            [ 7]  426 	ld	c,(hl)
-   01DA 23            [ 6]  427 	inc	hl
-   01DB 46            [ 7]  428 	ld	b,(hl)
-   01DC 03            [ 6]  429 	inc	bc
-   01DD D5            [11]  430 	push	de
-   01DE 2Ar02r00      [16]  431 	ld	hl,(_mouse_y)
-   01E1 E5            [11]  432 	push	hl
-   01E2 2Ar00r00      [16]  433 	ld	hl,(_mouse_x)
-   01E5 E5            [11]  434 	push	hl
-   01E6 C5            [11]  435 	push	bc
-   01E7 CDr00r00      [17]  436 	call	_isInLayout
-   01EA F1            [10]  437 	pop	af
-   01EB F1            [10]  438 	pop	af
-   01EC F1            [10]  439 	pop	af
-   01ED 7D            [ 4]  440 	ld	a,l
-   01EE D1            [10]  441 	pop	de
-   01EF B7            [ 4]  442 	or	a, a
-   01F0 28 23         [12]  443 	jr	Z,00107$
-                            444 ;synth.c:120: widget_event(widgets[i], EVENT_RIGHT_CLICK);
-   01F2 6B            [ 4]  445 	ld	l, e
-   01F3 62            [ 4]  446 	ld	h, d
-   01F4 4E            [ 7]  447 	ld	c,(hl)
-   01F5 23            [ 6]  448 	inc	hl
-   01F6 46            [ 7]  449 	ld	b,(hl)
-   01F7 D5            [11]  450 	push	de
-   01F8 3E 01         [ 7]  451 	ld	a,#0x01
-   01FA F5            [11]  452 	push	af
-   01FB 33            [ 6]  453 	inc	sp
-   01FC C5            [11]  454 	push	bc
-   01FD CDr00r00      [17]  455 	call	_widget_event
-   0200 F1            [10]  456 	pop	af
-   0201 33            [ 6]  457 	inc	sp
-                            458 ;synth.c:121: if (widgets[i]->dirty)
-   0202 E1            [10]  459 	pop	hl
-   0203 5E            [ 7]  460 	ld	e,(hl)
-   0204 23            [ 6]  461 	inc	hl
-   0205 56            [ 7]  462 	ld	d,(hl)
-   0206 6B            [ 4]  463 	ld	l, e
-   0207 62            [ 4]  464 	ld	h, d
-   0208 01 05 00      [10]  465 	ld	bc, #0x0005
-   020B 09            [11]  466 	add	hl, bc
-   020C 7E            [ 7]  467 	ld	a,(hl)
-   020D B7            [ 4]  468 	or	a, a
-   020E 28 05         [12]  469 	jr	Z,00107$
-                            470 ;synth.c:122: widget_redraw(widgets[i]);
-   0210 D5            [11]  471 	push	de
-   0211 CDr00r00      [17]  472 	call	_widget_redraw
-   0214 F1            [10]  473 	pop	af
-   0215                     474 00107$:
-                            475 ;synth.c:118: for (i = 0; i < NB_WIDGETS; i++)
-   0215 DD 34 FF      [23]  476 	inc	-1 (ix)
-   0218 DD 7E FF      [19]  477 	ld	a,-1 (ix)
-   021B EE 80         [ 7]  478 	xor	a, #0x80
-   021D D6 83         [ 7]  479 	sub	a, #0x83
-   021F 38 A4         [12]  480 	jr	C,00106$
-   0221 33            [ 6]  481 	inc	sp
-   0222 DD E1         [14]  482 	pop	ix
-   0224 C9            [10]  483 	ret
-                            484 ;synth.c:132: void refresh_mouse_buttons() {
-                            485 ;	---------------------------------
-                            486 ; Function refresh_mouse_buttons
-                            487 ; ---------------------------------
-   0225                     488 _refresh_mouse_buttons::
-                            489 ;synth.c:137: prev_buttons = mouse_buttons;
-   0225 3Ar04r00      [13]  490 	ld	a,(#_mouse_buttons + 0)
-   0228 32r06r00      [13]  491 	ld	(#_refresh_mouse_buttons_prev_buttons_1_85 + 0),a
-                            492 ;synth.c:138: mouse_buttons = (char)mouse_but_reg;
-   022B DB 32         [11]  493 	in	a,(_mouse_but_reg)
-   022D 32r04r00      [13]  494 	ld	(#_mouse_buttons + 0),a
-                            495 ;synth.c:140: if (!(prev_buttons & 1) && (mouse_buttons & 1)) {
-   0230 3Ar06r00      [13]  496 	ld	a,(#_refresh_mouse_buttons_prev_buttons_1_85 + 0)
-   0233 E6 01         [ 7]  497 	and	a, #0x01
-   0235 57            [ 4]  498 	ld	d,a
-   0236 3Ar04r00      [13]  499 	ld	a,(#_mouse_buttons + 0)
-   0239 E6 01         [ 7]  500 	and	a, #0x01
-   023B 5F            [ 4]  501 	ld	e,a
-   023C 7A            [ 4]  502 	ld	a,d
-   023D B7            [ 4]  503 	or	a,a
-   023E 20 10         [12]  504 	jr	NZ,00128$
-   0240 B3            [ 4]  505 	or	a,e
-   0241 28 0D         [12]  506 	jr	Z,00128$
-                            507 ;synth.c:141: click_timer = 0;
-   0243 21r07r00      [10]  508 	ld	hl,#_refresh_mouse_buttons_click_timer_1_85 + 0
-   0246 36 00         [10]  509 	ld	(hl), #0x00
-                            510 ;synth.c:142: initial_click = 1;
-   0248 21r08r00      [10]  511 	ld	hl,#_refresh_mouse_buttons_initial_click_1_85 + 0
-   024B 36 01         [10]  512 	ld	(hl), #0x01
-                            513 ;synth.c:143: left_click_event();		
-   024D C3r4Cr01      [10]  514 	jp	_left_click_event
-   0250                     515 00128$:
-                            516 ;synth.c:145: click_timer ++;
-   0250 21r07r00      [10]  517 	ld	hl,#_refresh_mouse_buttons_click_timer_1_85 + 0
-   0253 46            [ 7]  518 	ld	b, (hl)
-   0254 04            [ 4]  519 	inc	b
-                            520 ;synth.c:144: } else if ((prev_buttons & 1) && (mouse_buttons & 1)) {
-   0255 7A            [ 4]  521 	ld	a,d
-   0256 B7            [ 4]  522 	or	a, a
-   0257 28 33         [12]  523 	jr	Z,00124$
-   0259 7B            [ 4]  524 	ld	a,e
-   025A B7            [ 4]  525 	or	a, a
-   025B 28 2F         [12]  526 	jr	Z,00124$
-                            527 ;synth.c:145: click_timer ++;
-   025D 21r07r00      [10]  528 	ld	hl,#_refresh_mouse_buttons_click_timer_1_85 + 0
-   0260 70            [ 7]  529 	ld	(hl), b
-                            530 ;synth.c:146: if (initial_click && (click_timer == HOLD_CLICK)) {
-   0261 3Ar08r00      [13]  531 	ld	a,(#_refresh_mouse_buttons_initial_click_1_85 + 0)
-   0264 B7            [ 4]  532 	or	a, a
-   0265 28 12         [12]  533 	jr	Z,00105$
-   0267 3Ar07r00      [13]  534 	ld	a,(#_refresh_mouse_buttons_click_timer_1_85 + 0)
-   026A D6 32         [ 7]  535 	sub	a, #0x32
-   026C 20 0B         [12]  536 	jr	NZ,00105$
-                            537 ;synth.c:147: initial_click = 0;
-   026E 21r08r00      [10]  538 	ld	hl,#_refresh_mouse_buttons_initial_click_1_85 + 0
-   0271 36 00         [10]  539 	ld	(hl), #0x00
-                            540 ;synth.c:148: click_timer = 0;
-   0273 21r07r00      [10]  541 	ld	hl,#_refresh_mouse_buttons_click_timer_1_85 + 0
-   0276 36 00         [10]  542 	ld	(hl), #0x00
-   0278 C9            [10]  543 	ret
-   0279                     544 00105$:
-                            545 ;synth.c:149: } else if (!initial_click && (click_timer == REPEAT_CLICK)) {
-   0279 3Ar08r00      [13]  546 	ld	a,(#_refresh_mouse_buttons_initial_click_1_85 + 0)
-   027C B7            [ 4]  547 	or	a, a
-   027D C0            [11]  548 	ret	NZ
-   027E 3Ar07r00      [13]  549 	ld	a,(#_refresh_mouse_buttons_click_timer_1_85 + 0)
-   0281 D6 0A         [ 7]  550 	sub	a, #0x0A
-   0283 C0            [11]  551 	ret	NZ
-                            552 ;synth.c:150: click_timer = 0;
-   0284 21r07r00      [10]  553 	ld	hl,#_refresh_mouse_buttons_click_timer_1_85 + 0
-   0287 36 00         [10]  554 	ld	(hl), #0x00
-                            555 ;synth.c:151: left_click_event();
-   0289 C3r4Cr01      [10]  556 	jp	_left_click_event
-   028C                     557 00124$:
-                            558 ;synth.c:153: } else if (!(prev_buttons & 2) && (mouse_buttons & 2)) {
-   028C 3Ar06r00      [13]  559 	ld	a,(#_refresh_mouse_buttons_prev_buttons_1_85 + 0)
-   028F E6 02         [ 7]  560 	and	a, #0x02
-   0291 5F            [ 4]  561 	ld	e,a
-   0292 3Ar04r00      [13]  562 	ld	a,(#_mouse_buttons + 0)
-   0295 E6 02         [ 7]  563 	and	a, #0x02
-   0297 67            [ 4]  564 	ld	h,a
-   0298 7B            [ 4]  565 	ld	a,e
-   0299 B7            [ 4]  566 	or	a,a
-   029A 20 10         [12]  567 	jr	NZ,00120$
-   029C B4            [ 4]  568 	or	a,h
-   029D 28 0D         [12]  569 	jr	Z,00120$
-                            570 ;synth.c:154: click_timer = 0;
-   029F 21r07r00      [10]  571 	ld	hl,#_refresh_mouse_buttons_click_timer_1_85 + 0
-   02A2 36 00         [10]  572 	ld	(hl), #0x00
-                            573 ;synth.c:155: initial_click = 1;
-   02A4 21r08r00      [10]  574 	ld	hl,#_refresh_mouse_buttons_initial_click_1_85 + 0
-   02A7 36 01         [10]  575 	ld	(hl), #0x01
-                            576 ;synth.c:156: right_click_event();		
-   02A9 C3rB8r01      [10]  577 	jp	_right_click_event
-   02AC                     578 00120$:
-                            579 ;synth.c:157: } else if ((prev_buttons & 2) && (mouse_buttons & 2)) {
-   02AC 7B            [ 4]  580 	ld	a,e
-   02AD B7            [ 4]  581 	or	a, a
-   02AE 28 33         [12]  582 	jr	Z,00116$
-   02B0 7C            [ 4]  583 	ld	a,h
-   02B1 B7            [ 4]  584 	or	a, a
-   02B2 28 2F         [12]  585 	jr	Z,00116$
-                            586 ;synth.c:158: click_timer ++;
-   02B4 21r07r00      [10]  587 	ld	hl,#_refresh_mouse_buttons_click_timer_1_85 + 0
-   02B7 70            [ 7]  588 	ld	(hl), b
-                            589 ;synth.c:159: if (initial_click && (click_timer == HOLD_CLICK)) {
-   02B8 3Ar08r00      [13]  590 	ld	a,(#_refresh_mouse_buttons_initial_click_1_85 + 0)
-   02BB B7            [ 4]  591 	or	a, a
-   02BC 28 12         [12]  592 	jr	Z,00112$
-   02BE 3Ar07r00      [13]  593 	ld	a,(#_refresh_mouse_buttons_click_timer_1_85 + 0)
-   02C1 D6 32         [ 7]  594 	sub	a, #0x32
-   02C3 20 0B         [12]  595 	jr	NZ,00112$
-                            596 ;synth.c:160: initial_click = 0;
-   02C5 21r08r00      [10]  597 	ld	hl,#_refresh_mouse_buttons_initial_click_1_85 + 0
-   02C8 36 00         [10]  598 	ld	(hl), #0x00
-                            599 ;synth.c:161: click_timer = 0;
-   02CA 21r07r00      [10]  600 	ld	hl,#_refresh_mouse_buttons_click_timer_1_85 + 0
-   02CD 36 00         [10]  601 	ld	(hl), #0x00
-   02CF C9            [10]  602 	ret
-   02D0                     603 00112$:
-                            604 ;synth.c:162: } else if (!initial_click && (click_timer == REPEAT_CLICK)) {
-   02D0 3Ar08r00      [13]  605 	ld	a,(#_refresh_mouse_buttons_initial_click_1_85 + 0)
-   02D3 B7            [ 4]  606 	or	a, a
-   02D4 C0            [11]  607 	ret	NZ
-   02D5 3Ar07r00      [13]  608 	ld	a,(#_refresh_mouse_buttons_click_timer_1_85 + 0)
-   02D8 D6 0A         [ 7]  609 	sub	a, #0x0A
-   02DA C0            [11]  610 	ret	NZ
-                            611 ;synth.c:163: click_timer = 0;
-   02DB 21r07r00      [10]  612 	ld	hl,#_refresh_mouse_buttons_click_timer_1_85 + 0
-   02DE 36 00         [10]  613 	ld	(hl), #0x00
-                            614 ;synth.c:164: right_click_event();
-   02E0 C3rB8r01      [10]  615 	jp	_right_click_event
-   02E3                     616 00116$:
-                            617 ;synth.c:167: initial_click = 0;
-   02E3 21r08r00      [10]  618 	ld	hl,#_refresh_mouse_buttons_initial_click_1_85 + 0
-   02E6 36 00         [10]  619 	ld	(hl), #0x00
-   02E8 C9            [10]  620 	ret
-                            621 ;synth.c:172: void vbl(void) __interrupt (0x30) {
-                            622 ;	---------------------------------
-                            623 ; Function vbl
-                            624 ; ---------------------------------
-   02E9                     625 _vbl::
-   02E9 F5            [11]  626 	push	af
-   02EA C5            [11]  627 	push	bc
-   02EB D5            [11]  628 	push	de
-   02EC E5            [11]  629 	push	hl
-   02ED FD E5         [15]  630 	push	iy
-                            631 ;synth.c:174: move_mouse();
-   02EF CDrB8r00      [17]  632 	call	_move_mouse
-                            633 ;synth.c:179: __endasm;
-   02F2 FB            [ 4]  634 	ei
-   02F3 FD E1         [14]  635 	pop	iy
-   02F5 E1            [10]  636 	pop	hl
-   02F6 D1            [10]  637 	pop	de
-   02F7 C1            [10]  638 	pop	bc
-   02F8 F1            [10]  639 	pop	af
-   02F9 ED 4D         [14]  640 	reti
-                            641 ;synth.c:185: void clock50KHz(void) __interrupt (0x20) {
-                            642 ;	---------------------------------
-                            643 ; Function clock50KHz
-                            644 ; ---------------------------------
-   02FB                     645 _clock50KHz::
-   02FB F5            [11]  646 	push	af
-   02FC C5            [11]  647 	push	bc
-   02FD D5            [11]  648 	push	de
-   02FE E5            [11]  649 	push	hl
-   02FF FD E5         [15]  650 	push	iy
-                            651 ;synth.c:187: refresh_mouse_buttons();
-   0301 CDr25r02      [17]  652 	call	_refresh_mouse_buttons
-                            653 ;synth.c:188: tick50Hz ++;
-   0304 FD 21r05r00   [14]  654 	ld	iy,#_tick50Hz
-   0308 FD 34 00      [23]  655 	inc	0 (iy)
-   030B 20 07         [12]  656 	jr	NZ,00103$
-   030D FD 21r05r00   [14]  657 	ld	iy,#_tick50Hz
-   0311 FD 34 01      [23]  658 	inc	1 (iy)
-   0314                     659 00103$:
-                            660 ;synth.c:193: __endasm;
-   0314 FB            [ 4]  661 	ei
-   0315 FD E1         [14]  662 	pop	iy
-   0317 E1            [10]  663 	pop	hl
-   0318 D1            [10]  664 	pop	de
-   0319 C1            [10]  665 	pop	bc
-   031A F1            [10]  666 	pop	af
-   031B ED 4D         [14]  667 	reti
-                            668 ;synth.c:198: void putchar(char c) {
-                            669 ;	---------------------------------
-                            670 ; Function putchar
-                            671 ; ---------------------------------
-   031D                     672 _putchar::
-   031D DD E5         [15]  673 	push	ix
-   031F DD 21 00 00   [14]  674 	ld	ix,#0
-   0323 DD 39         [15]  675 	add	ix,sp
-   0325 F5            [11]  676 	push	af
-                            677 ;synth.c:199: unsigned char *dptr = (unsigned char*)(80 * (FONT_HEIGHT * cur_y) + cur_x);
-   0326 FD 21r08r00   [14]  678 	ld	iy,#_cur_y
-   032A FD 6E 00      [19]  679 	ld	l,0 (iy)
-   032D 26 00         [ 7]  680 	ld	h,#0x00
-   032F 4D            [ 4]  681 	ld	c, l
-   0330 44            [ 4]  682 	ld	b, h
-   0331 29            [11]  683 	add	hl, hl
-   0332 09            [11]  684 	add	hl, bc
-   0333 29            [11]  685 	add	hl, hl
-   0334 09            [11]  686 	add	hl, bc
-   0335 29            [11]  687 	add	hl, hl
-   0336 09            [11]  688 	add	hl, bc
-   0337 29            [11]  689 	add	hl, hl
-   0338 29            [11]  690 	add	hl, hl
-   0339 29            [11]  691 	add	hl, hl
-   033A 29            [11]  692 	add	hl, hl
-   033B 29            [11]  693 	add	hl, hl
-   033C EB            [ 4]  694 	ex	de,hl
-   033D FD 21r07r00   [14]  695 	ld	iy,#_cur_x
-   0341 FD 6E 00      [19]  696 	ld	l,0 (iy)
-   0344 26 00         [ 7]  697 	ld	h,#0x00
-   0346 19            [11]  698 	add	hl,de
-   0347 33            [ 6]  699 	inc	sp
-   0348 33            [ 6]  700 	inc	sp
-   0349 E5            [11]  701 	push	hl
-                            702 ;synth.c:201: if(c < 32) {
-   034A DD 7E 04      [19]  703 	ld	a,4 (ix)
-   034D EE 80         [ 7]  704 	xor	a, #0x80
-   034F D6 A0         [ 7]  705 	sub	a, #0xA0
-   0351 30 2A         [12]  706 	jr	NC,00108$
-                            707 ;synth.c:202: if(c == '\r') 
-   0353 DD 7E 04      [19]  708 	ld	a,4 (ix)
-   0356 D6 0D         [ 7]  709 	sub	a, #0x0D
-   0358 20 05         [12]  710 	jr	NZ,00102$
-                            711 ;synth.c:203: cur_x=0;
-   035A 21r07r00      [10]  712 	ld	hl,#_cur_x + 0
-   035D 36 00         [10]  713 	ld	(hl), #0x00
-   035F                     714 00102$:
-                            715 ;synth.c:205: if(c == '\n') {
-   035F DD 7E 04      [19]  716 	ld	a,4 (ix)
-   0362 D6 0A         [ 7]  717 	sub	a, #0x0A
-   0364 20 4E         [12]  718 	jr	NZ,00115$
-                            719 ;synth.c:206: cur_y++;
-   0366 21r08r00      [10]  720 	ld	hl, #_cur_y+0
-   0369 34            [11]  721 	inc	(hl)
-                            722 ;synth.c:207: cur_x=0;
-   036A 21r07r00      [10]  723 	ld	hl,#_cur_x + 0
-   036D 36 00         [10]  724 	ld	(hl), #0x00
-                            725 ;synth.c:209: if(cur_y >= 240 / FONT_HEIGHT)
-   036F 3Ar08r00      [13]  726 	ld	a,(#_cur_y + 0)
-   0372 D6 28         [ 7]  727 	sub	a, #0x28
-   0374 38 3E         [12]  728 	jr	C,00115$
-                            729 ;synth.c:210: cur_y = 0;
-   0376 21r08r00      [10]  730 	ld	hl,#_cur_y + 0
-   0379 36 00         [10]  731 	ld	(hl), #0x00
-                            732 ;synth.c:212: return;
-   037B 18 37         [12]  733 	jr	00115$
-   037D                     734 00108$:
-                            735 ;synth.c:215: if(c < 0) return;
-   037D DD CB 04 7E   [20]  736 	bit	7, 4 (ix)
-   0381 20 31         [12]  737 	jr	NZ,00115$
-                            738 ;synth.c:217: text_char(dptr, c);
-   0383 DD 7E 04      [19]  739 	ld	a,4 (ix)
-   0386 F5            [11]  740 	push	af
-   0387 33            [ 6]  741 	inc	sp
-   0388 DD 6E FE      [19]  742 	ld	l,-2 (ix)
-   038B DD 66 FF      [19]  743 	ld	h,-1 (ix)
-   038E E5            [11]  744 	push	hl
-   038F CDr00r00      [17]  745 	call	_text_char
-   0392 F1            [10]  746 	pop	af
-   0393 33            [ 6]  747 	inc	sp
-                            748 ;synth.c:219: cur_x++;
-   0394 21r07r00      [10]  749 	ld	hl, #_cur_x+0
-   0397 34            [11]  750 	inc	(hl)
-                            751 ;synth.c:220: if(cur_x >= 320 / FONT_WIDTH) {
-   0398 3Ar07r00      [13]  752 	ld	a,(#_cur_x + 0)
-   039B D6 50         [ 7]  753 	sub	a, #0x50
-   039D 38 15         [12]  754 	jr	C,00115$
-                            755 ;synth.c:221: cur_x = 0;
-   039F 21r07r00      [10]  756 	ld	hl,#_cur_x + 0
-   03A2 36 00         [10]  757 	ld	(hl), #0x00
-                            758 ;synth.c:222: cur_y++;
-   03A4 21r08r00      [10]  759 	ld	hl, #_cur_y+0
-   03A7 34            [11]  760 	inc	(hl)
-                            761 ;synth.c:224: if(cur_y >= 240 / FONT_HEIGHT)
-   03A8 3Ar08r00      [13]  762 	ld	a,(#_cur_y + 0)
-   03AB D6 28         [ 7]  763 	sub	a, #0x28
-   03AD 38 05         [12]  764 	jr	C,00115$
-                            765 ;synth.c:225: cur_y = 0;
-   03AF 21r08r00      [10]  766 	ld	hl,#_cur_y + 0
-   03B2 36 00         [10]  767 	ld	(hl), #0x00
-   03B4                     768 00115$:
-   03B4 DD F9         [10]  769 	ld	sp, ix
-   03B6 DD E1         [14]  770 	pop	ix
-   03B8 C9            [10]  771 	ret
-                            772 ;synth.c:229: void cls(void) {
-                            773 ;	---------------------------------
-                            774 ; Function cls
-                            775 ; ---------------------------------
-   03B9                     776 _cls::
-                            777 ;synth.c:233: for(i = 0; i < 240; i++) {
-   03B9 21 00 00      [10]  778 	ld	hl,#0x0000
-   03BC 5D            [ 4]  779 	ld	e,l
-   03BD 54            [ 4]  780 	ld	d,h
-   03BE                     781 00102$:
-                            782 ;synth.c:234: memset(p, 0, 80);
-   03BE 45            [ 4]  783 	ld	b,l
-   03BF 4C            [ 4]  784 	ld	c,h
-   03C0 E5            [11]  785 	push	hl
-   03C1 68            [ 4]  786 	ld	l, b
-   03C2 61            [ 4]  787 	ld	h, c
-   03C3 06 50         [ 7]  788 	ld	b, #0x50
-   03C5                     789 00115$:
-   03C5 36 00         [10]  790 	ld	(hl), #0x00
-   03C7 23            [ 6]  791 	inc	hl
-   03C8 10 FB         [13]  792 	djnz	00115$
-   03CA E1            [10]  793 	pop	hl
-                            794 ;synth.c:235: p += 80;
-   03CB 01 50 00      [10]  795 	ld	bc,#0x0050
-   03CE 09            [11]  796 	add	hl,bc
-                            797 ;synth.c:233: for(i = 0; i < 240; i++) {
-   03CF 13            [ 6]  798 	inc	de
-   03D0 7B            [ 4]  799 	ld	a,e
-   03D1 D6 F0         [ 7]  800 	sub	a, #0xF0
-   03D3 7A            [ 4]  801 	ld	a,d
-   03D4 17            [ 4]  802 	rla
-   03D5 3F            [ 4]  803 	ccf
-   03D6 1F            [ 4]  804 	rra
-   03D7 DE 80         [ 7]  805 	sbc	a, #0x80
-   03D9 38 E3         [12]  806 	jr	C,00102$
-                            807 ;synth.c:237: cur_x = 0;
-   03DB 21r07r00      [10]  808 	ld	hl,#_cur_x + 0
-   03DE 36 00         [10]  809 	ld	(hl), #0x00
-                            810 ;synth.c:238: cur_y = 0;
-   03E0 21r08r00      [10]  811 	ld	hl,#_cur_y + 0
-   03E3 36 00         [10]  812 	ld	(hl), #0x00
-   03E5 C9            [10]  813 	ret
-                            814 ;synth.c:247: void init_interrupt_table() {
-                            815 ;	---------------------------------
-                            816 ; Function init_interrupt_table
-                            817 ; ---------------------------------
-   03E6                     818 _init_interrupt_table::
-                            819 ;synth.c:259: __endasm;
-   03E6 21 00 80      [10]  820 	ld hl,#0x8000
-   03E9 7C            [ 4]  821 	ld a,h
-   03EA ED 47         [ 9]  822 	ld i,a
-   03EC FD 21rFBr02   [14]  823 	ld iy,#_clock50KHz
-   03F0 FD 22 20 80   [20]  824 	ld (#0x8020),iy
-   03F4 FD 21rE9r02   [14]  825 	ld iy,#_vbl
-   03F8 FD 22 30 80   [20]  826 	ld (#0x8030),iy
-   03FC C9            [10]  827 	ret
-                            828 ;synth.c:262: void ei() {
-                            829 ;	---------------------------------
-                            830 ; Function ei
-                            831 ; ---------------------------------
-   03FD                     832 _ei::
-                            833 ;synth.c:267: __endasm;
-   03FD ED 5E         [ 8]  834 	im 2
-   03FF FB            [ 4]  835 	ei
-   0400 C9            [10]  836 	ret
-                            837 ;synth.c:270: void main() {
-                            838 ;	---------------------------------
-                            839 ; Function main
-                            840 ; ---------------------------------
-   0401                     841 _main::
-   0401 DD E5         [15]  842 	push	ix
-   0403 DD 21 00 00   [14]  843 	ld	ix,#0
-   0407 DD 39         [15]  844 	add	ix,sp
-   0409 3B            [ 6]  845 	dec	sp
-                            846 ;synth.c:273: init_interrupt_table();
-   040A CDrE6r03      [17]  847 	call	_init_interrupt_table
-                            848 ;synth.c:275: cls();
-   040D CDrB9r03      [17]  849 	call	_cls
-                            850 ;synth.c:278: for(i = 0; i < 8; i++) {
-   0410 1E 00         [ 7]  851 	ld	e,#0x00
-   0412                     852 00111$:
-                            853 ;synth.c:279: *(char*)(0x7f10+i) = cursor_data[i];
-   0412 7B            [ 4]  854 	ld	a,e
-   0413 4F            [ 4]  855 	ld	c,a
-   0414 17            [ 4]  856 	rla
-   0415 9F            [ 4]  857 	sbc	a, a
-   0416 47            [ 4]  858 	ld	b,a
-   0417 FD 21 10 7F   [14]  859 	ld	iy,#0x7F10
-   041B FD 09         [15]  860 	add	iy, bc
-   041D 21r00r00      [10]  861 	ld	hl,#_cursor_data
-   0420 16 00         [ 7]  862 	ld	d,#0x00
-   0422 19            [11]  863 	add	hl, de
-   0423 7E            [ 7]  864 	ld	a,(hl)
-   0424 FD 77 00      [19]  865 	ld	0 (iy), a
-                            866 ;synth.c:280: *(char*)(0x7f18+i) = cursor_mask[i];
-   0427 21 18 7F      [10]  867 	ld	hl,#0x7F18
-   042A 09            [11]  868 	add	hl,bc
-   042B 4D            [ 4]  869 	ld	c, l
-   042C 44            [ 4]  870 	ld	b, h
-   042D 21r00r00      [10]  871 	ld	hl,#_cursor_mask
-   0430 16 00         [ 7]  872 	ld	d,#0x00
-   0432 19            [11]  873 	add	hl, de
-   0433 7E            [ 7]  874 	ld	a,(hl)
-   0434 02            [ 7]  875 	ld	(bc),a
-                            876 ;synth.c:278: for(i = 0; i < 8; i++) {
-   0435 1C            [ 4]  877 	inc	e
-   0436 7B            [ 4]  878 	ld	a,e
-   0437 EE 80         [ 7]  879 	xor	a, #0x80
-   0439 D6 88         [ 7]  880 	sub	a, #0x88
-   043B 38 D5         [12]  881 	jr	C,00111$
-                            882 ;synth.c:283: *(unsigned char*)0x7efd = 0x00;
-   043D 21 FD 7E      [10]  883 	ld	hl,#0x7EFD
-   0440 36 00         [10]  884 	ld	(hl),#0x00
-                            885 ;synth.c:285: *(unsigned char*)0x7efb = CURSOR_COLOR1;
-   0442 2E FB         [ 7]  886 	ld	l, #0xFB
-   0444 36 FF         [10]  887 	ld	(hl),#0xFF
-                            888 ;synth.c:286: *(unsigned char*)0x7efc = CURSOR_COLOR2;
-   0446 2E FC         [ 7]  889 	ld	l, #0xFC
-   0448 36 E0         [10]  890 	ld	(hl),#0xE0
-                            891 ;synth.c:289: *(unsigned char*)0x7f20 = BG_COLOR;
-   044A 21 20 7F      [10]  892 	ld	hl,#0x7F20
-   044D 36 4A         [10]  893 	ld	(hl),#0x4A
-                            894 ;synth.c:292: init_ui();
-   044F CDr19r00      [17]  895 	call	_init_ui
-                            896 ;synth.c:295: ei();
-   0452 CDrFDr03      [17]  897 	call	_ei
-                            898 ;synth.c:298: do {
-   0455                     899 00108$:
-                            900 ;synth.c:299: char c = keys;
-   0455 DB 20         [11]  901 	in	a,(_keys)
-   0457 DD 77 FF      [19]  902 	ld	-1 (ix),a
-                            903 ;synth.c:302: if (c & 0x1) { 	// Space
-   045A DD CB FF 46   [20]  904 	bit	0, -1 (ix)
-   045E 28 47         [12]  905 	jr	Z,00103$
-                            906 ;synth.c:303: ym2151_write(0x20, 0xC0);	// L/R
-   0460 21 20 C0      [10]  907 	ld	hl,#0xC020
-   0463 E5            [11]  908 	push	hl
-   0464 CDr00r00      [17]  909 	call	_ym2151_write
-                            910 ;synth.c:305: ym2151_write(0x28 + ch, 0x00);
-   0467 21 28 00      [10]  911 	ld	hl, #0x0028
-   046A E3            [19]  912 	ex	(sp),hl
-   046B CDr00r00      [17]  913 	call	_ym2151_write
-                            914 ;synth.c:306: ym2151_write(0x30 + ch, 0x00);
-   046E 21 30 00      [10]  915 	ld	hl, #0x0030
-   0471 E3            [19]  916 	ex	(sp),hl
-   0472 CDr00r00      [17]  917 	call	_ym2151_write
-                            918 ;synth.c:307: ym2151_write(0x38 + ch, 0x00);
-   0475 21 38 00      [10]  919 	ld	hl, #0x0038
-   0478 E3            [19]  920 	ex	(sp),hl
-   0479 CDr00r00      [17]  921 	call	_ym2151_write
-                            922 ;synth.c:308: ym2151_write(0x40 + ch, 0x00);
-   047C 21 40 00      [10]  923 	ld	hl, #0x0040
-   047F E3            [19]  924 	ex	(sp),hl
-   0480 CDr00r00      [17]  925 	call	_ym2151_write
-                            926 ;synth.c:309: ym2151_write(0x60 + ch, 0x00);
-   0483 21 60 00      [10]  927 	ld	hl, #0x0060
-   0486 E3            [19]  928 	ex	(sp),hl
-   0487 CDr00r00      [17]  929 	call	_ym2151_write
-                            930 ;synth.c:310: ym2151_write(0x80 + ch, 0x00);
-   048A 21 80 00      [10]  931 	ld	hl, #0x0080
-   048D E3            [19]  932 	ex	(sp),hl
-   048E CDr00r00      [17]  933 	call	_ym2151_write
-                            934 ;synth.c:311: ym2151_write(0xA0 + ch, 0x00);
-   0491 21 A0 00      [10]  935 	ld	hl, #0x00A0
-   0494 E3            [19]  936 	ex	(sp),hl
-   0495 CDr00r00      [17]  937 	call	_ym2151_write
-                            938 ;synth.c:312: ym2151_write(0xC0 + ch, 0x00);
-   0498 21 C0 00      [10]  939 	ld	hl, #0x00C0
-   049B E3            [19]  940 	ex	(sp),hl
-   049C CDr00r00      [17]  941 	call	_ym2151_write
-                            942 ;synth.c:313: ym2151_write(0xE0 + ch, 0x00);
-   049F 21 E0 00      [10]  943 	ld	hl, #0x00E0
-   04A2 E3            [19]  944 	ex	(sp),hl
-   04A3 CDr00r00      [17]  945 	call	_ym2151_write
-   04A6 F1            [10]  946 	pop	af
-   04A7                     947 00103$:
-                            948 ;synth.c:315: if (c & 0x2) {	// S
-   04A7 DD CB FF 4E   [20]  949 	bit	1, -1 (ix)
-   04AB 28 10         [12]  950 	jr	Z,00105$
-                            951 ;synth.c:316: ym2151_setCT1(1);
-   04AD 3E 01         [ 7]  952 	ld	a,#0x01
-   04AF F5            [11]  953 	push	af
-   04B0 33            [ 6]  954 	inc	sp
-   04B1 CDr00r00      [17]  955 	call	_ym2151_setCT1
-   04B4 33            [ 6]  956 	inc	sp
-                            957 ;synth.c:317: ym2151_write(0x08, 0x40);	// K_ON, MOD1, CH0
-   04B5 21 08 40      [10]  958 	ld	hl,#0x4008
-   04B8 E5            [11]  959 	push	hl
-   04B9 CDr00r00      [17]  960 	call	_ym2151_write
-   04BC F1            [10]  961 	pop	af
-   04BD                     962 00105$:
-                            963 ;synth.c:320: if (c & 0x4) {	// C
-   04BD DD CB FF 56   [20]  964 	bit	2, -1 (ix)
-   04C1 28 92         [12]  965 	jr	Z,00108$
-                            966 ;synth.c:321: ym2151_write(0x08, 0x00);	// K_OFF, CH0
-   04C3 21 08 00      [10]  967 	ld	hl,#0x0008
-   04C6 E5            [11]  968 	push	hl
-   04C7 CDr00r00      [17]  969 	call	_ym2151_write
-   04CA F1            [10]  970 	pop	af
-                            971 ;synth.c:324: } while(1);
-   04CB 18 88         [12]  972 	jr	00108$
-   04CD 33            [ 6]  973 	inc	sp
-   04CE DD E1         [14]  974 	pop	ix
-   04D0 C9            [10]  975 	ret
-                            976 	.area _CODE
-                            977 	.area _INITIALIZER
-   0000                     978 __xinit__mouse_x:
-   0000 A0 00               979 	.dw #0x00A0
-   0002                     980 __xinit__mouse_y:
-   0002 78 00               981 	.dw #0x0078
-   0004                     982 __xinit__mouse_buttons:
-   0004 00                  983 	.db #0x00	; 0
-   0005                     984 __xinit__tick50Hz:
-   0005 00 00               985 	.dw #0x0000
-   0007                     986 __xinit__cur_x:
-   0007 00                  987 	.db #0x00	; 0
-   0008                     988 __xinit__cur_y:
-   0008 00                  989 	.db #0x00	; 0
-                            990 	.area _CABS (ABS)
+   092F 00                 1592 	.db 0x00
+   0930                    1593 ___str_20:
+   0930 46 72 65 71 75 65  1594 	.ascii "Frequency:"
+        6E 63 79 3A
+   093A 00                 1595 	.db 0x00
+   093B                    1596 ___str_21:
+   093B 4C 46 4F 20 4D 6F  1597 	.ascii "LFO Modulation (FM/PM):"
+        64 75 6C 61 74 69
+        6F 6E 20 28 46 4D
+        2F 50 4D 29 3A
+   0952 00                 1598 	.db 0x00
+   0953                    1599 ___str_22:
+   0953 41 6D 70 6C 69 74  1600 	.ascii "Amplitude:"
+        75 64 65 3A
+   095D 00                 1601 	.db 0x00
+                           1602 ;synth.c:247: void move_mouse() {
+                           1603 ;	---------------------------------
+                           1604 ; Function move_mouse
+                           1605 ; ---------------------------------
+   095E                    1606 _move_mouse::
+                           1607 ;synth.c:250: mouse_x += (char)mouse_x_reg;
+   095E DB 30         [11] 1608 	in	a,(_mouse_x_reg)
+   0960 57            [ 4] 1609 	ld	d,a
+   0961 17            [ 4] 1610 	rla
+   0962 9F            [ 4] 1611 	sbc	a, a
+   0963 5F            [ 4] 1612 	ld	e,a
+   0964 21r03r00      [10] 1613 	ld	hl,#_mouse_x
+   0967 7E            [ 7] 1614 	ld	a,(hl)
+   0968 82            [ 4] 1615 	add	a, d
+   0969 77            [ 7] 1616 	ld	(hl),a
+   096A 23            [ 6] 1617 	inc	hl
+   096B 7E            [ 7] 1618 	ld	a,(hl)
+   096C 8B            [ 4] 1619 	adc	a, e
+   096D 77            [ 7] 1620 	ld	(hl),a
+                           1621 ;synth.c:251: mouse_y -= (char)mouse_y_reg;
+   096E DB 31         [11] 1622 	in	a,(_mouse_y_reg)
+   0970 57            [ 4] 1623 	ld	d,a
+   0971 17            [ 4] 1624 	rla
+   0972 9F            [ 4] 1625 	sbc	a, a
+   0973 5F            [ 4] 1626 	ld	e,a
+   0974 21r05r00      [10] 1627 	ld	hl,#_mouse_y
+   0977 7E            [ 7] 1628 	ld	a,(hl)
+   0978 92            [ 4] 1629 	sub	a, d
+   0979 77            [ 7] 1630 	ld	(hl),a
+   097A 23            [ 6] 1631 	inc	hl
+   097B 7E            [ 7] 1632 	ld	a,(hl)
+   097C 9B            [ 4] 1633 	sbc	a, e
+   097D 77            [ 7] 1634 	ld	(hl),a
+                           1635 ;synth.c:254: if(mouse_x < 0)   mouse_x = 0;
+   097E 3Ar04r00      [13] 1636 	ld	a,(#_mouse_x + 1)
+   0981 CB 7F         [ 8] 1637 	bit	7,a
+   0983 28 06         [12] 1638 	jr	Z,00102$
+   0985 21 00 00      [10] 1639 	ld	hl,#0x0000
+   0988 22r03r00      [16] 1640 	ld	(_mouse_x),hl
+   098B                    1641 00102$:
+                           1642 ;synth.c:255: if(mouse_x > 319) mouse_x = 319;
+   098B 3E 3F         [ 7] 1643 	ld	a,#0x3F
+   098D FD 21r03r00   [14] 1644 	ld	iy,#_mouse_x
+   0991 FD BE 00      [19] 1645 	cp	a, 0 (iy)
+   0994 3E 01         [ 7] 1646 	ld	a,#0x01
+   0996 FD 21r03r00   [14] 1647 	ld	iy,#_mouse_x
+   099A FD 9E 01      [19] 1648 	sbc	a, 1 (iy)
+   099D E2rA2r09      [10] 1649 	jp	PO, 00127$
+   09A0 EE 80         [ 7] 1650 	xor	a, #0x80
+   09A2                    1651 00127$:
+   09A2 F2rABr09      [10] 1652 	jp	P,00104$
+   09A5 21 3F 01      [10] 1653 	ld	hl,#0x013F
+   09A8 22r03r00      [16] 1654 	ld	(_mouse_x),hl
+   09AB                    1655 00104$:
+                           1656 ;synth.c:256: if(mouse_y < 0)   mouse_y = 0;
+   09AB 3Ar06r00      [13] 1657 	ld	a,(#_mouse_y + 1)
+   09AE CB 7F         [ 8] 1658 	bit	7,a
+   09B0 28 06         [12] 1659 	jr	Z,00106$
+   09B2 21 00 00      [10] 1660 	ld	hl,#0x0000
+   09B5 22r05r00      [16] 1661 	ld	(_mouse_y),hl
+   09B8                    1662 00106$:
+                           1663 ;synth.c:257: if(mouse_y > 239)  mouse_y = 239;
+   09B8 3E EF         [ 7] 1664 	ld	a,#0xEF
+   09BA FD 21r05r00   [14] 1665 	ld	iy,#_mouse_y
+   09BE FD BE 00      [19] 1666 	cp	a, 0 (iy)
+   09C1 3E 00         [ 7] 1667 	ld	a,#0x00
+   09C3 FD 21r05r00   [14] 1668 	ld	iy,#_mouse_y
+   09C7 FD 9E 01      [19] 1669 	sbc	a, 1 (iy)
+   09CA E2rCFr09      [10] 1670 	jp	PO, 00128$
+   09CD EE 80         [ 7] 1671 	xor	a, #0x80
+   09CF                    1672 00128$:
+   09CF F2rD8r09      [10] 1673 	jp	P,00108$
+   09D2 21 EF 00      [10] 1674 	ld	hl,#0x00EF
+   09D5 22r05r00      [16] 1675 	ld	(_mouse_y),hl
+   09D8                    1676 00108$:
+                           1677 ;synth.c:260: *(unsigned char*)0x7efe = mouse_x;
+   09D8 3Ar03r00      [13] 1678 	ld	a,(#_mouse_x + 0)
+   09DB 32 FE 7E      [13] 1679 	ld	(#0x7EFE),a
+                           1680 ;synth.c:261: *(unsigned char*)0x7eff = (mouse_x & 0x100) >> 8;
+   09DE 3Ar04r00      [13] 1681 	ld	a,(#_mouse_x + 1)
+   09E1 E6 01         [ 7] 1682 	and	a, #0x01
+   09E3 57            [ 4] 1683 	ld	d,a
+   09E4 CB 07         [ 8] 1684 	rlc	a
+   09E6 9F            [ 4] 1685 	sbc	a, a
+   09E7 21 FF 7E      [10] 1686 	ld	hl,#0x7EFF
+   09EA 72            [ 7] 1687 	ld	(hl),d
+                           1688 ;synth.c:262: *(unsigned char*)0x7f00 = mouse_y;
+   09EB 3Ar05r00      [13] 1689 	ld	a,(#_mouse_y + 0)
+   09EE 32 00 7F      [13] 1690 	ld	(#0x7F00),a
+   09F1 C9            [10] 1691 	ret
+                           1692 ;synth.c:265: void left_click_event() {
+                           1693 ;	---------------------------------
+                           1694 ; Function left_click_event
+                           1695 ; ---------------------------------
+   09F2                    1696 _left_click_event::
+   09F2 DD E5         [15] 1697 	push	ix
+   09F4 DD 21 00 00   [14] 1698 	ld	ix,#0
+   09F8 DD 39         [15] 1699 	add	ix,sp
+   09FA 3B            [ 6] 1700 	dec	sp
+                           1701 ;synth.c:268: for (i = 0; i < NB_WIDGETS; i++)
+   09FB DD 36 FF 00   [19] 1702 	ld	-1 (ix),#0x00
+   09FF                    1703 00107$:
+                           1704 ;synth.c:269: if (widgets[i] && isInLayout(&(widgets[i]->layout), mouse_x, mouse_y)) {
+   09FF DD 6E FF      [19] 1705 	ld	l,-1 (ix)
+   0A02 DD 7E FF      [19] 1706 	ld	a,-1 (ix)
+   0A05 17            [ 4] 1707 	rla
+   0A06 9F            [ 4] 1708 	sbc	a, a
+   0A07 67            [ 4] 1709 	ld	h,a
+   0A08 29            [11] 1710 	add	hl, hl
+   0A09 3Er00         [ 7] 1711 	ld	a,#<(_widgets)
+   0A0B 85            [ 4] 1712 	add	a, l
+   0A0C 5F            [ 4] 1713 	ld	e,a
+   0A0D 3Es00         [ 7] 1714 	ld	a,#>(_widgets)
+   0A0F 8C            [ 4] 1715 	adc	a, h
+   0A10 57            [ 4] 1716 	ld	d,a
+   0A11 6B            [ 4] 1717 	ld	l, e
+   0A12 62            [ 4] 1718 	ld	h, d
+   0A13 4E            [ 7] 1719 	ld	c,(hl)
+   0A14 23            [ 6] 1720 	inc	hl
+   0A15 46            [ 7] 1721 	ld	b,(hl)
+   0A16 78            [ 4] 1722 	ld	a,b
+   0A17 B1            [ 4] 1723 	or	a,c
+   0A18 28 38         [12] 1724 	jr	Z,00108$
+   0A1A 03            [ 6] 1725 	inc	bc
+   0A1B D5            [11] 1726 	push	de
+   0A1C 2Ar05r00      [16] 1727 	ld	hl,(_mouse_y)
+   0A1F E5            [11] 1728 	push	hl
+   0A20 2Ar03r00      [16] 1729 	ld	hl,(_mouse_x)
+   0A23 E5            [11] 1730 	push	hl
+   0A24 C5            [11] 1731 	push	bc
+   0A25 CDr00r00      [17] 1732 	call	_isInLayout
+   0A28 F1            [10] 1733 	pop	af
+   0A29 F1            [10] 1734 	pop	af
+   0A2A F1            [10] 1735 	pop	af
+   0A2B 7D            [ 4] 1736 	ld	a,l
+   0A2C D1            [10] 1737 	pop	de
+   0A2D B7            [ 4] 1738 	or	a, a
+   0A2E 28 22         [12] 1739 	jr	Z,00108$
+                           1740 ;synth.c:270: widget_event(widgets[i], EVENT_LEFT_CLICK);
+   0A30 6B            [ 4] 1741 	ld	l, e
+   0A31 62            [ 4] 1742 	ld	h, d
+   0A32 4E            [ 7] 1743 	ld	c,(hl)
+   0A33 23            [ 6] 1744 	inc	hl
+   0A34 46            [ 7] 1745 	ld	b,(hl)
+   0A35 D5            [11] 1746 	push	de
+   0A36 AF            [ 4] 1747 	xor	a, a
+   0A37 F5            [11] 1748 	push	af
+   0A38 33            [ 6] 1749 	inc	sp
+   0A39 C5            [11] 1750 	push	bc
+   0A3A CDr00r00      [17] 1751 	call	_widget_event
+   0A3D F1            [10] 1752 	pop	af
+   0A3E 33            [ 6] 1753 	inc	sp
+                           1754 ;synth.c:271: if (widgets[i]->dirty)
+   0A3F E1            [10] 1755 	pop	hl
+   0A40 5E            [ 7] 1756 	ld	e,(hl)
+   0A41 23            [ 6] 1757 	inc	hl
+   0A42 56            [ 7] 1758 	ld	d,(hl)
+   0A43 6B            [ 4] 1759 	ld	l, e
+   0A44 62            [ 4] 1760 	ld	h, d
+   0A45 01 05 00      [10] 1761 	ld	bc, #0x0005
+   0A48 09            [11] 1762 	add	hl, bc
+   0A49 7E            [ 7] 1763 	ld	a,(hl)
+   0A4A B7            [ 4] 1764 	or	a, a
+   0A4B 28 05         [12] 1765 	jr	Z,00108$
+                           1766 ;synth.c:272: widget_redraw(widgets[i]);
+   0A4D D5            [11] 1767 	push	de
+   0A4E CDr00r00      [17] 1768 	call	_widget_redraw
+   0A51 F1            [10] 1769 	pop	af
+   0A52                    1770 00108$:
+                           1771 ;synth.c:268: for (i = 0; i < NB_WIDGETS; i++)
+   0A52 DD 34 FF      [23] 1772 	inc	-1 (ix)
+   0A55 DD 7E FF      [19] 1773 	ld	a,-1 (ix)
+   0A58 EE 80         [ 7] 1774 	xor	a, #0x80
+   0A5A D6 98         [ 7] 1775 	sub	a, #0x98
+   0A5C 38 A1         [12] 1776 	jr	C,00107$
+   0A5E 33            [ 6] 1777 	inc	sp
+   0A5F DD E1         [14] 1778 	pop	ix
+   0A61 C9            [10] 1779 	ret
+                           1780 ;synth.c:276: void right_click_event() {
+                           1781 ;	---------------------------------
+                           1782 ; Function right_click_event
+                           1783 ; ---------------------------------
+   0A62                    1784 _right_click_event::
+   0A62 DD E5         [15] 1785 	push	ix
+   0A64 DD 21 00 00   [14] 1786 	ld	ix,#0
+   0A68 DD 39         [15] 1787 	add	ix,sp
+   0A6A 3B            [ 6] 1788 	dec	sp
+                           1789 ;synth.c:279: for (i = 0; i < NB_WIDGETS; i++)
+   0A6B DD 36 FF 00   [19] 1790 	ld	-1 (ix),#0x00
+   0A6F                    1791 00107$:
+                           1792 ;synth.c:280: if (widgets[i] && isInLayout(&(widgets[i]->layout), mouse_x, mouse_y)) {
+   0A6F DD 6E FF      [19] 1793 	ld	l,-1 (ix)
+   0A72 DD 7E FF      [19] 1794 	ld	a,-1 (ix)
+   0A75 17            [ 4] 1795 	rla
+   0A76 9F            [ 4] 1796 	sbc	a, a
+   0A77 67            [ 4] 1797 	ld	h,a
+   0A78 29            [11] 1798 	add	hl, hl
+   0A79 3Er00         [ 7] 1799 	ld	a,#<(_widgets)
+   0A7B 85            [ 4] 1800 	add	a, l
+   0A7C 5F            [ 4] 1801 	ld	e,a
+   0A7D 3Es00         [ 7] 1802 	ld	a,#>(_widgets)
+   0A7F 8C            [ 4] 1803 	adc	a, h
+   0A80 57            [ 4] 1804 	ld	d,a
+   0A81 6B            [ 4] 1805 	ld	l, e
+   0A82 62            [ 4] 1806 	ld	h, d
+   0A83 4E            [ 7] 1807 	ld	c,(hl)
+   0A84 23            [ 6] 1808 	inc	hl
+   0A85 46            [ 7] 1809 	ld	b,(hl)
+   0A86 78            [ 4] 1810 	ld	a,b
+   0A87 B1            [ 4] 1811 	or	a,c
+   0A88 28 39         [12] 1812 	jr	Z,00108$
+   0A8A 03            [ 6] 1813 	inc	bc
+   0A8B D5            [11] 1814 	push	de
+   0A8C 2Ar05r00      [16] 1815 	ld	hl,(_mouse_y)
+   0A8F E5            [11] 1816 	push	hl
+   0A90 2Ar03r00      [16] 1817 	ld	hl,(_mouse_x)
+   0A93 E5            [11] 1818 	push	hl
+   0A94 C5            [11] 1819 	push	bc
+   0A95 CDr00r00      [17] 1820 	call	_isInLayout
+   0A98 F1            [10] 1821 	pop	af
+   0A99 F1            [10] 1822 	pop	af
+   0A9A F1            [10] 1823 	pop	af
+   0A9B 7D            [ 4] 1824 	ld	a,l
+   0A9C D1            [10] 1825 	pop	de
+   0A9D B7            [ 4] 1826 	or	a, a
+   0A9E 28 23         [12] 1827 	jr	Z,00108$
+                           1828 ;synth.c:281: widget_event(widgets[i], EVENT_RIGHT_CLICK);
+   0AA0 6B            [ 4] 1829 	ld	l, e
+   0AA1 62            [ 4] 1830 	ld	h, d
+   0AA2 4E            [ 7] 1831 	ld	c,(hl)
+   0AA3 23            [ 6] 1832 	inc	hl
+   0AA4 46            [ 7] 1833 	ld	b,(hl)
+   0AA5 D5            [11] 1834 	push	de
+   0AA6 3E 01         [ 7] 1835 	ld	a,#0x01
+   0AA8 F5            [11] 1836 	push	af
+   0AA9 33            [ 6] 1837 	inc	sp
+   0AAA C5            [11] 1838 	push	bc
+   0AAB CDr00r00      [17] 1839 	call	_widget_event
+   0AAE F1            [10] 1840 	pop	af
+   0AAF 33            [ 6] 1841 	inc	sp
+                           1842 ;synth.c:282: if (widgets[i]->dirty)
+   0AB0 E1            [10] 1843 	pop	hl
+   0AB1 5E            [ 7] 1844 	ld	e,(hl)
+   0AB2 23            [ 6] 1845 	inc	hl
+   0AB3 56            [ 7] 1846 	ld	d,(hl)
+   0AB4 6B            [ 4] 1847 	ld	l, e
+   0AB5 62            [ 4] 1848 	ld	h, d
+   0AB6 01 05 00      [10] 1849 	ld	bc, #0x0005
+   0AB9 09            [11] 1850 	add	hl, bc
+   0ABA 7E            [ 7] 1851 	ld	a,(hl)
+   0ABB B7            [ 4] 1852 	or	a, a
+   0ABC 28 05         [12] 1853 	jr	Z,00108$
+                           1854 ;synth.c:283: widget_redraw(widgets[i]);
+   0ABE D5            [11] 1855 	push	de
+   0ABF CDr00r00      [17] 1856 	call	_widget_redraw
+   0AC2 F1            [10] 1857 	pop	af
+   0AC3                    1858 00108$:
+                           1859 ;synth.c:279: for (i = 0; i < NB_WIDGETS; i++)
+   0AC3 DD 34 FF      [23] 1860 	inc	-1 (ix)
+   0AC6 DD 7E FF      [19] 1861 	ld	a,-1 (ix)
+   0AC9 EE 80         [ 7] 1862 	xor	a, #0x80
+   0ACB D6 98         [ 7] 1863 	sub	a, #0x98
+   0ACD 38 A0         [12] 1864 	jr	C,00107$
+   0ACF 33            [ 6] 1865 	inc	sp
+   0AD0 DD E1         [14] 1866 	pop	ix
+   0AD2 C9            [10] 1867 	ret
+                           1868 ;synth.c:293: void refresh_mouse_buttons() {
+                           1869 ;	---------------------------------
+                           1870 ; Function refresh_mouse_buttons
+                           1871 ; ---------------------------------
+   0AD3                    1872 _refresh_mouse_buttons::
+                           1873 ;synth.c:298: prev_buttons = mouse_buttons;
+   0AD3 3Ar07r00      [13] 1874 	ld	a,(#_mouse_buttons + 0)
+   0AD6 32r30r00      [13] 1875 	ld	(#_refresh_mouse_buttons_prev_buttons_1_120 + 0),a
+                           1876 ;synth.c:299: mouse_buttons = (char)mouse_but_reg;
+   0AD9 DB 32         [11] 1877 	in	a,(_mouse_but_reg)
+   0ADB 32r07r00      [13] 1878 	ld	(#_mouse_buttons + 0),a
+                           1879 ;synth.c:301: if (!(prev_buttons & 1) && (mouse_buttons & 1)) {
+   0ADE 3Ar30r00      [13] 1880 	ld	a,(#_refresh_mouse_buttons_prev_buttons_1_120 + 0)
+   0AE1 E6 01         [ 7] 1881 	and	a, #0x01
+   0AE3 57            [ 4] 1882 	ld	d,a
+   0AE4 3Ar07r00      [13] 1883 	ld	a,(#_mouse_buttons + 0)
+   0AE7 E6 01         [ 7] 1884 	and	a, #0x01
+   0AE9 5F            [ 4] 1885 	ld	e,a
+   0AEA 7A            [ 4] 1886 	ld	a,d
+   0AEB B7            [ 4] 1887 	or	a,a
+   0AEC 20 10         [12] 1888 	jr	NZ,00128$
+   0AEE B3            [ 4] 1889 	or	a,e
+   0AEF 28 0D         [12] 1890 	jr	Z,00128$
+                           1891 ;synth.c:302: click_timer = 0;
+   0AF1 21r31r00      [10] 1892 	ld	hl,#_refresh_mouse_buttons_click_timer_1_120 + 0
+   0AF4 36 00         [10] 1893 	ld	(hl), #0x00
+                           1894 ;synth.c:303: initial_click = 1;
+   0AF6 21r32r00      [10] 1895 	ld	hl,#_refresh_mouse_buttons_initial_click_1_120 + 0
+   0AF9 36 01         [10] 1896 	ld	(hl), #0x01
+                           1897 ;synth.c:304: left_click_event();		
+   0AFB C3rF2r09      [10] 1898 	jp	_left_click_event
+   0AFE                    1899 00128$:
+                           1900 ;synth.c:306: click_timer ++;
+   0AFE 21r31r00      [10] 1901 	ld	hl,#_refresh_mouse_buttons_click_timer_1_120 + 0
+   0B01 46            [ 7] 1902 	ld	b, (hl)
+   0B02 04            [ 4] 1903 	inc	b
+                           1904 ;synth.c:305: } else if ((prev_buttons & 1) && (mouse_buttons & 1)) {
+   0B03 7A            [ 4] 1905 	ld	a,d
+   0B04 B7            [ 4] 1906 	or	a, a
+   0B05 28 33         [12] 1907 	jr	Z,00124$
+   0B07 7B            [ 4] 1908 	ld	a,e
+   0B08 B7            [ 4] 1909 	or	a, a
+   0B09 28 2F         [12] 1910 	jr	Z,00124$
+                           1911 ;synth.c:306: click_timer ++;
+   0B0B 21r31r00      [10] 1912 	ld	hl,#_refresh_mouse_buttons_click_timer_1_120 + 0
+   0B0E 70            [ 7] 1913 	ld	(hl), b
+                           1914 ;synth.c:307: if (initial_click && (click_timer == HOLD_CLICK)) {
+   0B0F 3Ar32r00      [13] 1915 	ld	a,(#_refresh_mouse_buttons_initial_click_1_120 + 0)
+   0B12 B7            [ 4] 1916 	or	a, a
+   0B13 28 12         [12] 1917 	jr	Z,00105$
+   0B15 3Ar31r00      [13] 1918 	ld	a,(#_refresh_mouse_buttons_click_timer_1_120 + 0)
+   0B18 D6 32         [ 7] 1919 	sub	a, #0x32
+   0B1A 20 0B         [12] 1920 	jr	NZ,00105$
+                           1921 ;synth.c:308: initial_click = 0;
+   0B1C 21r32r00      [10] 1922 	ld	hl,#_refresh_mouse_buttons_initial_click_1_120 + 0
+   0B1F 36 00         [10] 1923 	ld	(hl), #0x00
+                           1924 ;synth.c:309: click_timer = 0;
+   0B21 21r31r00      [10] 1925 	ld	hl,#_refresh_mouse_buttons_click_timer_1_120 + 0
+   0B24 36 00         [10] 1926 	ld	(hl), #0x00
+   0B26 C9            [10] 1927 	ret
+   0B27                    1928 00105$:
+                           1929 ;synth.c:310: } else if (!initial_click && (click_timer == REPEAT_CLICK)) {
+   0B27 3Ar32r00      [13] 1930 	ld	a,(#_refresh_mouse_buttons_initial_click_1_120 + 0)
+   0B2A B7            [ 4] 1931 	or	a, a
+   0B2B C0            [11] 1932 	ret	NZ
+   0B2C 3Ar31r00      [13] 1933 	ld	a,(#_refresh_mouse_buttons_click_timer_1_120 + 0)
+   0B2F D6 0A         [ 7] 1934 	sub	a, #0x0A
+   0B31 C0            [11] 1935 	ret	NZ
+                           1936 ;synth.c:311: click_timer = 0;
+   0B32 21r31r00      [10] 1937 	ld	hl,#_refresh_mouse_buttons_click_timer_1_120 + 0
+   0B35 36 00         [10] 1938 	ld	(hl), #0x00
+                           1939 ;synth.c:312: left_click_event();
+   0B37 C3rF2r09      [10] 1940 	jp	_left_click_event
+   0B3A                    1941 00124$:
+                           1942 ;synth.c:314: } else if (!(prev_buttons & 2) && (mouse_buttons & 2)) {
+   0B3A 3Ar30r00      [13] 1943 	ld	a,(#_refresh_mouse_buttons_prev_buttons_1_120 + 0)
+   0B3D E6 02         [ 7] 1944 	and	a, #0x02
+   0B3F 5F            [ 4] 1945 	ld	e,a
+   0B40 3Ar07r00      [13] 1946 	ld	a,(#_mouse_buttons + 0)
+   0B43 E6 02         [ 7] 1947 	and	a, #0x02
+   0B45 67            [ 4] 1948 	ld	h,a
+   0B46 7B            [ 4] 1949 	ld	a,e
+   0B47 B7            [ 4] 1950 	or	a,a
+   0B48 20 10         [12] 1951 	jr	NZ,00120$
+   0B4A B4            [ 4] 1952 	or	a,h
+   0B4B 28 0D         [12] 1953 	jr	Z,00120$
+                           1954 ;synth.c:315: click_timer = 0;
+   0B4D 21r31r00      [10] 1955 	ld	hl,#_refresh_mouse_buttons_click_timer_1_120 + 0
+   0B50 36 00         [10] 1956 	ld	(hl), #0x00
+                           1957 ;synth.c:316: initial_click = 1;
+   0B52 21r32r00      [10] 1958 	ld	hl,#_refresh_mouse_buttons_initial_click_1_120 + 0
+   0B55 36 01         [10] 1959 	ld	(hl), #0x01
+                           1960 ;synth.c:317: right_click_event();		
+   0B57 C3r62r0A      [10] 1961 	jp	_right_click_event
+   0B5A                    1962 00120$:
+                           1963 ;synth.c:318: } else if ((prev_buttons & 2) && (mouse_buttons & 2)) {
+   0B5A 7B            [ 4] 1964 	ld	a,e
+   0B5B B7            [ 4] 1965 	or	a, a
+   0B5C 28 33         [12] 1966 	jr	Z,00116$
+   0B5E 7C            [ 4] 1967 	ld	a,h
+   0B5F B7            [ 4] 1968 	or	a, a
+   0B60 28 2F         [12] 1969 	jr	Z,00116$
+                           1970 ;synth.c:319: click_timer ++;
+   0B62 21r31r00      [10] 1971 	ld	hl,#_refresh_mouse_buttons_click_timer_1_120 + 0
+   0B65 70            [ 7] 1972 	ld	(hl), b
+                           1973 ;synth.c:320: if (initial_click && (click_timer == HOLD_CLICK)) {
+   0B66 3Ar32r00      [13] 1974 	ld	a,(#_refresh_mouse_buttons_initial_click_1_120 + 0)
+   0B69 B7            [ 4] 1975 	or	a, a
+   0B6A 28 12         [12] 1976 	jr	Z,00112$
+   0B6C 3Ar31r00      [13] 1977 	ld	a,(#_refresh_mouse_buttons_click_timer_1_120 + 0)
+   0B6F D6 32         [ 7] 1978 	sub	a, #0x32
+   0B71 20 0B         [12] 1979 	jr	NZ,00112$
+                           1980 ;synth.c:321: initial_click = 0;
+   0B73 21r32r00      [10] 1981 	ld	hl,#_refresh_mouse_buttons_initial_click_1_120 + 0
+   0B76 36 00         [10] 1982 	ld	(hl), #0x00
+                           1983 ;synth.c:322: click_timer = 0;
+   0B78 21r31r00      [10] 1984 	ld	hl,#_refresh_mouse_buttons_click_timer_1_120 + 0
+   0B7B 36 00         [10] 1985 	ld	(hl), #0x00
+   0B7D C9            [10] 1986 	ret
+   0B7E                    1987 00112$:
+                           1988 ;synth.c:323: } else if (!initial_click && (click_timer == REPEAT_CLICK)) {
+   0B7E 3Ar32r00      [13] 1989 	ld	a,(#_refresh_mouse_buttons_initial_click_1_120 + 0)
+   0B81 B7            [ 4] 1990 	or	a, a
+   0B82 C0            [11] 1991 	ret	NZ
+   0B83 3Ar31r00      [13] 1992 	ld	a,(#_refresh_mouse_buttons_click_timer_1_120 + 0)
+   0B86 D6 0A         [ 7] 1993 	sub	a, #0x0A
+   0B88 C0            [11] 1994 	ret	NZ
+                           1995 ;synth.c:324: click_timer = 0;
+   0B89 21r31r00      [10] 1996 	ld	hl,#_refresh_mouse_buttons_click_timer_1_120 + 0
+   0B8C 36 00         [10] 1997 	ld	(hl), #0x00
+                           1998 ;synth.c:325: right_click_event();
+   0B8E C3r62r0A      [10] 1999 	jp	_right_click_event
+   0B91                    2000 00116$:
+                           2001 ;synth.c:328: initial_click = 0;
+   0B91 21r32r00      [10] 2002 	ld	hl,#_refresh_mouse_buttons_initial_click_1_120 + 0
+   0B94 36 00         [10] 2003 	ld	(hl), #0x00
+   0B96 C9            [10] 2004 	ret
+                           2005 ;synth.c:333: void vbl(void) __interrupt (0x30) {
+                           2006 ;	---------------------------------
+                           2007 ; Function vbl
+                           2008 ; ---------------------------------
+   0B97                    2009 _vbl::
+   0B97 F5            [11] 2010 	push	af
+   0B98 C5            [11] 2011 	push	bc
+   0B99 D5            [11] 2012 	push	de
+   0B9A E5            [11] 2013 	push	hl
+   0B9B FD E5         [15] 2014 	push	iy
+                           2015 ;synth.c:335: move_mouse();
+   0B9D CDr5Er09      [17] 2016 	call	_move_mouse
+                           2017 ;synth.c:340: __endasm;
+   0BA0 FB            [ 4] 2018 	ei
+   0BA1 FD E1         [14] 2019 	pop	iy
+   0BA3 E1            [10] 2020 	pop	hl
+   0BA4 D1            [10] 2021 	pop	de
+   0BA5 C1            [10] 2022 	pop	bc
+   0BA6 F1            [10] 2023 	pop	af
+   0BA7 ED 4D         [14] 2024 	reti
+                           2025 ;synth.c:346: void clock50KHz(void) __interrupt (0x20) {
+                           2026 ;	---------------------------------
+                           2027 ; Function clock50KHz
+                           2028 ; ---------------------------------
+   0BA9                    2029 _clock50KHz::
+   0BA9 F5            [11] 2030 	push	af
+   0BAA C5            [11] 2031 	push	bc
+   0BAB D5            [11] 2032 	push	de
+   0BAC E5            [11] 2033 	push	hl
+   0BAD FD E5         [15] 2034 	push	iy
+                           2035 ;synth.c:348: refresh_mouse_buttons();
+   0BAF CDrD3r0A      [17] 2036 	call	_refresh_mouse_buttons
+                           2037 ;synth.c:349: tick50Hz ++;
+   0BB2 FD 21r08r00   [14] 2038 	ld	iy,#_tick50Hz
+   0BB6 FD 34 00      [23] 2039 	inc	0 (iy)
+   0BB9 20 07         [12] 2040 	jr	NZ,00103$
+   0BBB FD 21r08r00   [14] 2041 	ld	iy,#_tick50Hz
+   0BBF FD 34 01      [23] 2042 	inc	1 (iy)
+   0BC2                    2043 00103$:
+                           2044 ;synth.c:354: __endasm;
+   0BC2 FB            [ 4] 2045 	ei
+   0BC3 FD E1         [14] 2046 	pop	iy
+   0BC5 E1            [10] 2047 	pop	hl
+   0BC6 D1            [10] 2048 	pop	de
+   0BC7 C1            [10] 2049 	pop	bc
+   0BC8 F1            [10] 2050 	pop	af
+   0BC9 ED 4D         [14] 2051 	reti
+                           2052 ;synth.c:359: void putchar(char c) {
+                           2053 ;	---------------------------------
+                           2054 ; Function putchar
+                           2055 ; ---------------------------------
+   0BCB                    2056 _putchar::
+   0BCB DD E5         [15] 2057 	push	ix
+   0BCD DD 21 00 00   [14] 2058 	ld	ix,#0
+   0BD1 DD 39         [15] 2059 	add	ix,sp
+   0BD3 F5            [11] 2060 	push	af
+                           2061 ;synth.c:360: unsigned char *dptr = (unsigned char*)(80 * (FONT_HEIGHT * cur_y) + cur_x);
+   0BD4 FD 21r0Br00   [14] 2062 	ld	iy,#_cur_y
+   0BD8 FD 6E 00      [19] 2063 	ld	l,0 (iy)
+   0BDB 26 00         [ 7] 2064 	ld	h,#0x00
+   0BDD 4D            [ 4] 2065 	ld	c, l
+   0BDE 44            [ 4] 2066 	ld	b, h
+   0BDF 29            [11] 2067 	add	hl, hl
+   0BE0 09            [11] 2068 	add	hl, bc
+   0BE1 29            [11] 2069 	add	hl, hl
+   0BE2 09            [11] 2070 	add	hl, bc
+   0BE3 29            [11] 2071 	add	hl, hl
+   0BE4 09            [11] 2072 	add	hl, bc
+   0BE5 29            [11] 2073 	add	hl, hl
+   0BE6 29            [11] 2074 	add	hl, hl
+   0BE7 29            [11] 2075 	add	hl, hl
+   0BE8 29            [11] 2076 	add	hl, hl
+   0BE9 29            [11] 2077 	add	hl, hl
+   0BEA EB            [ 4] 2078 	ex	de,hl
+   0BEB FD 21r0Ar00   [14] 2079 	ld	iy,#_cur_x
+   0BEF FD 6E 00      [19] 2080 	ld	l,0 (iy)
+   0BF2 26 00         [ 7] 2081 	ld	h,#0x00
+   0BF4 19            [11] 2082 	add	hl,de
+   0BF5 33            [ 6] 2083 	inc	sp
+   0BF6 33            [ 6] 2084 	inc	sp
+   0BF7 E5            [11] 2085 	push	hl
+                           2086 ;synth.c:362: if(c < 32) {
+   0BF8 DD 7E 04      [19] 2087 	ld	a,4 (ix)
+   0BFB EE 80         [ 7] 2088 	xor	a, #0x80
+   0BFD D6 A0         [ 7] 2089 	sub	a, #0xA0
+   0BFF 30 2A         [12] 2090 	jr	NC,00108$
+                           2091 ;synth.c:363: if(c == '\r') 
+   0C01 DD 7E 04      [19] 2092 	ld	a,4 (ix)
+   0C04 D6 0D         [ 7] 2093 	sub	a, #0x0D
+   0C06 20 05         [12] 2094 	jr	NZ,00102$
+                           2095 ;synth.c:364: cur_x=0;
+   0C08 21r0Ar00      [10] 2096 	ld	hl,#_cur_x + 0
+   0C0B 36 00         [10] 2097 	ld	(hl), #0x00
+   0C0D                    2098 00102$:
+                           2099 ;synth.c:366: if(c == '\n') {
+   0C0D DD 7E 04      [19] 2100 	ld	a,4 (ix)
+   0C10 D6 0A         [ 7] 2101 	sub	a, #0x0A
+   0C12 20 4E         [12] 2102 	jr	NZ,00115$
+                           2103 ;synth.c:367: cur_y++;
+   0C14 21r0Br00      [10] 2104 	ld	hl, #_cur_y+0
+   0C17 34            [11] 2105 	inc	(hl)
+                           2106 ;synth.c:368: cur_x=0;
+   0C18 21r0Ar00      [10] 2107 	ld	hl,#_cur_x + 0
+   0C1B 36 00         [10] 2108 	ld	(hl), #0x00
+                           2109 ;synth.c:370: if(cur_y >= 240 / FONT_HEIGHT)
+   0C1D 3Ar0Br00      [13] 2110 	ld	a,(#_cur_y + 0)
+   0C20 D6 28         [ 7] 2111 	sub	a, #0x28
+   0C22 38 3E         [12] 2112 	jr	C,00115$
+                           2113 ;synth.c:371: cur_y = 0;
+   0C24 21r0Br00      [10] 2114 	ld	hl,#_cur_y + 0
+   0C27 36 00         [10] 2115 	ld	(hl), #0x00
+                           2116 ;synth.c:373: return;
+   0C29 18 37         [12] 2117 	jr	00115$
+   0C2B                    2118 00108$:
+                           2119 ;synth.c:376: if(c < 0) return;
+   0C2B DD CB 04 7E   [20] 2120 	bit	7, 4 (ix)
+   0C2F 20 31         [12] 2121 	jr	NZ,00115$
+                           2122 ;synth.c:378: text_char(dptr, c);
+   0C31 DD 7E 04      [19] 2123 	ld	a,4 (ix)
+   0C34 F5            [11] 2124 	push	af
+   0C35 33            [ 6] 2125 	inc	sp
+   0C36 DD 6E FE      [19] 2126 	ld	l,-2 (ix)
+   0C39 DD 66 FF      [19] 2127 	ld	h,-1 (ix)
+   0C3C E5            [11] 2128 	push	hl
+   0C3D CDr00r00      [17] 2129 	call	_text_char
+   0C40 F1            [10] 2130 	pop	af
+   0C41 33            [ 6] 2131 	inc	sp
+                           2132 ;synth.c:380: cur_x++;
+   0C42 21r0Ar00      [10] 2133 	ld	hl, #_cur_x+0
+   0C45 34            [11] 2134 	inc	(hl)
+                           2135 ;synth.c:381: if(cur_x >= 320 / FONT_WIDTH) {
+   0C46 3Ar0Ar00      [13] 2136 	ld	a,(#_cur_x + 0)
+   0C49 D6 50         [ 7] 2137 	sub	a, #0x50
+   0C4B 38 15         [12] 2138 	jr	C,00115$
+                           2139 ;synth.c:382: cur_x = 0;
+   0C4D 21r0Ar00      [10] 2140 	ld	hl,#_cur_x + 0
+   0C50 36 00         [10] 2141 	ld	(hl), #0x00
+                           2142 ;synth.c:383: cur_y++;
+   0C52 21r0Br00      [10] 2143 	ld	hl, #_cur_y+0
+   0C55 34            [11] 2144 	inc	(hl)
+                           2145 ;synth.c:385: if(cur_y >= 240 / FONT_HEIGHT)
+   0C56 3Ar0Br00      [13] 2146 	ld	a,(#_cur_y + 0)
+   0C59 D6 28         [ 7] 2147 	sub	a, #0x28
+   0C5B 38 05         [12] 2148 	jr	C,00115$
+                           2149 ;synth.c:386: cur_y = 0;
+   0C5D 21r0Br00      [10] 2150 	ld	hl,#_cur_y + 0
+   0C60 36 00         [10] 2151 	ld	(hl), #0x00
+   0C62                    2152 00115$:
+   0C62 DD F9         [10] 2153 	ld	sp, ix
+   0C64 DD E1         [14] 2154 	pop	ix
+   0C66 C9            [10] 2155 	ret
+                           2156 ;synth.c:390: void cls(void) {
+                           2157 ;	---------------------------------
+                           2158 ; Function cls
+                           2159 ; ---------------------------------
+   0C67                    2160 _cls::
+                           2161 ;synth.c:394: for(i = 0; i < 240; i++) {
+   0C67 21 00 00      [10] 2162 	ld	hl,#0x0000
+   0C6A 5D            [ 4] 2163 	ld	e,l
+   0C6B 54            [ 4] 2164 	ld	d,h
+   0C6C                    2165 00102$:
+                           2166 ;synth.c:395: memset(p, 0, 80);
+   0C6C 45            [ 4] 2167 	ld	b,l
+   0C6D 4C            [ 4] 2168 	ld	c,h
+   0C6E E5            [11] 2169 	push	hl
+   0C6F 68            [ 4] 2170 	ld	l, b
+   0C70 61            [ 4] 2171 	ld	h, c
+   0C71 06 50         [ 7] 2172 	ld	b, #0x50
+   0C73                    2173 00115$:
+   0C73 36 00         [10] 2174 	ld	(hl), #0x00
+   0C75 23            [ 6] 2175 	inc	hl
+   0C76 10 FB         [13] 2176 	djnz	00115$
+   0C78 E1            [10] 2177 	pop	hl
+                           2178 ;synth.c:396: p += 80;
+   0C79 01 50 00      [10] 2179 	ld	bc,#0x0050
+   0C7C 09            [11] 2180 	add	hl,bc
+                           2181 ;synth.c:394: for(i = 0; i < 240; i++) {
+   0C7D 13            [ 6] 2182 	inc	de
+   0C7E 7B            [ 4] 2183 	ld	a,e
+   0C7F D6 F0         [ 7] 2184 	sub	a, #0xF0
+   0C81 7A            [ 4] 2185 	ld	a,d
+   0C82 17            [ 4] 2186 	rla
+   0C83 3F            [ 4] 2187 	ccf
+   0C84 1F            [ 4] 2188 	rra
+   0C85 DE 80         [ 7] 2189 	sbc	a, #0x80
+   0C87 38 E3         [12] 2190 	jr	C,00102$
+                           2191 ;synth.c:398: cur_x = 0;
+   0C89 21r0Ar00      [10] 2192 	ld	hl,#_cur_x + 0
+   0C8C 36 00         [10] 2193 	ld	(hl), #0x00
+                           2194 ;synth.c:399: cur_y = 0;
+   0C8E 21r0Br00      [10] 2195 	ld	hl,#_cur_y + 0
+   0C91 36 00         [10] 2196 	ld	(hl), #0x00
+   0C93 C9            [10] 2197 	ret
+                           2198 ;synth.c:408: void init_interrupt_table() {
+                           2199 ;	---------------------------------
+                           2200 ; Function init_interrupt_table
+                           2201 ; ---------------------------------
+   0C94                    2202 _init_interrupt_table::
+                           2203 ;synth.c:420: __endasm;
+   0C94 21 00 80      [10] 2204 	ld hl,#0x8000
+   0C97 7C            [ 4] 2205 	ld a,h
+   0C98 ED 47         [ 9] 2206 	ld i,a
+   0C9A FD 21rA9r0B   [14] 2207 	ld iy,#_clock50KHz
+   0C9E FD 22 20 80   [20] 2208 	ld (#0x8020),iy
+   0CA2 FD 21r97r0B   [14] 2209 	ld iy,#_vbl
+   0CA6 FD 22 30 80   [20] 2210 	ld (#0x8030),iy
+   0CAA C9            [10] 2211 	ret
+                           2212 ;synth.c:423: void ei() {
+                           2213 ;	---------------------------------
+                           2214 ; Function ei
+                           2215 ; ---------------------------------
+   0CAB                    2216 _ei::
+                           2217 ;synth.c:428: __endasm;
+   0CAB ED 5E         [ 8] 2218 	im 2
+   0CAD FB            [ 4] 2219 	ei
+   0CAE C9            [10] 2220 	ret
+                           2221 ;synth.c:431: void main() {
+                           2222 ;	---------------------------------
+                           2223 ; Function main
+                           2224 ; ---------------------------------
+   0CAF                    2225 _main::
+   0CAF DD E5         [15] 2226 	push	ix
+   0CB1 DD 21 00 00   [14] 2227 	ld	ix,#0
+   0CB5 DD 39         [15] 2228 	add	ix,sp
+   0CB7 F5            [11] 2229 	push	af
+   0CB8 3B            [ 6] 2230 	dec	sp
+                           2231 ;synth.c:433: char prev_keys, current_keys = 0;
+   0CB9 DD 36 FD 00   [19] 2232 	ld	-3 (ix),#0x00
+                           2233 ;synth.c:435: init_interrupt_table();
+   0CBD CDr94r0C      [17] 2234 	call	_init_interrupt_table
+                           2235 ;synth.c:437: cls();
+   0CC0 CDr67r0C      [17] 2236 	call	_cls
+                           2237 ;synth.c:440: for(i = 0; i < 8; i++) {
+   0CC3 1E 00         [ 7] 2238 	ld	e,#0x00
+   0CC5                    2239 00113$:
+                           2240 ;synth.c:441: *(char*)(0x7f10+i) = cursor_data[i];
+   0CC5 7B            [ 4] 2241 	ld	a,e
+   0CC6 4F            [ 4] 2242 	ld	c,a
+   0CC7 17            [ 4] 2243 	rla
+   0CC8 9F            [ 4] 2244 	sbc	a, a
+   0CC9 47            [ 4] 2245 	ld	b,a
+   0CCA FD 21 10 7F   [14] 2246 	ld	iy,#0x7F10
+   0CCE FD 09         [15] 2247 	add	iy,bc
+   0CD0 21r00r00      [10] 2248 	ld	hl,#_cursor_data
+   0CD3 16 00         [ 7] 2249 	ld	d,#0x00
+   0CD5 19            [11] 2250 	add	hl, de
+   0CD6 7E            [ 7] 2251 	ld	a,(hl)
+   0CD7 FD 77 00      [19] 2252 	ld	0 (iy), a
+                           2253 ;synth.c:442: *(char*)(0x7f18+i) = cursor_mask[i];
+   0CDA 21 18 7F      [10] 2254 	ld	hl,#0x7F18
+   0CDD 09            [11] 2255 	add	hl,bc
+   0CDE 4D            [ 4] 2256 	ld	c, l
+   0CDF 44            [ 4] 2257 	ld	b, h
+   0CE0 21r00r00      [10] 2258 	ld	hl,#_cursor_mask
+   0CE3 16 00         [ 7] 2259 	ld	d,#0x00
+   0CE5 19            [11] 2260 	add	hl, de
+   0CE6 7E            [ 7] 2261 	ld	a,(hl)
+   0CE7 02            [ 7] 2262 	ld	(bc),a
+                           2263 ;synth.c:440: for(i = 0; i < 8; i++) {
+   0CE8 1C            [ 4] 2264 	inc	e
+   0CE9 7B            [ 4] 2265 	ld	a,e
+   0CEA EE 80         [ 7] 2266 	xor	a, #0x80
+   0CEC D6 88         [ 7] 2267 	sub	a, #0x88
+   0CEE 38 D5         [12] 2268 	jr	C,00113$
+                           2269 ;synth.c:445: *(unsigned char*)0x7efd = 0x00;
+   0CF0 21 FD 7E      [10] 2270 	ld	hl,#0x7EFD
+   0CF3 36 00         [10] 2271 	ld	(hl),#0x00
+                           2272 ;synth.c:447: *(unsigned char*)0x7efb = CURSOR_COLOR1;
+   0CF5 2E FB         [ 7] 2273 	ld	l, #0xFB
+   0CF7 36 FF         [10] 2274 	ld	(hl),#0xFF
+                           2275 ;synth.c:448: *(unsigned char*)0x7efc = CURSOR_COLOR2;
+   0CF9 2E FC         [ 7] 2276 	ld	l, #0xFC
+   0CFB 36 E0         [10] 2277 	ld	(hl),#0xE0
+                           2278 ;synth.c:451: *(unsigned char*)0x7f20 = BG_COLOR;
+   0CFD 21 20 7F      [10] 2279 	ld	hl,#0x7F20
+   0D00 36 4A         [10] 2280 	ld	(hl),#0x4A
+                           2281 ;synth.c:453: ym2151_init();
+   0D02 CDr00r00      [17] 2282 	call	_ym2151_init
+                           2283 ;synth.c:456: init_ui();
+   0D05 CDr54r02      [17] 2284 	call	_init_ui
+                           2285 ;synth.c:459: ei();
+   0D08 CDrABr0C      [17] 2286 	call	_ei
+                           2287 ;synth.c:462: do {
+   0D0B                    2288 00110$:
+                           2289 ;synth.c:465: prev_keys = current_keys;
+   0D0B DD 4E FD      [19] 2290 	ld	c,-3 (ix)
+                           2291 ;synth.c:466: current_keys = keys;
+   0D0E DB 20         [11] 2292 	in	a,(_keys)
+   0D10 DD 77 FD      [19] 2293 	ld	-3 (ix),a
+                           2294 ;synth.c:467: mask = 0x1;
+                           2295 ;synth.c:468: for (i = 0; i < 8; i++) {
+   0D13 11 01 00      [10] 2296 	ld	de,#0x0001
+   0D16                    2297 00115$:
+                           2298 ;synth.c:469: if (!(prev_keys & mask) && (current_keys & mask)) { // key pressed
+   0D16 79            [ 4] 2299 	ld	a,c
+   0D17 A3            [ 4] 2300 	and	a, e
+   0D18 DD 77 FF      [19] 2301 	ld	-1 (ix),a
+   0D1B DD 7E FD      [19] 2302 	ld	a,-3 (ix)
+   0D1E A3            [ 4] 2303 	and	a, e
+   0D1F DD 77 FE      [19] 2304 	ld	-2 (ix),a
+                           2305 ;synth.c:470: ym2151_setKeyNote(current_channel, 4, i);
+   0D22 21r00r00      [10] 2306 	ld	hl,#_current_channel + 0
+   0D25 46            [ 7] 2307 	ld	b, (hl)
+                           2308 ;synth.c:469: if (!(prev_keys & mask) && (current_keys & mask)) { // key pressed
+   0D26 DD 7E FF      [19] 2309 	ld	a,-1 (ix)
+   0D29 B7            [ 4] 2310 	or	a, a
+   0D2A 20 29         [12] 2311 	jr	NZ,00106$
+   0D2C DD 7E FE      [19] 2312 	ld	a,-2 (ix)
+   0D2F B7            [ 4] 2313 	or	a, a
+   0D30 28 23         [12] 2314 	jr	Z,00106$
+                           2315 ;synth.c:470: ym2151_setKeyNote(current_channel, 4, i);
+   0D32 C5            [11] 2316 	push	bc
+   0D33 D5            [11] 2317 	push	de
+   0D34 1E 04         [ 7] 2318 	ld	e, #0x04
+   0D36 D5            [11] 2319 	push	de
+   0D37 C5            [11] 2320 	push	bc
+   0D38 33            [ 6] 2321 	inc	sp
+   0D39 CDr00r00      [17] 2322 	call	_ym2151_setKeyNote
+   0D3C F1            [10] 2323 	pop	af
+   0D3D 33            [ 6] 2324 	inc	sp
+   0D3E D1            [10] 2325 	pop	de
+   0D3F C1            [10] 2326 	pop	bc
+                           2327 ;synth.c:471: ym2151_setKeyState(current_channel, key_config);
+   0D40 21r00r00      [10] 2328 	ld	hl,#_current_channel + 0
+   0D43 46            [ 7] 2329 	ld	b, (hl)
+   0D44 C5            [11] 2330 	push	bc
+   0D45 D5            [11] 2331 	push	de
+   0D46 3Ar02r00      [13] 2332 	ld	a,(_key_config)
+   0D49 F5            [11] 2333 	push	af
+   0D4A 33            [ 6] 2334 	inc	sp
+   0D4B C5            [11] 2335 	push	bc
+   0D4C 33            [ 6] 2336 	inc	sp
+   0D4D CDr00r00      [17] 2337 	call	_ym2151_setKeyState
+   0D50 F1            [10] 2338 	pop	af
+   0D51 D1            [10] 2339 	pop	de
+   0D52 C1            [10] 2340 	pop	bc
+   0D53 18 19         [12] 2341 	jr	00107$
+   0D55                    2342 00106$:
+                           2343 ;synth.c:472: } else if ((prev_keys & mask) && !(current_keys & mask)) { // key released
+   0D55 DD 7E FF      [19] 2344 	ld	a,-1 (ix)
+   0D58 B7            [ 4] 2345 	or	a, a
+   0D59 28 13         [12] 2346 	jr	Z,00107$
+   0D5B DD 7E FE      [19] 2347 	ld	a,-2 (ix)
+   0D5E B7            [ 4] 2348 	or	a, a
+   0D5F 20 0D         [12] 2349 	jr	NZ,00107$
+                           2350 ;synth.c:473: ym2151_setKeyState(current_channel, YM_KEY_OFF);
+   0D61 C5            [11] 2351 	push	bc
+   0D62 D5            [11] 2352 	push	de
+   0D63 AF            [ 4] 2353 	xor	a, a
+   0D64 F5            [11] 2354 	push	af
+   0D65 33            [ 6] 2355 	inc	sp
+   0D66 C5            [11] 2356 	push	bc
+   0D67 33            [ 6] 2357 	inc	sp
+   0D68 CDr00r00      [17] 2358 	call	_ym2151_setKeyState
+   0D6B F1            [10] 2359 	pop	af
+   0D6C D1            [10] 2360 	pop	de
+   0D6D C1            [10] 2361 	pop	bc
+   0D6E                    2362 00107$:
+                           2363 ;synth.c:475: mask <<= 1;
+   0D6E CB 23         [ 8] 2364 	sla	e
+                           2365 ;synth.c:468: for (i = 0; i < 8; i++) {
+   0D70 14            [ 4] 2366 	inc	d
+   0D71 7A            [ 4] 2367 	ld	a,d
+   0D72 EE 80         [ 7] 2368 	xor	a, #0x80
+   0D74 D6 88         [ 7] 2369 	sub	a, #0x88
+   0D76 38 9E         [12] 2370 	jr	C,00115$
+                           2371 ;synth.c:478: } while(1);
+   0D78 18 91         [12] 2372 	jr	00110$
+                           2373 	.area _CODE
+                           2374 	.area _INITIALIZER
+   0000                    2375 __xinit__current_channel:
+   0000 00 00              2376 	.dw #0x0000
+   0002                    2377 __xinit__key_config:
+   0002 00                 2378 	.db #0x00	; 0
+   0003                    2379 __xinit__mouse_x:
+   0003 A0 00              2380 	.dw #0x00A0
+   0005                    2381 __xinit__mouse_y:
+   0005 78 00              2382 	.dw #0x0078
+   0007                    2383 __xinit__mouse_buttons:
+   0007 00                 2384 	.db #0x00	; 0
+   0008                    2385 __xinit__tick50Hz:
+   0008 00 00              2386 	.dw #0x0000
+   000A                    2387 __xinit__cur_x:
+   000A 00                 2388 	.db #0x00	; 0
+   000B                    2389 __xinit__cur_y:
+   000B 00                 2390 	.db #0x00	; 0
+                           2391 	.area _CABS (ABS)
