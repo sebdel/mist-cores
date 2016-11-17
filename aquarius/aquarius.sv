@@ -40,6 +40,7 @@ module aquarius (
    output [5:0] VGA_G,
    output [5:0] VGA_B
 );
+`default_nettype none
 
 // clocks
 wire pixel_clock;
@@ -48,22 +49,40 @@ wire cpu_clock;
 
 // the configuration string is returned to the io controller to allow
 // it to control the menu on the OSD 
-parameter CONF_STR = {
+localparam CONF_STR = {
         "AQUARIUS;BIN;",
-        "O1,Scanlines,On,Off;",
-        "T2,Reset"
+		  "F,CAQ,Load Tape;",
+		  "O12,Tape,STOP,PLAY,REC;",
+        "O34,Scanlines,Off,25%,50%,75%;",
+        "T5,Reset"
 };
-
-parameter CONF_STR_LEN = 13+20+8;
+/*
+localparam CONF_STR = {
+	"SPECTRUM;;",
+	"S,TRDIMGDSKMGT,Load Disk;", 	->Load Disk *.TRD,IMG,DSK,MGT
+	"F,TAPCSW,Load Tape;",			->Load Tape *.TAP,CSW
+	"O6,Fast tape load,On,Off;",	->Fast Tape Load: On/Off			status
+	"O89,Video timings,ULA-48,ULA-128,Pentagon;",	-> 				status
+	"OFG,Scanlines,None,25%,50%,75%;",										status
+	"OAC,Memory,Standard 128K,Pentagon 512K,Profi 1024K,Standard 48K;",	status
+	"ODE,Features,ULA+ & Timex,ULA+,Timex,None;",								status
+	"V,v3.31.",`BUILD_DATE
+};*/
 
 // the status register is controlled by the on screen display (OSD)
-wire [7:0] status;
+wire [31:0] status;
+wire arm_reset = status[0];
+wire [1:0] tape_ctrl = status[2:1];
+wire [1:0] scanlines = status[4:3];
+wire osd_reset = status[5];
+
 // the MiST emulates a PS2 keyboard and joysticks
 wire ps2_kbd_clk, ps2_kbd_data;
 wire [7:0] joystick0,joystick1;
 
 // include user_io module for arm controller communication
-user_io #(.STRLEN(CONF_STR_LEN)) user_io ( 
+user_io #(.STRLEN($size(CONF_STR)>>3)) user_io
+( 
 		.conf_str   ( CONF_STR   ),
 
 		.SPI_SCK    ( SPI_SCK    ),
@@ -115,7 +134,7 @@ vga vga (
 	.pclk       ( pixel_clock	),	 
 	.addr_pixel ( addr_pixel	),
 	.data       ( data_pixel	),
-	.scanlines  ( !status[1]	),
+	.scanlines  ( scanlines		),
 	
 	// video output as fed into the VGA outputs
 	.hs    	( video_hs          ),
@@ -130,20 +149,21 @@ vga vga (
 // The CPU is kept in reset for further 256 cycles after the PLL is
 // generating stable clocks to make sure things like the SDRAM have
 // some time to initialize
-// status 0 is arm controller power up reset, status 2 is reset entry in OSD
 reg [7:0] cpu_reset_cnt = 8'h00;
 wire cpu_reset = (cpu_reset_cnt != 255);
+wire rom_download = dio_download && (dio_index == 4'd1);
+
 always @(posedge cpu_clock) begin
-	if(!pll_locked || status[0] || status[2] || dio_download) begin
+	if(!pll_locked || arm_reset || osd_reset || rom_download) begin
 		cpu_reset_cnt <= 8'd0;
 	end else 
 		if(cpu_reset_cnt != 255)
 			cpu_reset_cnt <= cpu_reset_cnt + 8'd1;
 end
 
-always @(negedge dio_download) begin
+always @(negedge rom_download) begin
 	rom_loaded <= 1'b1;
-end			
+end
 
 // CPU control signals
 wire [15:0] cpu_addr;
@@ -179,11 +199,41 @@ wire ram_rden, ram_wren;
 
 // during ROM download, data_io writes to the ram. Otherwise it's the CPU.
 wire [7:0] sdram_din = dio_download ? dio_data : extram_data;
-wire [24:0] sdram_addr = dio_download ? { 11'b11, dio_addr[13:0] } : { 9'd0, cpu_addr[15:0] };
+reg [24:0] sdram_addr;
 wire sdram_wr = dio_download ? dio_write : !ram_wren;
 wire sdram_oe = dio_download ? 1'b1 : !ram_rden;
 
 assign SDRAM_CKE = 1'b1;
+
+always_comb begin
+	casex({dio_download, tape_req, dio_index[4:0]})
+		'b1_X_XXX01:	sdram_addr = { 11'b11, dio_addr[13:0] };	// Load BIN file in the CART space in the upper 16Kb @ $C000
+		'b1_X_XXX10:	sdram_addr = { 9'b1, dio_addr[15:0] };		// Load CAQ file after the Aquarius adress space @ $10000 
+		
+		'b0_1_XXXXX:	sdram_addr = { 9'b1, tape_addr[15:0] };	// Play CAQ file
+		'bX_X_XXXXX:	sdram_addr = { 9'd0, cpu_addr[15:0] };		// ...or just access regular Aquarius RAM when not downloading.
+	endcase
+/*
+	casex({dma, tape_req})
+		'b1X: ram_din = ioctl_dout;
+		'b01: ram_din = 0;
+		'b00: ram_din = cpu_dout;
+	endcase
+
+	casex({dma, tape_req})
+		'b1X: ram_rd = 0;
+		'b01: ram_rd = ~nMREQ;
+		'b00: ram_rd = ~nMREQ & ~nRD;
+	endcase
+
+	casex({dma, tape_req})
+		'b1X: ram_we = ioctl_wr;
+		'b01: ram_we = 0;
+		'b00: ram_we = (addr[15] | addr[14] | ((plusd_mem | mf128_mem) & addr[13])) & ~nMREQ & ~nWR;
+	endcase
+	*/
+end
+
 
 sdram sdram (
 	// interface to the MT48LC16M16 chip
@@ -214,6 +264,7 @@ wire dio_download;
 wire [24:0] dio_addr;
 wire [7:0] dio_data;
 wire dio_write;
+wire [4:0] dio_index;
 reg rom_loaded = 0;
 
 data_io data_io (
@@ -222,7 +273,8 @@ data_io data_io (
    .ss	( SPI_SS2 ),
    .sdi	( SPI_DI  ),
 
-	.downloading ( dio_download ),  // signal indicating an active rom download
+	.downloading	( dio_download	),  // signal indicating an active rom download
+	.index			( dio_index		),
 	         
    // external ram interface
    .clk   ( cpu_clock ),
@@ -329,20 +381,23 @@ vram2k vram2k (
 	.q_b       ( vd_in        )
 );
 
-// include sound codec
-wire speaker;
+wire [15:0] tape_addr;
+wire tape_req;
 
-CodecDriver_DAC CodecDriver_DAC (
-	.CLK ( cpu_clock   ),
-   .RST ( cpu_reset   ), 
+tape tape (
+	.clk			( clock_100mhz	),
+	.tape_clk 	( clock_1_7KHz ),
+	.reset		( cpu_reset	),
+	
+	// Memory interface
+	.data 	( extram_q 			),
+	.addr		( tape_addr			),
+	.req		( tape_req			),
+	.length	( dio_addr[15:0]	),
 
-    // Pla1 Interface
-   .CASS_IN  ( cass_in  ),
-   .CASS_OUT ( cass_out ),
-
-   // Speaker
-   .SPEAKER ( speaker ),
-   .MUTE    ( 1'b0 )
+	// Tape interface
+	.ctrl		( tape_ctrl	),
+	.out		( cass_in	)
 );
 
 wire [7:0] psg_dout, psg_din;
@@ -385,8 +440,8 @@ Pads pads (
 	.pad1_out ( pad1      )
 );
 
-// Mix PSG and speaker output. That's not how the original worked though. (we lack the line SOUND from the cartridge)
-wire [14:0] audio_data = { psg_audio_out[7] | speaker, psg_audio_out[6:0], 7'h00 } - 15'h4000;
+// Mix PSG and cassette output. That's not how the original worked but we lack the line SOUND from the cartridge to mute cass_out.
+wire [14:0] audio_data = { psg_audio_out[7] | cass_out, psg_audio_out[6:0], 7'h00 } - 15'h4000;
 
 sigma_delta_dac sigma_delta_dac (
    .clk      ( ram_clock     ),
@@ -425,8 +480,8 @@ keyboard keyboard (
 	.ps2_data   ( ps2_kbd_data ),	
 
 	// outputs
-	.datao ( keyboard_datao ),
-	.int   ( keyboard_int   )
+	.datao 		( keyboard_datao ),
+	.interrupt	( keyboard_int   )
 );
 
 // derive 12KHz ps2 clock from 100Mhz clock (and a ~3Hz clock for dbg purpose)
@@ -442,8 +497,20 @@ end
 reg clk2m;	
 always @(posedge cpu_clock)
 	clk2m <= !clk2m;
-		  
+
+// divide 12KHz by 7 to get the tape clock (1.666 KHz)	
+reg [3:0] ps2_div = 4'd0;
+wire clock_1_7KHz = (ps2_div == 4'd6);
+
+always @(posedge ps2_clock) begin
+	if (ps2_div == 6)
+		ps2_div <= 4'd0;
+	else	
+		ps2_div <= ps2_div + 4'd1;
+end
+
 // PLL to generate 100MHz system clock, 4MHz cpu clock & 32MHz SDRAM clock
+wire pll_locked;
 pll pll (
 	 .inclk0 ( CLOCK_27[0]   ),
 	 .locked ( pll_locked    ),         // PLL is running stable

@@ -16,14 +16,14 @@ module vga (
 	output [18:0] addr_pixel,
 	
 	// enable/disable scanlines
-	input scanlines,
+	input [1:0] scanlines,
 	
 	// output to VGA screen
    output reg	hs,
    output reg 	vs,
-   output [5:0] r,
-   output [5:0] g,
-   output [5:0] b
+   output reg [5:0] r,
+   output reg [5:0] g,
+   output reg [5:0] b
 );
 					
 // 640x480@60HZ VESA according to  http://tinyvga.com/vga-timing/640x480@60Hz
@@ -100,11 +100,35 @@ end
 
 // split the 8 rgb bits into the three base colors. Every second line is
 // darker when scanlines are enabled
-wire scanline = scanlines && v_cnt[0];
-assign r = (!scanline)?{ pixel[5:4], 4'b0000 }:{ 1'b0, pixel[5:4], 3'b000 };
-assign g = (!scanline)?{ pixel[3:2], 4'b0000 }:{ 1'b0, pixel[3:2], 3'b000 };
-assign b = (!scanline)?{ pixel[1:0], 4'b0000 }:{ 1'b0, pixel[1:0], 3'b000 };
 
+always@(posedge pixel_clock) begin
+	casez({scanlines, v_cnt[0]})
+		3'b??_0,
+		3'b00_?:	begin
+			r <= { pixel[5:4], 4'b0000 };
+			g <= { pixel[3:2], 4'b0000 };
+			b <= { pixel[1:0], 4'b0000 };
+		end
+		3'b01_1: begin // reduce 25% = 1/2 + 1/4
+			r <= { 1'b0, pixel[5:4], 3'b000 } + { 2'b0, pixel[5:4], 2'b00 };
+			g <= { 1'b0, pixel[3:2], 3'b000 } + { 2'b0, pixel[3:2], 2'b00 };
+			b <= { 1'b0, pixel[1:0], 3'b000 } + { 2'b0, pixel[1:0], 2'b00 };
+		end
+
+		3'b10_1: begin // reduce 50% = 1/2
+			r <= { 1'b0, pixel[5:4], 3'b000 };
+			g <= { 1'b0, pixel[3:2], 3'b000 };
+			b <= { 1'b0, pixel[1:0], 3'b000 };
+		end
+
+		3'b11_1: begin // reduce 75% = 1/4
+			r <= { 2'b0, pixel[5:4], 2'b00 };
+			g <= { 2'b0, pixel[3:2], 2'b00 };
+			b <= { 2'b0, pixel[1:0], 2'b00 };
+		end
+	endcase
+end
+			
 assign addr_pixel = video_counter;
 
 endmodule

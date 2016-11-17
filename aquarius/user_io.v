@@ -38,7 +38,7 @@ module user_io #(parameter STRLEN=0) (
 	output      [1:0] switches,
 	output  				scandoubler_disable,
 
-	output reg [7:0]  status,
+	output reg [31:0]  status,
 
 	// connection to sd card emulation
 	input      [31:0] sd_lba,
@@ -357,7 +357,7 @@ always@(posedge SPI_SCK or posedge CONF_DATA0) begin
 							ps2_kbd_wptr <= ps2_kbd_wptr + 3'd1;
 						end
 				
-					8'h15: status <= dout;
+					8'h15: status[7:0] <= dout;
 				
 					// send SD config IO -> FPGA
 					// flag that download begins
@@ -391,6 +391,9 @@ always@(posedge SPI_SCK or posedge CONF_DATA0) begin
 
 					// notify image selection
 					8'h1c: mount_strobe <= 1'b1;
+
+					// status, 32bit version
+					8'h1e: if(byte_cnt<5) status[(byte_cnt-1)<<3 +:8] <= dout;
 
 					default: ;
 				endcase

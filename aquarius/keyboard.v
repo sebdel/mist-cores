@@ -8,7 +8,7 @@ module keyboard (
 	
 	// outputs
 	output reg [7:0] datao,
-	output int
+	output interrupt
 );
 
 wire [7:0] byte;
@@ -16,7 +16,7 @@ wire valid;
 wire error;
 
 reg [3:0] int_counter;
-assign int = (int_counter != 0);
+assign interrupt = (int_counter != 0);
 
 always @(posedge clk) begin
 	if(reset) begin
